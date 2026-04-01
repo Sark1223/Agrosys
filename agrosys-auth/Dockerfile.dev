@@ -1,0 +1,28 @@
+# agrosys-auth/Dockerfile.dev
+FROM eclipse-temurin:21-jdk
+WORKDIR /app
+
+# Instalamos Maven (si no está incluido en la imagen base)
+# eclipse-temurin no trae Maven, así que necesitamos instalarlo
+RUN apt-get update && apt-get install -y maven && rm -rf /var/lib/apt/lists/*
+
+# Copiamos archivos de configuración de Maven
+COPY pom.xml ./
+COPY .mvn .mvn
+COPY mvnw ./
+
+# Descargamos dependencias para cachearlas
+#RUN mvn dependency:go-offline
+RUN ./mvnw dependency:go-offline -B
+
+# Copiamos el código fuente
+COPY src ./src
+
+# Exponemos puertos
+EXPOSE 8083
+
+# Variable para habilitar DevTools
+ENV MAVEN_OPTS="-Dspring.devtools.restart.enabled=true"
+RUN chmod +x mvnw
+# Comando para desarrollo con hot reload
+CMD ["./mvnw", "spring-boot:run", "-Dspring-boot.run.profiles=docker"]

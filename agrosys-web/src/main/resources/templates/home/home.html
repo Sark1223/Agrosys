@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: html_head}"></head>
+
+<body>
+
+    <div class="d-flex vh-100">
+        <div th:replace="~{fragments :: sidebar}"></div>
+
+        <main class="content-area p-4 w-100 bg-light">
+            <header class="d-flex justify-content-between">
+                <h1>Bienvenid@!</h1>
+                <i class="ri-user-3-fill profile-icon"></i>
+            </header>
+            <p>Aquí tienes el estatus general. (:</p>
+
+            <div class="dashboard-cards">
+            </div>
+        </main>
+
+</body>
+
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="alert alert-dismissible alert-warning py-2 mt-4" th:if="${info}">
+            <button type="button" class="btn-close py-0 h-100" data-bs-dismiss="alert"></button>
+            <strong>Oh no!</strong> La sesión ha expirado :(
+        </div>
+        <h2>Iniciar sesión</h2>
+
+        <form method="post" action="/login">
+            <div class="input-group">
+                <label for="username">Nombre de usuario:</label>
+                <input type="text" name="username" placeholder="Ingrese su nombre de usuario" />
+            </div>
+            <div class="input-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" name="password" placeholder="Ingrese su contraseña" />
+            </div>
+            <!-- <div class="button-group">
+                <button class="btn-ingresar" type="submit">Ingresar</button>
+            </div> -->
+
+            <button class="btn-ingresar" type="submit">Ingresar</button>
+
+        </form>
+        <div class="alert alert-dismissible alert-danger py-2 mt-4" th:if="${error}">
+            <button type="button" class="btn-close py-0 h-100" data-bs-dismiss="alert"></button>
+            <strong>Oh no!</strong> Las credenciales son inválidas :(
+        </div>
+
+
+    </div>
+</body>
+
+</html>

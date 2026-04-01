@@ -1,0 +1,100 @@
+#version: '3.8'
+
+services:
+  # === BASE DE DATOS ===
+  mysql-auth:
+    image: mysql:8.0
+    container_name: agrosys-mysql-auth
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: agrosys_auth
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-auth-data:/var/lib/mysql
+    networks:
+      - agrosys-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  mysql-agrosys:
+    image: mysql:8.0
+    container_name: agrosys-mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root123}
+      MYSQL_DATABASE: agrosys_db
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql-agrosys-db-data:/var/lib/mysql
+    networks:
+      - agrosys-network
+
+  # === MICROSERVICIOS ===
+  agrosys-auth:
+    build: ./agrosys-auth
+    container_name: agrosys-auth
+    ports:
+      - "8083:8083"
+    environment:
+      # Estas variables SOBREESCRIBEN los valores por defecto en application.properties
+      DB_URL_AUTH: ${DB_URL_AUTH}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+    depends_on:
+      mysql-auth:
+        condition: service_healthy
+    networks:
+      - agrosys-network
+
+  # agrosys-crops:
+  #   build: ./agrosys-crops
+  #   container_name: agrosys-crops
+  #   ports:
+  #     - "8082:8082"
+  #   environment:
+  #     SPRING_PROFILES_ACTIVE: docker
+  #     SPRING_DATASOURCE_URL: jdbc:mysql://mysql-crops:3306/agrosys_crops?useSSL=false&serverTimezone=UTC
+  #     SPRING_DATASOURCE_USERNAME: root
+  #     SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root123}
+  #   depends_on:
+  #     - mysql-crops
+  #   networks:
+  #     - agrosys-network
+
+  agrosys-gateway:
+    build: ./agrosys-gateway
+    container_name: agrosys-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      AUTH_SERVICE_URL: http://agrosys-auth:8083
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      - agrosys-auth
+    networks:
+      - agrosys-network
+
+  agrosys-web:
+    build: ./agrosys-web
+    container_name: agrosys-web
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      GATEWAY_URL: http://agrosys-gateway:8080
+    networks:
+      - agrosys-network
+
+networks:
+  agrosys-network:
+    driver: bridge
+
+volumes:
+  mysql-auth-data:
+  mysql-agrosys-db-data:

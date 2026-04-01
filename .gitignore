@@ -1,0 +1,39 @@
+# IDEs y Editores
+.vscode/
+.idea/
+*.swp
+*.iml
+
+# Variables de Entorno
+.env
+.env.local
+.env.*.local
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Backend (Spring Boot / Java / Maven)
+**/target/
+**/build/
+*.jar
+*.war
+*.ear
+.mvn/wrapper/maven-wrapper.properties
+
+# Frontend (Node / Angular / React / Vue)
+**/node_modules/
+**/dist/
+**/build/
+**/out/
+.npm
+.eslintcache
+npm-debug.log*
+
+# Logs
+*.log
+logs/
+
+# Sistema Operativo
+.DS_Store
+Thumbs.db
