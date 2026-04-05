@@ -60,6 +60,32 @@ public interface UserRepository extends JpaRepository<AgrosysUser, Integer> {
                                         """, nativeQuery = true)
         UserCustom loadUserByUsername(String user);
 
+        interface getUser {
+                Integer getUserId();
+
+                String getUserName();
+
+                String getFirstName();
+
+                String getLastName();
+
+                Integer getRolId();
+
+                String getRolName();
+        }
+        @Query(value = """
+                        SELECT
+                                u.userId,
+                                u.username,
+                                u.firstName,
+                                u.lastName,
+                                r.rolId,
+                                r.name as rolName
+                        FROM agrosys_auth.USER u
+                        LEFT JOIN agrosys_auth.ROL r ON r.rolId = u.rolId;
+                                                """, nativeQuery = true)
+        List<getUser> findAllUsers();
+
         @Query(value = """
                         SELECT userId
                         FROM agrosys_auth.USER
@@ -74,12 +100,28 @@ public interface UserRepository extends JpaRepository<AgrosysUser, Integer> {
                         """, nativeQuery = true)
         Integer existsByUserName(String user);
 
+        @Query(value = """
+                        SELECT userId
+                        FROM agrosys_auth.USER
+                        WHERE userName = :user AND userId != :excludeUserId
+                        """, nativeQuery = true)
+        Integer existsByUserName(String user, Integer excludeUserId);
+
+
         @Modifying
         @Query(value = """
-                        INSERT INTO agrosys_auth.USER (userId, userName, password, rolId)
-                        VALUES (:userId, :userName, :password, :rolId)
+                        INSERT INTO agrosys_auth.USER (firstName, lastName, userName, password, rolId)
+                        VALUES (:firstName, :lastName, :userName, :password, :rolId)
                         """, nativeQuery = true)
-        Integer insertUser(Integer userId, String userName, String password, Integer rolId);
+        Integer insertUser(String firstName, String lastName, String userName, String password, Integer rolId);
+
+        @Modifying
+        @Query(value = """
+                        UPDATE agrosys_auth.USER
+                        SET firstName = :firstName, lastName = :lastName, userName = :userName, rolId = :rolId
+                        WHERE userId = :userId
+                        """, nativeQuery = true)
+        Integer updateUser(String firstName, String lastName, String userName, Integer rolId, Integer userId);
 
         @Transactional
         @Modifying

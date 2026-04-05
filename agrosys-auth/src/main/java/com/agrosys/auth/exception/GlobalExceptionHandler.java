@@ -1,6 +1,9 @@
 package com.agrosys.auth.exception;
 
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -10,9 +13,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import com.agrosys.auth.dto.Response;
+
+import lombok.extern.slf4j.Slf4j;
 
 @RestControllerAdvice
 @Slf4j
@@ -22,7 +25,7 @@ public class GlobalExceptionHandler {
      * Maneja errores de validación (@Valid)
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationExceptions(
+    public ResponseEntity<Response> handleValidationExceptions(
             MethodArgumentNotValidException ex) {
         
         Map<String, String> errors = new HashMap<>();
@@ -39,15 +42,20 @@ public class GlobalExceptionHandler {
                 .message("Error de validación en los campos")
                 .details(errors)
                 .build();
+        Response response = Response.builder()
+                .success(false)
+                .message("Error de validación en los campos")
+                .data(error)
+                .build();
         
-        return ResponseEntity.badRequest().body(error);
+        return ResponseEntity.ok(response);
     }
 
     /**
      * Maneja error de credenciales incorrectas
      */
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorResponse> handleBadCredentialsException(
+    public ResponseEntity<Response> handleBadCredentialsException(
             BadCredentialsException ex) {
         
         log.error("Intento de login fallido: {}", ex.getMessage());
@@ -59,14 +67,20 @@ public class GlobalExceptionHandler {
                 .message("Usuario o contraseña incorrectos")
                 .build();
         
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        Response response = Response.builder()
+                .success(false)
+                .message("Usuario o contraseña incorrectos")
+                .data(error)
+                .build();   
+        
+        return ResponseEntity.ok(response);
     }
 
     /**
      * Maneja error de usuario no encontrado
      */
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(
+    public ResponseEntity<Response> handleUsernameNotFoundException(
             UsernameNotFoundException ex) {
         
         ErrorResponse error = ErrorResponse.builder()
@@ -76,14 +90,20 @@ public class GlobalExceptionHandler {
                 .message(ex.getMessage())
                 .build();
         
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        Response response = Response.builder()
+                .success(false)
+                .message("Usuario no encontrado")
+                .data(error)
+                .build();
+        
+        return ResponseEntity.ok(response);
     }
 
     /**
      * Maneja errores de negocio (RuntimeException)
      */
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex) {
+    public ResponseEntity<Response> handleRuntimeException(RuntimeException ex) {
         
         log.error("Error inesperado: {}", ex.getMessage(), ex);
         
@@ -94,14 +114,21 @@ public class GlobalExceptionHandler {
                 .message(ex.getMessage())
                 .build();
         
-        return ResponseEntity.badRequest().body(error);
+        Response response = Response.builder()
+                .success(false)
+                .message(ex.getMessage())
+                .data(error)
+                .build();
+
+        return ResponseEntity.ok(response);
+
     }
 
     /**
      * Maneja cualquier otra excepción no contemplada
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
+    public ResponseEntity<Response> handleGenericException(Exception ex) {
         
         log.error("Error interno del servidor: {}", ex.getMessage(), ex);
         
@@ -112,6 +139,12 @@ public class GlobalExceptionHandler {
                 .message("Ha ocurrido un error interno en el servidor")
                 .build();
         
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        Response response = Response.builder()
+                .success(false)
+                .message("Ha ocurrido un error interno en el servidor")
+                .data(error)
+                .build();
+        
+        return ResponseEntity.ok(response);
     }
 }

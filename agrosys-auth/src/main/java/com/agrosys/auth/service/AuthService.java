@@ -8,17 +8,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.agrosys.auth.dto.LoginRequest;
 import com.agrosys.auth.dto.LoginResponse;
-import com.agrosys.auth.dto.RegisterRequest;
-import com.agrosys.auth.dto.RegisterResponse;
 import com.agrosys.auth.repository.UserRepository;
 import com.agrosys.auth.security.JwtService;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final JwtService tokenProvider;
     private final AuthenticationManager authenticationManager;
 
@@ -84,43 +79,4 @@ public class AuthService {
         return isValid;
     }
 
-    @Transactional
-    public RegisterResponse register(RegisterRequest request) {
-        log.info("[REQUEST] - request: {}", request);
-
-        if (userRepository.existsUserById(request.getUserId()) != null) {
-            log.warn("[FIELD VIOLATION] - El ID de usuario ya está en uso: {}", request.getUserId());
-            throw new RuntimeException("El ID de usuario ya está en uso");
-        }
-
-        if (userRepository.existsByUserName(request.getUserName()) != null) {
-            log.warn("[FIELD VIOLATION] - El nombre de usuario ya está en uso: {}", request.getUserName());
-            throw new RuntimeException("El nombre de usuario ya está en uso");
-        }
-
-        String encodedPassword = passwordEncoder.encode(request.getPassword());
-        Integer user = userRepository.insertUser(request.getUserId(), request.getUserName(), encodedPassword,
-                request.getRolId());
-
-        if (user == null || user == 0) {
-            log.error("[FAILED] - No se pudo registrar el usuario");
-            throw new RuntimeException("No se pudo registrar el usuario");
-        }
-
-        UserRepository.UserProjection savedUser = userRepository.findByUserName(request.getUserName());
-        if (savedUser == null) {
-            log.error("[FAILED] - Error al recuperar el usuario registrado: {}", request.getUserName());
-            throw new RuntimeException("No se pudo recuperar el usuario registrado");
-        }
-        log.info("[SUCCESS] - Usuario registrado exitosamente: {} con ID: {}",
-                savedUser.getNamePorfile(), savedUser.getUserId());
-
-        // 7. Construir respuesta
-        return RegisterResponse.builder()
-                .userId(savedUser.getUserId())
-                .userName(savedUser.getNamePorfile())
-                .message("Usuario registrado exitosamente")
-                .success(true)
-                .build();
-    }
 }

@@ -28,7 +28,7 @@
         </div>
         <h2>Iniciar sesión</h2>
 
-        <form method="post" action="/login">
+        <form method="post" th:href="@{/login}">
             <div class="input-group">
                 <label for="username">Nombre de usuario:</label>
                 <input type="text" name="username" placeholder="Ingrese su nombre de usuario" />

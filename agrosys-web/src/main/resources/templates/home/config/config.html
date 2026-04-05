@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: html_head}"></head>
+
+<body>
+
+    <div class="d-flex vh-100">
+        <div th:replace="~{fragments :: sidebar}"></div>
+
+        <main class="content-area p-4 w-100 bg-light">
+            <header class="d-flex justify-content-between">
+                <h1>Configuración</h1>
+                <i class="ri-user-3-fill profile-icon"></i>
+            </header>
+            <div class="page-content">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#usuarios" aria-selected="true"
+                            role="tab">Usuarios</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" data-bs-toggle="tab" href="#roles" aria-selected="false" role="tab"
+                            tabindex="-1">Roles</a>
+                    </li>
+                </ul>
+                <div id="myTabContent" class="tab-content">
+                    <div class="tab-pane fade active show" id="usuarios" role="tabpanel">
+                        <div class="options p-2 d-flex justify-content-end flex-nowrap">
+                            <button class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#modalAddUser">Agregar Usuario</button>
+                        </div>
+                        <div class="cards d-flex flex-wrap flex-row g-2" id="cardsContainer">
+                            <div class="card" style="width: 300px;">
+                                <div class="card-body d-flex flex-row justify-content-between align-items-start">
+                                    <div class="d-flex flex-column">
+                                        <h5 class="card-title">Usuario 1</h5>
+                                        <p class="card-text">Detalles del usuario 1.</p>
+                                    </div>
+                                    <div class="dropdown">
+                                        <i class="ri-more-2-fill" type="button" id="dropdownMenuButton2"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+
+                                        </i>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#"><i
+                                                        class="ri-pencil-fill pe-1"></i>Editar</a></li>
+                                            <li><a class="dropdown-item" href="#"><i
+                                                        class="ri-delete-bin-fill pe-1"></i>Eliminar</a></li>
+                                        </ul>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="roles" role="tabpanel">
+                        <p>Detalles de los roles.</p>
+
+                    </div>
+
+                </div>
+            </div>
+        </main>
+
+        <div class="modal fade" id="modalAddUser" tabindex="-1" aria-labelledby="modalAddUser" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Agregar Usuario</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/config/new-user}" id="addUserForm" class="needs-validation"
+                            novalidate>
+                            <div>
+                                <label for="nombreInput" class="form-label mt-4">Nombre <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nombreInput" name="nombre"
+                                    placeholder="Ingrese el nombre del usuario" autocomplete="off" required>
+                                <div class="invalid-feedback">El nombre es requerido</div>
+                            </div>
+                            <div>
+                                <label for="apellidoInput" class="form-label mt-4">Apellido <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="apellidoInput" name="apellido"
+                                    placeholder="Ingrese el apellido del usuario" autocomplete="off" required>
+                                <div class="invalid-feedback">El apellido es requerido</div>
+                            </div>
+
+                            <div>
+                                <label for="roleSelect" class="form-label mt-4">Rol <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="roleSelect" aria-label="Default select example"
+                                    name="role" required>
+                                    <option value="">-- Seleccione un rol --</option>
+                                    <option value="1">Super Admin</option>
+                                    <option value="2">Admin</option>
+                                    <option value="3">User</option>
+                                    <option value="4">Guest</option>
+                                    <option value="5">Blocked</option>
+                                </select>
+                                <div class="invalid-feedback">El rol es requerido</div>
+                            </div>
+                            <div>
+                                <label for="usernameInput" class="form-label mt-4">Nombre de usuario <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="usernameInput" autocomplete="off"
+                                    name="username" aria-describedby="userNameHelp" placeholder="Enter username"
+                                    required>
+                                <small id="userNameHelp" class="form-text text-muted">El nombre de usuario debe ser un
+                                    nombre único y servira para iniciar sesión.</small>
+                                <div class="invalid-feedback">El nombre de usuario es requerido</div>
+                            </div>
+                            <div>
+                                <label for="passwordInput" class="form-label mt-4">Password <span
+                                        class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="passwordInput" name="password"
+                                    aria-describedby="passwordHelp" placeholder="Password" autocomplete="off" required>
+                                <small id="passwordHelp" class="form-text text-muted">La contraseña debe tener al menos
+                                    8 caracteres.</small>
+                                <div class="invalid-feedback">La contraseña es requerida</div>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success"
+                            onclick="const $f = $('#addUserForm'); $.fn.postFormData($f, $f.attr('action'), '/agrosys/config')">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalEditUser" tabindex="-1" aria-labelledby="modalAddUser" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Usuario</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/config/edit-user}" id="editUserForm" class="needs-validation"
+                            novalidate>
+                            <input type="number" id="userIdInputEdit" name="userId" hidden>
+                            <div>
+                                <label for="nombreInput" class="form-label mt-4">Nombre <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nombreInputEdit" name="nombre"
+                                    placeholder="Ingrese el nombre del usuario" autocomplete="off" required>
+                                <div class="invalid-feedback">El nombre es requerido</div>
+                            </div>
+                            <div>
+                                <label for="apellidoInput" class="form-label mt-4">Apellido <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="apellidoInputEdit" name="apellido"
+                                    placeholder="Ingrese el apellido del usuario" autocomplete="off" required>
+                                <div class="invalid-feedback">El apellido es requerido</div>
+                            </div>
+
+                            <div>
+                                <label for="roleSelect" class="form-label mt-4">Rol <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="roleSelectEdit" aria-label="Default select example"
+                                    name="role" required>
+                                    <option value="">-- Seleccione un rol --</option>
+                                    <option value="1">Super Admin</option>
+                                    <option value="2">Admin</option>
+                                    <option value="3">User</option>
+                                    <option value="4">Guest</option>
+                                    <option value="5">Blocked</option>
+                                </select>
+                                <div class="invalid-feedback">El rol es requerido</div>
+                            </div>
+                            <div>
+                                <label for="usernameInput" class="form-label mt-4">Nombre de usuario <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="usernameInputEdit" autocomplete="off"
+                                    name="username" aria-describedby="userNameHelp" placeholder="Enter username"
+                                    required>
+                                <small id="userNameHelp" class="form-text text-muted">El nombre de usuario debe ser un
+                                    nombre único y servira para iniciar sesión.</small>
+                                <div class="invalid-feedback">El nombre de usuario es requerido</div>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success"
+                            onclick="const $fe = $('#editUserForm'); $.fn.postFormData($fe, $fe.attr('action'), '/agrosys/config')">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script th:src="@{/js/config/config.js}"></script>
+</body>
+
+</html>

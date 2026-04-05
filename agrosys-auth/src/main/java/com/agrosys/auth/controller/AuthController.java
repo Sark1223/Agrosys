@@ -3,9 +3,7 @@ package com.agrosys.auth.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,8 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.agrosys.auth.dto.LoginRequest;
 import com.agrosys.auth.dto.LoginResponse;
-import com.agrosys.auth.dto.RegisterRequest;
-import com.agrosys.auth.dto.RegisterResponse;
 import com.agrosys.auth.service.AuthService;
 
 import jakarta.validation.Valid;
@@ -36,14 +32,6 @@ public class AuthController {
         log.info("[REQUEST] - request: {}", request);
         LoginResponse response = authService.login(request);
         return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/register")
-    @PreAuthorize("hasAuthority('MODULE_USUARIOS')")
-    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
-        log.info("[REQUEST] - request: {}", request);
-        RegisterResponse response = authService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/validate")

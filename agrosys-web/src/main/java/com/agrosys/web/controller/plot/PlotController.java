@@ -1,10 +1,11 @@
-package com.agrosys.web.controller.parcelas;
+package com.agrosys.web.controller.plot;
 
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.agrosys.web.utils.JwtHelper;
 
@@ -13,13 +14,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Controller
+@RequestMapping("/plot")
 @RequiredArgsConstructor
 @Slf4j
 public class PlotController {
 
     private final JwtHelper jwtHelper;
 
-    @GetMapping("/plot")
+    @GetMapping("")
     public String loginPage(HttpSession session, Model model) {
 
         List<String> modules = jwtHelper.getUserModules(session);
@@ -28,7 +30,7 @@ public class PlotController {
 
 
         model.addAttribute("modules", modules);
-        return "home/parcelas/parcelas";
+        return "home/plot/plot";
     }
 
 }

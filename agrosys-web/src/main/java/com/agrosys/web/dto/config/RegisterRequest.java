@@ -1,4 +1,4 @@
-package com.agrosys.auth.dto;
+package com.agrosys.web.dto.config;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 public class RegisterRequest {
     private Integer userId; // Para identificar al usuario a actualizar, si es una actualización
-
+    
     @NotBlank(message = "El nombre es requerido")
     @Size(min = 3, max = 100, message = "El nombre debe tener entre 3 y 100 caracteres")
     private String firstName;
