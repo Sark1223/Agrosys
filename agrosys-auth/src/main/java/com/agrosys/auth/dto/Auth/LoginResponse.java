@@ -1,4 +1,4 @@
-package com.agrosys.auth.dto;
+package com.agrosys.auth.dto.Auth;
 
 import java.util.Date;
 import java.util.List;

@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.agrosys.auth.dto.LoginRequest;
-import com.agrosys.auth.dto.LoginResponse;
+import com.agrosys.auth.dto.Auth.LoginRequest;
+import com.agrosys.auth.dto.Auth.LoginResponse;
 import com.agrosys.auth.service.AuthService;
 
 import jakarta.validation.Valid;

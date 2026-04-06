@@ -1,7 +1,7 @@
-package com.agrosys.auth.dto;
+package com.agrosys.auth.dto.Auth;
 
-import lombok.Data;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 
 @Data
 public class LoginRequest {

@@ -10,8 +10,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.agrosys.auth.dto.LoginRequest;
-import com.agrosys.auth.dto.LoginResponse;
+import com.agrosys.auth.dto.Auth.LoginRequest;
+import com.agrosys.auth.dto.Auth.LoginResponse;
 import com.agrosys.auth.repository.UserRepository;
 import com.agrosys.auth.security.JwtService;
 

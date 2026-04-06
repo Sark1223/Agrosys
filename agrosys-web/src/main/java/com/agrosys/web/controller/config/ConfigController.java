@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.agrosys.web.dto.Response;
 import com.agrosys.web.dto.config.RegisterRequest;
+import com.agrosys.web.dto.config.UserPatch;
 import com.agrosys.web.utils.GatewayClient;
 import com.agrosys.web.utils.JwtHelper;
 
@@ -39,7 +40,8 @@ public class ConfigController {
     }
 
     @PostMapping("/new-user")
-    public ResponseEntity<Response> postUser(@RequestParam String nombre,
+    public ResponseEntity<Response> postUser(
+        @RequestParam String nombre,
             @RequestParam String apellido,
             @RequestParam String role,
             @RequestParam String username,
@@ -87,8 +89,8 @@ public class ConfigController {
 
     @PostMapping("/edit-user")
     public ResponseEntity<Response> updateUser(
-        @RequestParam Integer userId,
-        @RequestParam String nombre,
+            @RequestParam Integer userId,
+            @RequestParam String nombre,
             @RequestParam String apellido,
             @RequestParam String role,
             @RequestParam String username,
@@ -105,11 +107,62 @@ public class ConfigController {
         requestData.setFirstName(nombre);
         requestData.setLastName(apellido);
         requestData.setUserName(username);
-        requestData.setPassword("xxxxxxxx"); //Para reutilizar el DTO, aunque no se usará para actualizar la contraseña
+        requestData.setPassword("xxxxxxxx"); // Para reutilizar el DTO, aunque no se usará para actualizar la contraseña
         requestData.setRolId(Integer.valueOf(role));
 
-        Response response = gatewayClient.post("/api/users/update", requestData, Response.class,
+        Response response = gatewayClient.put("/api/users/update", requestData, Response.class,
                 session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta de la actualización: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/edit-password-user")
+    public ResponseEntity<Response> updateUser(
+            @RequestParam Integer userId,
+            @RequestParam String password,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_CONFIG"))
+            return ResponseEntity.status(403).build();
+
+        log.info("Actualizando usuario");
+        UserPatch requestData = new UserPatch();
+        requestData.setUserId(userId);
+        requestData.setPassword(password);
+
+        Response response = gatewayClient.patch(
+            "/api/users/update-password", 
+            requestData, 
+            Response.class,
+            session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta de la actualización: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/delete-user")
+    public ResponseEntity<Response> deleteUser(
+            @RequestParam Integer userId,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_CONFIG"))
+            return ResponseEntity.status(403).build();
+
+        log.info("Actualizando usuario");
+        UserPatch requestData = new UserPatch();
+        requestData.setUserId(userId);
+        requestData.setPassword("xxxxxxxx"); // Para reutilizar el DTO, aunque no se usará para actualizar la contraseña   
+        
+        Response response = gatewayClient.delete(
+            "/api/users/delete", 
+            requestData, 
+            Response.class,
+            session.getAttribute("JWT_TOKEN").toString());
 
         log.info("Respuesta de la actualización: {}", response);
 

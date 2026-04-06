@@ -1,4 +1,4 @@
-package com.agrosys.auth.dto;
+package com.agrosys.auth.dto.User;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

@@ -135,7 +135,7 @@
             </div>
         </div>
 
-        <div class="modal fade" id="modalEditUser" tabindex="-1" aria-labelledby="modalAddUser" aria-hidden="true">
+        <div class="modal fade" id="modalEditUser" tabindex="-1" aria-labelledby="modalEditUser" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -198,6 +198,72 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="modalEditPasswordUser" tabindex="-1" aria-labelledby="modalEditPasswordUser" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Contraseña</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/config/edit-password-user}" id="editPasswordForm" class="needs-validation"
+                            novalidate>
+                            <input type="number" id="userIdInputEditPassword" name="userId" hidden>                            
+                            <div>
+                                <label for="usernameInputEditPassword" class="form-label mt-4">Nombre de usuario</label>
+                                <input type="text" class="form-control" id="usernameInputEditPassword" autocomplete="off"
+                                    aria-describedby="userNameHelp" placeholder="Enter username"
+                                    disabled>
+                            </div>
+                            <div>
+                                <label for="passwordInputEditPassword" class="form-label mt-4">Nueva Contraseña<span
+                                        class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="passwordInputEditPassword" name="password"
+                                    aria-describedby="passwordHelp" placeholder="Password" autocomplete="off" required>
+                                <small id="passwordHelp" class="form-text text-muted">La contraseña debe tener al menos
+                                    8 caracteres.</small>
+                                <div class="invalid-feedback">La contraseña es requerida</div>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success"
+                            onclick="const $fep = $('#editPasswordForm'); $.fn.postFormData($fep, $fep.attr('action'), '/agrosys/config')">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalDeleteUser" tabindex="-1" aria-labelledby="modalDeleteUser" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content border-danger text-white bg-dark">
+                    <div class="modal-header border-danger">
+                        <h5 class="modal-title">Eliminar Usuario</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="textDelete">¿Está seguro de que desea eliminar al usuario?</p>
+                        <form method="post" th:action="@{/config/delete-user}" id="deleteUserForm" class="needs-validation"
+                            novalidate>
+                            <input type="number" id="userIdInputDelete" name="userId" hidden> 
+                        </form>
+                    </div>
+                    <div class="modal-footer border-danger fw-bolder">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger"
+                            onclick="const $fd = $('#deleteUserForm'); $.fn.postFormData($fd, $fd.attr('action'), '/agrosys/config')">
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script th:src="@{/js/config/config.js}"></script>
 </body>
 

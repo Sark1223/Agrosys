@@ -1,4 +1,4 @@
-package com.agrosys.auth.dto;
+package com.agrosys.auth.dto.User;
 
 import lombok.Builder;
 import lombok.Data;

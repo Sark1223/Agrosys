@@ -5,8 +5,9 @@ import java.util.List;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.agrosys.auth.dto.RegisterRequest;
-import com.agrosys.auth.dto.RegisterResponse;
+import com.agrosys.auth.dto.Response;
+import com.agrosys.auth.dto.User.RegisterRequest;
+import com.agrosys.auth.dto.User.RegisterResponse;
 import com.agrosys.auth.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
@@ -19,6 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+
+    public List<UserRepository.getUser> getAllUsers() {
+        return userRepository.findAllUsers();
+    }
 
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
@@ -55,10 +60,6 @@ public class UserService {
                 .build();
     }
 
-    public List<UserRepository.getUser> getAllUsers() {
-        return userRepository.findAllUsers();
-    }
-
     @Transactional
     public RegisterResponse updateUser(RegisterRequest request) {
         log.info("[REQUEST] - request: {}", request);
@@ -68,10 +69,10 @@ public class UserService {
             throw new RuntimeException("El nombre de usuario ya está en uso");
         }
 
-        Integer user = userRepository.updateUser(request.getFirstName(), request.getLastName(), request.getUserName(),
+        Integer update = userRepository.updateUser(request.getFirstName(), request.getLastName(), request.getUserName(),
                 request.getRolId(), request.getUserId());
 
-        if (user == null || user == 0) {
+        if (update == null || update == 0) {
             log.error("[FAILED] - Error al actualizar");
             throw new RuntimeException("No se pudo registrar el usuario");
         }
@@ -84,6 +85,60 @@ public class UserService {
                 .userName(request.getFirstName() + " " + request.getLastName())
                 .message("Usuario actualizado exitosamente")
                 .success(true)
+                .build();
+    }
+
+    @Transactional
+    public Response updatePasswordUser(Integer userId, String newPassword) {
+        log.info("[REQUEST] - userId: {}, newPassword: {}", userId, newPassword);
+
+        if(userId.equals(1))
+            return Response.builder()
+                    .success(false)
+                    .message("No se puede actualizar la contraseña del usuario administrador")
+                    .data(null)
+                    .build();
+
+        String encodedPassword = passwordEncoder.encode(newPassword);
+
+        Integer update = userRepository.updatePasswordUser(userId, encodedPassword);
+
+        if (update == null || update == 0) {
+            log.error("[FAILED] - Error al actualizar la contraseña");
+            throw new RuntimeException("No se pudo actualizar la contraseña");
+        }
+        // 7. Construir respuesta
+        return Response.builder()
+                .success(true)
+                .message("Contraseña de usuario actualizada exitosamente")
+                .data(update)
+                .build();
+    }
+
+    @Transactional
+    public Response deleteUser(Integer userId) {
+        log.info("[REQUEST] - request: {}", userId); 
+        
+        if(userId.equals(1))
+            return Response.builder()
+                    .success(false)
+                    .message("No se puede eliminar el usuario administrador")
+                    .data(null)
+                    .build();
+
+        Integer delete = userRepository.deleteUser(userId);
+        if (delete == null || delete == 0) {
+            log.error("[FAILED] - Error al eliminar el usuario");
+            throw new RuntimeException("No se pudo eliminar el usuario");
+        }
+
+        log.info("[SUCCESS] - Usuario eliminado exitosamente"); 
+        
+        // 7. Construir respuesta
+        return Response.builder()
+                .success(true)
+                .message("Usuario eliminado exitosamente")
+                .data(delete)
                 .build();
     }
 }

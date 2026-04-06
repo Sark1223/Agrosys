@@ -132,6 +132,23 @@ public interface UserRepository extends JpaRepository<AgrosysUser, Integer> {
                                                 """, nativeQuery = true)
         Integer updateTokenByUserName(String token, String userName);
 
+        @Transactional
+        @Modifying
+        @Query(value = """
+                        UPDATE agrosys_auth.`USER`
+                        SET password = :password
+                        WHERE userId = :userId
+                                                """, nativeQuery = true)
+        Integer updatePasswordUser(Integer userId, String password);
+
+        @Transactional
+        @Modifying
+        @Query(value = """
+                        DELETE FROM agrosys_auth.`USER`
+                        WHERE userId = :userId
+                                                """, nativeQuery = true)
+        Integer deleteUser(Integer userId);
+
         // Consulta para obtener los módulos a los que tiene acceso un rol específico
 
         @Query(value = """
