@@ -1,27 +1,20 @@
-# agrosys-web/Dockerfile.dev
 FROM eclipse-temurin:21-jdk
 WORKDIR /app
 
-# Instalamos Maven
-RUN apt-get update && apt-get install -y maven && rm -rf /var/lib/apt/lists/*
-
-# Copiamos archivos de configuración
-COPY pom.xml ./
+# Copiar el Maven Wrapper
+COPY mvnw .
 COPY .mvn .mvn
-COPY mvnw ./
+COPY pom.xml .
 
-# Descargamos dependencias
-#RUN mvn dependency:go-offline
+# Dar permisos de ejecución al wrapper
+RUN chmod +x mvnw
+
+# Descargar dependencias (esta capa se cachea si pom.xml no cambia)
 RUN ./mvnw dependency:go-offline -B
 
-# Copiamos código fuente
+# Copiar el código fuente
 COPY src ./src
-
-# Exponemos puerto
 EXPOSE 8081
 
-# Habilitamos DevTools
-ENV MAVEN_OPTS="-Dspring.devtools.restart.enabled=true"
-RUN chmod +x mvnw
-# Comando para desarrollo
+# Comando para desarrollo con perfil docker
 CMD ["./mvnw", "spring-boot:run", "-Dspring-boot.run.profiles=docker"]

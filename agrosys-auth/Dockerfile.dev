@@ -14,12 +14,7 @@ RUN ./mvnw dependency:go-offline -B
 
 # Copiar el código fuente
 COPY src ./src
-
-# Exponer puerto
 EXPOSE 8083
-
-# Variables para Spring DevTools (hot reload)
-ENV MAVEN_OPTS="-Dspring.devtools.restart.enabled=true"
 
 # Comando para desarrollo con perfil docker
 CMD ["./mvnw", "spring-boot:run", "-Dspring-boot.run.profiles=docker"]

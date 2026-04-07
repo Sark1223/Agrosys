@@ -1,7 +1,7 @@
 FROM eclipse-temurin:21-jdk
 WORKDIR /app
 
-# Copiar el Maven Wrapper (estos archivos SÍ existen en tu proyecto)
+# Copiar el Maven Wrapper
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
@@ -9,17 +9,12 @@ COPY pom.xml .
 # Dar permisos de ejecución al wrapper
 RUN chmod +x mvnw
 
-# Descargar dependencias (esto cachea las librerías)
+# Descargar dependencias (esta capa se cachea si pom.xml no cambia)
 RUN ./mvnw dependency:go-offline -B
 
 # Copiar el código fuente
 COPY src ./src
-
-# Exponer puerto
-EXPOSE 8083
-
-# Variables para Spring DevTools (hot reload)
-ENV MAVEN_OPTS="-Dspring.devtools.restart.enabled=true"
+EXPOSE 8084
 
 # Comando para desarrollo con perfil docker
 CMD ["./mvnw", "spring-boot:run", "-Dspring-boot.run.profiles=docker"]

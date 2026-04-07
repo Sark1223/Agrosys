@@ -25,7 +25,7 @@ public class PlotController {
         Response successResponse = Response.builder()
                 .success(true)
                 .message("Usuarios obtenidos exitosamente")
-                .data("plots obtenidos exitosamente (simulado)") // Aquí iría la lista real de usuarios
+                .data("plots obtenidos exitosamente (simuladoooo)") // Aquí iría la lista real de usuarios
                 .build();
         return ResponseEntity.ok(successResponse);
     }
