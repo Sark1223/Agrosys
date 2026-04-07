@@ -27,7 +27,7 @@
         <nav class="d-flex flex-column justify-content-center w-100 h-100 p-2 bg-dark gap-1">
             <a th:href="@{/home}" type="button"
                 class="text-decoration-none text-warning"><i class="ri-home-9-fill fs-5"></i></a>
-            <a th:href="@{/plot}" th:if="${#lists.contains(modules, 'MODULE_PARCELAS')}"
+            <a th:href="@{/plots}" th:if="${#lists.contains(modules, 'MODULE_PARCELAS')}"
                 class="text-decoration-none text-light"><i class="ri-plant-fill fs-5"></i></a>
             <a th:href="@{/transactions}" th:if="${#lists.contains(modules, 'MODULE_PARCELAS')}"
                 class="text-decoration-none text-light"><i class="ri-cash-line fs-5"></i></a>

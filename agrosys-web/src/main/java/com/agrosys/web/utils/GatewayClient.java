@@ -21,7 +21,7 @@ public class GatewayClient {
 
     private final WebClient.Builder webClientBuilder;
 
-    @Value("${gateway.base-url:http://localhost:8080}")
+    @Value("${gateway.base-url}")
     private String gatewayUrl;
 
     @SuppressWarnings("null")

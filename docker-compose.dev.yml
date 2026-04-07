@@ -22,7 +22,7 @@ services:
     image: mysql:8.0
     container_name: agrosys-mysql-db
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root123}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: agrosys_db
     ports:
       - "3308:3306"
@@ -30,6 +30,10 @@ services:
       - mysql-agrosys-db-data:/var/lib/mysql
     networks:
       - agrosys-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
 
   # === MICROSERVICIOS EN MODO DESARROLLO ===
   agrosys-auth:
@@ -66,7 +70,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
       AUTH_SERVICE_URL: http://agrosys-auth:8083
-      JWT_SECRET: ${JWT_SECRET}
+      #JWT_SECRET: ${JWT_SECRET}
     depends_on:
       - agrosys-auth
     networks:
@@ -87,7 +91,34 @@ services:
       - ./agrosys-web/target:/app/target
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      GATEWAY_URL: http://agrosys-gateway:8080
+      JWT_SECRET: ${JWT_SECRET}
+      GATEWAY_URL: ${GATEWAY_URL}
+    networks:
+      - agrosys-network
+
+  agrosys-plot:
+    build:
+      context: ./agrosys-plot
+      dockerfile: Dockerfile.dev  # Usamos Dockerfile de desarrollo
+    container_name: agrosys-plot
+    ports:
+      - "8084:8084"
+    volumes:
+      # Bind mount del código fuente para hot reload
+      - ./agrosys-plot/src:/app/src:delegated
+      - ./agrosys-plot/pom.xml:/app/pom.xml
+      # Opcional: montar el directorio de clases compiladas
+      - ./agrosys-plot/target:/app/target
+    environment:
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      mysql-agrosys:
+        condition: service_healthy
     networks:
       - agrosys-network
 
