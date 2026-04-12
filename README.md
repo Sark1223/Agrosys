@@ -43,4 +43,4 @@ Proyecto para la digitalización de procesos de agricultura
   - https://bootswatch.com/sandstone/ [^6]
 
   [^5]: GUIA DE APOYO SOBRE BOOTSRAP.
-  [^6]: LA VERSION INSTAKADA EN EL PROYECTO.
+  [^6]: LA VERSION INSTALADA EN EL PROYECTO.
