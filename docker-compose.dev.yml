@@ -49,6 +49,7 @@ services:
       - ./agrosys-auth/pom.xml:/app/pom.xml
       # Opcional: montar el directorio de clases compiladas
       - ./agrosys-auth/target:/app/target
+      - ./agrosys-auth/src/main/resources/db:/app/src/main/resources/db:delegated
     environment:
       DB_URL_AUTH: ${DB_URL_AUTH}
       DB_USERNAME: ${DB_USERNAME}
@@ -109,6 +110,8 @@ services:
       - ./agrosys-plot/pom.xml:/app/pom.xml
       # Opcional: montar el directorio de clases compiladas
       - ./agrosys-plot/target:/app/target
+      - ./agrosys-plot/src/main/resources/db:/app/src/main/resources/db:delegated
+  
     environment:
       DB_URL: ${DB_URL}
       DB_USERNAME: ${DB_USERNAME}
