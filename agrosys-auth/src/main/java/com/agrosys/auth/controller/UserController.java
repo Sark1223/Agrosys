@@ -35,7 +35,7 @@ public class UserController {
 
     @GetMapping("/get-all")
     @PreAuthorize("hasAuthority('MODULE_USUARIOS')")
-    public ResponseEntity<Object> getAllUsers() {
+    public ResponseEntity<Response> getAllUsers() {
         List<UserRepository.getUser> users = userService.getAllUsers();
         Response successResponse = Response.builder()
                 .success(true)

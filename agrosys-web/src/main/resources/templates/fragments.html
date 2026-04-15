@@ -29,11 +29,11 @@
                 class="text-decoration-none text-warning"><i class="ri-home-9-fill fs-5"></i></a>
             <a th:href="@{/plots}" th:if="${#lists.contains(modules, 'MODULE_PARCELAS')}"
                 class="text-decoration-none text-light"><i class="ri-plant-fill fs-5"></i></a>
-            <a th:href="@{/transactions}" th:if="${#lists.contains(modules, 'MODULE_PARCELAS')}"
+            <a th:href="@{/transactions}" th:if="${#lists.contains(modules, 'MODULE_FINANZAS')}"
                 class="text-decoration-none text-light"><i class="ri-cash-line fs-5"></i></a>
-            <a th:href="@{/workers}" th:if="${#lists.contains(modules, 'MODULE_PARCELAS')}"
+            <a th:href="@{/workers}" th:if="${#lists.contains(modules, 'MODULE_TRABAJADORES')}"
                 class="text-decoration-none text-light"><i class="ri-team-fill fs-5"></i></a>
-            <a th:href="@{/tasks}" th:if="${#lists.contains(modules, 'MODULE_PARCELAS')}"
+            <a th:href="@{/tasks}" th:if="${#lists.contains(modules, 'MODULE_TAREAS')}"
                 class="text-decoration-none text-light"><i class="ri-todo-fillfs-5"></i></a>
         </nav>
         <div class="footer-icons d-flex flex-column justify-content-center p-2 bg-dark">

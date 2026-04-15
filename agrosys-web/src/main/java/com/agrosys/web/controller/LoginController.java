@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.agrosys.web.dto.login.LoginResponse;
 import com.agrosys.web.utils.GatewayClient;
@@ -35,32 +36,37 @@ public class LoginController {
         if (expired != null) {
             model.addAttribute("info", "Tu sesión ha expirado.");
         }
-        
+
         return "login";
     }
 
     @PostMapping("/login")
     public String login(@RequestParam String username,
             @RequestParam String password,
-            Model model,
+            RedirectAttributes redirectAttributes,
             HttpSession session) {
         try {
             LoginResponse response = gatewayClient.login(username, password);
 
+            if (response == null || response.getToken() == null) {
+                log.warn("Respuesta de autenticación vacía para usuario: {}", username);
+                redirectAttributes.addFlashAttribute("error", "Credenciales inválidas");
+                return "redirect:/login";
+            }
             // Guardar token en sesión
             session.setAttribute("JWT_TOKEN", response.getToken());
             session.setAttribute("USERNAME", username);
             session.setAttribute("NAME", response.getUserName());
             session.setAttribute("USER_ID", response.getUserId());
 
-            log.info("Usuario {} autenticado correctamente", username, response);
+            log.info("Usuario {} autenticado correctamente: {}", username, response);
 
             return "redirect:/home";
 
         } catch (Exception e) {
             log.error("Error de autenticación para usuario: {}", username, e);
-            model.addAttribute("error", "Credenciales inválidas");
-            return "login";
+            redirectAttributes.addFlashAttribute("error", "Credenciales inválidas");
+            return "redirect:/login";
         }
     }
 

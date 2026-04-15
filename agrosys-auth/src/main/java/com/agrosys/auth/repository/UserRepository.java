@@ -115,6 +115,7 @@ public interface UserRepository extends JpaRepository<AgrosysUser, Integer> {
                         """, nativeQuery = true)
         Integer insertUser(String firstName, String lastName, String userName, String password, Integer rolId);
 
+        @Transactional
         @Modifying
         @Query(value = """
                         UPDATE agrosys_auth.USER

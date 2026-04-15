@@ -8,8 +8,8 @@ import lombok.Data;
 
 @Data
 public class UserPatch {
-    @NotNull(message = "El rol es requerido")
-    @Min(value = 2, message = "El rol debe ser mayor a 1")
+    @NotNull(message = "El usuario es requerido")
+    @Min(value = 2, message = "El usuario debe ser mayor a 1")
     private Integer userId;
 
     @NotBlank(message = "La contraseña es requerida")

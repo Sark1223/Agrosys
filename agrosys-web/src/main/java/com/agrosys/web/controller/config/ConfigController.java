@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.agrosys.web.dto.Response;
 import com.agrosys.web.dto.config.RegisterRequest;
+import com.agrosys.web.dto.config.RolRegister;
 import com.agrosys.web.dto.config.UserPatch;
 import com.agrosys.web.utils.GatewayClient;
 import com.agrosys.web.utils.JwtHelper;
@@ -28,20 +29,41 @@ public class ConfigController {
     private final JwtHelper jwtHelper;
     private final GatewayClient gatewayClient;
 
+    // @GetMapping("/{tab}")
     @GetMapping
-    public String loginPage(HttpSession session, Model model) {
+    public String configPage(@RequestParam(required = false, defaultValue = "usuarios") String tab, HttpSession session,
+            Model model) {
 
         List<String> modules = jwtHelper.getUserModules(session);
         if (!modules.contains("MODULE_CONFIG"))
             return "redirect:/access-denied";
 
         model.addAttribute("modules", modules);
+        model.addAttribute("activeTab", tab);
         return "home/config/config";
+    }
+
+    @GetMapping("/get-users")
+    public ResponseEntity<Response> getAllUsers(
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_CONFIG"))
+            return ResponseEntity.status(403).build();
+
+        log.info("Obteniendo lista de usuarios");
+
+        Response response = gatewayClient.get("/api/users/get-all", Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta del registro: {}", response);
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/new-user")
     public ResponseEntity<Response> postUser(
-        @RequestParam String nombre,
+            @RequestParam String nombre,
             @RequestParam String apellido,
             @RequestParam String role,
             @RequestParam String username,
@@ -62,24 +84,6 @@ public class ConfigController {
         requestData.setRolId(Integer.valueOf(role));
 
         Response response = gatewayClient.post("/api/users/register", requestData, Response.class,
-                session.getAttribute("JWT_TOKEN").toString());
-
-        log.info("Respuesta del registro: {}", response);
-
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/get-users")
-    public ResponseEntity<Response> getAllUsers(
-            HttpSession session) {
-
-        List<String> modules = jwtHelper.getUserModules(session);
-        if (!modules.contains("MODULE_CONFIG"))
-            return ResponseEntity.status(403).build();
-
-        log.info("Obteniendo lista de usuarios");
-
-        Response response = gatewayClient.get("/api/users/get-all", Response.class,
                 session.getAttribute("JWT_TOKEN").toString());
 
         log.info("Respuesta del registro: {}", response);
@@ -134,10 +138,10 @@ public class ConfigController {
         requestData.setPassword(password);
 
         Response response = gatewayClient.patch(
-            "/api/users/update-password", 
-            requestData, 
-            Response.class,
-            session.getAttribute("JWT_TOKEN").toString());
+                "/api/users/update-password",
+                requestData,
+                Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
 
         log.info("Respuesta de la actualización: {}", response);
 
@@ -156,16 +160,110 @@ public class ConfigController {
         log.info("Actualizando usuario");
         UserPatch requestData = new UserPatch();
         requestData.setUserId(userId);
-        requestData.setPassword("xxxxxxxx"); // Para reutilizar el DTO, aunque no se usará para actualizar la contraseña   
-        
+        requestData.setPassword("xxxxxxxx"); // Para reutilizar el DTO, aunque no se usará para actualizar la contraseña
+
         Response response = gatewayClient.delete(
-            "/api/users/delete", 
-            requestData, 
-            Response.class,
-            session.getAttribute("JWT_TOKEN").toString());
+                "/api/users/delete",
+                requestData,
+                Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
 
         log.info("Respuesta de la actualización: {}", response);
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/get-roles")
+    public ResponseEntity<Response> getAllRoles(
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_CONFIG"))
+            return ResponseEntity.status(403).build();
+
+        log.info("Obteniendo lista de roles");
+
+        Response response = gatewayClient.get("/api/roles/get-all", Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/new-role")
+    public ResponseEntity<Response> newRole(
+            @RequestParam String roleName,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) List<Integer> modulos,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_CONFIG"))
+            return ResponseEntity.status(403).build();
+
+        RolRegister requestData = new RolRegister();
+        requestData.setName(roleName);
+        requestData.setDescription(description);
+        requestData.setModulos(modulos);
+
+        log.info("Creando nuevo rol: {} - Description: {} - Modulos: {}", roleName, description, modulos);
+
+        Response response = gatewayClient.post("/api/roles/post", requestData,
+        Response.class,
+        session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/edit-role")
+    public ResponseEntity<Response> editRole(
+            @RequestParam Integer roleId,
+            @RequestParam String roleName,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) List<Integer> modulos,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_CONFIG"))
+            return ResponseEntity.status(403).build();
+
+        RolRegister requestData = new RolRegister();
+        requestData.setName(roleName);
+        requestData.setDescription(description);
+        requestData.setModulos(modulos);
+
+        log.info("Creando nuevo rol: {} - Description: {} - Modulos: {}", roleName, description, modulos);
+
+        Response response = gatewayClient.put("/api/roles/update/" + roleId, requestData,
+        Response.class,
+        session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/delete-role")
+    public ResponseEntity<Response> deleteRole(
+            @RequestParam Integer roleId,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_CONFIG"))
+            return ResponseEntity.status(403).build();
+
+        log.info("Actualizando rol");
+        Response response = gatewayClient.delete(
+                "/api/roles/delete/" + roleId,
+                Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta de la actualización: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
 }

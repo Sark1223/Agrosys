@@ -11,27 +11,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "USER")
+@Table(name = "ROL")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AgrosysUser {
-    
+public class AgrosysRol {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "userId")
-    private Integer userId;
-    
-    @Column(name = "userName", unique = true, nullable = false, length = 50)
-    private String userName;
-    
-    @Column(name = "password", nullable = false)
-    private String password;
-    
-    @Column(name = "token")
-    private String token;
-    
     @Column(name = "rolId")
     private Integer rolId;
-    
+
+    @Column(name = "name", unique = true, nullable = false, length = 50)
+    private String name;
+
+    @Column(name = "description", nullable = true, length = 100)
+    private String description;
 }

@@ -109,4 +109,15 @@ public class GatewayClient {
                 .bodyToMono(responseType)
                 .block();
     }
+
+    @SuppressWarnings("null")
+    public <T> T delete(String path, Class<T> responseType, String token) {
+        return webClientBuilder.build()
+                .delete()
+                .uri(gatewayUrl + path)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .retrieve()
+                .bodyToMono(responseType)
+                .block();
+    }
 }
