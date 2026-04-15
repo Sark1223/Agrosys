@@ -14,6 +14,7 @@ public class WebConfig implements WebMvcConfigurer {
     
     private final JwtInterceptor jwtInterceptor;
     
+    @SuppressWarnings("null")
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtInterceptor)

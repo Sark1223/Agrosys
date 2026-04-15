@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @Slf4j
-public class UserController {
+public class AgrosysUserController {
     private final UserService userService;
 
     @GetMapping("/get-all")

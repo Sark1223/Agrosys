@@ -125,6 +125,89 @@ services:
     networks:
       - agrosys-network
 
+  agrosys-worker:
+    build:
+      context: ./agrosys-worker
+      dockerfile: Dockerfile.dev  # Usamos Dockerfile de desarrollo
+    container_name: agrosys-worker
+    ports:
+      - "8085:8085"
+    volumes:
+      # Bind mount del código fuente para hot reload
+      - ./agrosys-worker/src:/app/src:delegated
+      - ./agrosys-worker/pom.xml:/app/pom.xml
+      # Opcional: montar el directorio de clases compiladas
+      - ./agrosys-worker/target:/app/target
+      - ./agrosys-worker/src/main/resources/db:/app/src/main/resources/db:delegated
+  
+    environment:
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      mysql-agrosys:
+        condition: service_healthy
+    networks:
+      - agrosys-network
+
+  agrosys-transaction:
+    build:
+      context: ./agrosys-transaction
+      dockerfile: Dockerfile.dev  # Usamos Dockerfile de desarrollo
+    container_name: agrosys-transaction
+    ports:
+      - "8086:8086"
+    volumes:
+      # Bind mount del código fuente para hot reload
+      - ./agrosys-transaction/src:/app/src:delegated
+      - ./agrosys-transaction/pom.xml:/app/pom.xml
+      # Opcional: montar el directorio de clases compiladas
+      - ./agrosys-transaction/target:/app/target
+      - ./agrosys-transaction/src/main/resources/db:/app/src/main/resources/db:delegated
+  
+    environment:
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      mysql-agrosys:
+        condition: service_healthy
+    networks:
+      - agrosys-network
+
+  agrosys-task:
+    build:
+      context: ./agrosys-task
+      dockerfile: Dockerfile.dev  # Usamos Dockerfile de desarrollo
+    container_name: agrosys-task
+    ports:
+      - "8087:8087"
+    volumes:
+      # Bind mount del código fuente para hot reload
+      - ./agrosys-task/src:/app/src:delegated
+      - ./agrosys-task/pom.xml:/app/pom.xml
+      # Opcional: montar el directorio de clases compiladas
+      - ./agrosys-task/target:/app/target
+      - ./agrosys-task/src/main/resources/db:/app/src/main/resources/db:delegated
+  
+    environment:
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      mysql-agrosys:
+        condition: service_healthy
+    networks:
+      - agrosys-network
 networks:
   agrosys-network:
     driver: bridge

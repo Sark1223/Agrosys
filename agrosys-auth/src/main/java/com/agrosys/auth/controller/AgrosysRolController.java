@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/roles")
 @RequiredArgsConstructor
 @Slf4j
-public class RolController {
+public class AgrosysRolController {
 
     private final RolService rolService;
     

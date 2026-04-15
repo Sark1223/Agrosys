@@ -18,6 +18,7 @@ public class JwtInterceptor implements HandlerInterceptor {
     @Autowired
     private JwtHelper jwtHelper;
 
+    @SuppressWarnings("null")
     @Override
     public boolean preHandle(HttpServletRequest request,
             HttpServletResponse response,

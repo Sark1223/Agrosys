@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/plot")
 @RequiredArgsConstructor
 @Slf4j
-public class PlotController {
+public class AgrosysPlotController {
 
     @GetMapping("/get-all")
     // @PreAuthorize("hasAuthority('MODULE_USUARIOS')")

@@ -9,7 +9,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.agrosys.web.dto.login.LoginResponse;
 import com.agrosys.web.utils.GatewayClient;
-import com.agrosys.web.utils.JwtHelper;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 public class LoginController {
 
     private final GatewayClient gatewayClient;
-    private final JwtHelper jwtHelper;
 
     @GetMapping("/login")
     public String loginPage(
