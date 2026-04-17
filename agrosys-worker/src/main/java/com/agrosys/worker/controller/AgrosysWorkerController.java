@@ -30,7 +30,7 @@ public class AgrosysWorkerController {
     private final WorkerService workerService;
 
     @GetMapping("/get-all")
-    @PreAuthorize("hasAuthority('MODULE_WORKERS')")
+    @PreAuthorize("hasAuthority('MODULE_TRABAJADORES')")
     public ResponseEntity<Response> getAllWorkers() {
         List<WorkerRepository.WorkerProjection> workers = workerService.getAllWorkers();
         Response successResponse = Response.builder()
@@ -42,7 +42,7 @@ public class AgrosysWorkerController {
     }
 
     @PostMapping("/register")
-    @PreAuthorize("hasAuthority('MODULE_WORKERS')")
+    @PreAuthorize("hasAuthority('MODULE_TRABAJADORES')")
     public ResponseEntity<Response> createWorker(@Valid @RequestBody WorkerRequest request) {
         log.info("[REQUEST] - request: {}", request);
         WorkerResponse response = workerService.crearWorker(request);
