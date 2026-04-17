@@ -35,9 +35,9 @@ public class RolService {
             throw new IllegalArgumentException("El nombre del rol ya existe");
         }
 
-        Integer rolId = rolRepository.insertRol(request.getName(), request.getDescription());
+        Integer rolId = insertRol(request);
 
-        if (rolId == null || rolId == 0) {
+        if (rolId.equals(0)) {
             throw new RuntimeException("No se pudo registrar el rol");
         }
 
@@ -126,7 +126,7 @@ public class RolService {
         }
 
         Integer userWithRol = rolRepository.existsUserWithRol(rolId);
-        if (userWithRol == null || userWithRol > 0) {
+        if (userWithRol != null) {
             throw new RuntimeException("No se puede eliminar el rol porque está en uso");
         }
 
@@ -140,4 +140,14 @@ public class RolService {
                 .build();
     }
 
+    @Transactional
+    public Integer insertRol(RolRegister request){
+        Integer rol = rolRepository.insertRol(request.getName(), request.getDescription());
+
+        if(rol != null){
+            return rolRepository.getLastInsert();
+        }
+
+        return 0;
+    }
 }

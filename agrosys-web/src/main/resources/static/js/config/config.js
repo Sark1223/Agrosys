@@ -52,7 +52,7 @@ function getActiveTab() {
     return 'usuarios';
 }
 
-$.fn.getAllUsers = function () {
+$.fn.getAllPlots = function () {
 
     $.ajax({
         url: '/agrosys/config/get-users',
@@ -260,6 +260,6 @@ $.fn.getAllRoles = function () {
     });
 };
 
-$.fn.getAllUsers(); // Llamada inicial para obtener los usuarios al cargar la página
+$.fn.getAllPlots(); // Llamada inicial para obtener los usuarios al cargar la página
 $.fn.getAllRoles(); // Llamada inicial para obtener los roles al cargar la página
 

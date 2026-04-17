@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    
+    <div th:fragment="plotModals">
+        <div class="modal fade" id="modalAddPlot" tabindex="-1" aria-labelledby="modalAddPlot" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Agregar Parcela</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/new-plot}" id="addPlotForm" class="needs-validation"
+                            novalidate>
+                            <div>
+                                <label for="nombrePlotInput" class="form-label mt-4">Nombre <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nombrePlotInput" name="plotName"
+                                    minlength="2" maxlength="50" placeholder="Ingrese el nombre de la parcela"
+                                    autocomplete="off" required>
+                                <div class="invalid-feedback">El nombre es requerido</div>
+                            </div>
+                            <div>
+                                <label for="descripcionPlotInput" class="form-label mt-4">Descripción </label>
+                                <input type="text" class="form-control" id="descripcionPlotInput" name="description"
+                                    maxlength="100" placeholder="Ingrese la descripción de la parcela" autocomplete="off">
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-add-plot">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalEditPlot" tabindex="-1" aria-labelledby="modalEditPlotLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Parcela</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/edit-plot}" id="editPlotForm" class="needs-validation"
+                            novalidate>
+                            <input type="number" id="plotIdInputEdit" name="plotId" hidden required>
+                            <div>
+                                <label for="nombrePlotInputEdit" class="form-label mt-4">Nombre <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nombrePlotInputEdit" name="plotName"
+                                    minlength="2" maxlength="50" placeholder="Ingrese el nombre de la parcela"
+                                    autocomplete="off" required>
+                                <div class="invalid-feedback">El nombre es requerido</div>
+                            </div>
+                            <div>
+                                <label for="descripcionPlotInputEdit" class="form-label mt-4">Descripción </label>
+                                <input type="text" class="form-control" id="descripcionPlotInputEdit" name="description"
+                                    maxlength="100" placeholder="Ingrese la descripción de la parcela" autocomplete="off">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-edit-plot">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalDeletePlot" tabindex="-1" aria-labelledby="modalDeleteUser" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content border-danger text-white bg-dark">
+                    <div class="modal-header border-danger">
+                        <h5 class="modal-title">Eliminar Parcela</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="textDeletePlot">¿Está seguro de que desea eliminar la parcela?</p>
+                        <form method="post" th:action="@{/plots/delete-plot}" id="deletePlotForm"
+                            class="needs-validation" novalidate>
+                            <input type="number" id="plotIdInputDelete" name="plotId" hidden required>
+                        </form>
+                    </div>
+                    <div class="modal-footer border-danger fw-bolder">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" id="btn-submit-delete-plot">
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
