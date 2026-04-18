@@ -29,7 +29,7 @@
                         th:classappend="${activeTab == 'usuarios'} ? 'show active' : ''">
                         <div class="options p-2 d-flex justify-content-end flex-nowrap">
                             <button class="btn btn-primary" data-bs-toggle="modal"
-                                data-bs-target="#modalAddUser">Agregar Worker</button>
+                                data-bs-target="#modalAddUser">Agregar Trabajador</button>
                         </div>
                         <div class="cards d-flex flex-wrap flex-row g-2" id="cardsContainerUsers">
                             <!-- Se carga por JavaScript -->
@@ -142,7 +142,7 @@
                 </div>
             </div>
         </div>
-        
+
         <script th:src="@{/js/workers/worker.js}"></script>
 </body>
 

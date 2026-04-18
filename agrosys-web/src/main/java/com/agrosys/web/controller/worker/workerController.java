@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -98,6 +99,39 @@ public class workerController {
             log.error("[FAILED] - Error al registrar worker: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("success", false, "message", "Error al registrar worker"));
+        }
+    }
+
+    @DeleteMapping("/delete")
+    @ResponseBody
+    public ResponseEntity<Object> deleteWorker(@RequestBody Map<String, Integer> body, HttpSession session) {
+        try {
+            String token = (String) session.getAttribute("JWT_TOKEN");
+            Integer workerId = body.get("userId");  // ← viene del frontend con clave "userId"
+            log.info("Intentando eliminar worker con ID: {}", workerId);
+
+            if (workerId == null) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("success", false, "message", "ID del worker no proporcionado"));
+            }
+
+            // Crear un nuevo mapa con la clave que espera el worker microservice
+            Map<String, Integer> requestBody = Map.of("id", workerId);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(token);
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<Map<String, Integer>> entity = new HttpEntity<>(requestBody, headers);
+
+            return restTemplate.exchange(
+                    gatewayBaseUrl + "/api/workers/delete",
+                    HttpMethod.DELETE,
+                    entity,
+                    Object.class);
+        } catch (RestClientException e) {
+            log.error("[FAILED] - Error al eliminar worker: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "message", "Error al eliminar worker: " + e.getMessage()));
         }
     }
 }

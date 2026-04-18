@@ -56,4 +56,12 @@ public class WorkerService {
                 .success(true)
                 .build();
     }
+
+    @Transactional
+    public void deleteWorker(Integer workerId) {
+        if (workerRepository.countById(workerId) == 0) {
+            throw new RuntimeException("Worker no encontrado con ID: " + workerId);
+        }
+        workerRepository.deleteWorkerById(workerId);
+    }
 }
