@@ -3,6 +3,7 @@ package com.agrosys.task.dto;
 import java.time.LocalDate;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -16,11 +17,13 @@ public class TaskRequest {
     @Size(max = 256, message = "La descripción no puede superar 256 caracteres")
     private String description;
 
+    @NotNull(message = "La fecha de creación es obligatoria")
     private LocalDate createAt;
 
     private LocalDate endAt;
 
     private Integer taskStageId;
 
+    @NotNull(message = "El ID del plantío es obligatorio")
     private Integer plantationId;
 }
