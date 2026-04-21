@@ -32,7 +32,14 @@ public class WorkerService {
             throw new RuntimeException("El nombre del worker ya está en uso");
         }
 
-        Integer worker = workerRepository.insertWorker(request.getName(), request.getNotas());
+        String notas = request.getNotas() != null ? request.getNotas() : null;
+        String photo = request.getPhoto() != null ? request.getPhoto() : null;
+
+        Integer worker = workerRepository.insertWorker(
+                request.getName(),
+                notas,
+                request.getSalary(),
+                photo);
 
         if (worker == null || worker == 0) {
             log.error("[FAILED] - No se pudo registrar el worker");
@@ -52,6 +59,8 @@ public class WorkerService {
                 .workerId(saved.getWorkerId())
                 .name(saved.getName())
                 .notas(saved.getNotas())
+                .salary(saved.getSalary())
+                .photo(saved.getPhoto())
                 .message("Worker registrado exitosamente")
                 .success(true)
                 .build();
@@ -63,5 +72,54 @@ public class WorkerService {
             throw new RuntimeException("Worker no encontrado con ID: " + workerId);
         }
         workerRepository.deleteWorkerById(workerId);
+    }
+
+    @Transactional
+    public WorkerResponse actualizarWorker(Integer workerId, WorkerRequest request) {
+        log.info("[REQUEST UPDATE] - workerId: {}, request: {}", workerId, request);
+
+        if (workerRepository.countById(workerId) == 0) {
+            throw new RuntimeException("Worker no encontrado con ID: " + workerId);
+        }
+
+        Integer existingName = workerRepository.existsByNameExcludingId(request.getName(), workerId);
+        if (existingName != null) {
+            log.warn("[FIELD VIOLATION] - El nombre del worker ya está en uso: {}", request.getName());
+            throw new RuntimeException("El nombre del worker ya está en uso");
+        }
+
+        String notas = request.getNotas() != null ? request.getNotas() : null;
+        String photo = request.getPhoto() != null ? request.getPhoto() : null;
+
+        Integer updated = workerRepository.updateWorker(
+                workerId,
+                request.getName(),
+                notas,
+                request.getSalary(),
+                photo);
+
+        if (updated == null || updated == 0) {
+            log.error("[FAILED] - No se pudo actualizar el worker");
+            throw new RuntimeException("No se pudo actualizar el worker");
+        }
+
+        WorkerRepository.WorkerProjection saved = workerRepository.findByName(request.getName());
+        if (saved == null) {
+            log.error("[FAILED] - Error al recuperar el worker actualizado: {}", request.getName());
+            throw new RuntimeException("No se pudo recuperar el worker actualizado");
+        }
+
+        log.info("[SUCCESS] - Worker actualizado exitosamente: {} con ID: {}",
+                saved.getName(), saved.getWorkerId());
+
+        return WorkerResponse.builder()
+                .workerId(saved.getWorkerId())
+                .name(saved.getName())
+                .notas(saved.getNotas())
+                .salary(saved.getSalary())
+                .photo(saved.getPhoto())
+                .message("Worker actualizado exitosamente")
+                .success(true)
+                .build();
     }
 }

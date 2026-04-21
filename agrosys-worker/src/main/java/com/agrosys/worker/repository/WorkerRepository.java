@@ -22,13 +22,19 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
         String getName();
 
         String getNotas();
+
+        java.math.BigDecimal getSalary();
+
+        String getPhoto();
     }
 
     @Query(value = """
             SELECT
                 w.workerId,
                 w.name,
-                w.notas
+                w.notas,
+                w.salary,
+                w.photo
             FROM agrosys_worker.WORKER w
             WHERE w.name = :name
             """, nativeQuery = true)
@@ -38,7 +44,9 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
             SELECT
                 w.workerId,
                 w.name,
-                w.notas
+                w.notas,
+                w.salary,
+                w.photo
             FROM agrosys_worker.WORKER w
             """, nativeQuery = true)
     List<WorkerProjection> findAllWorkers();
@@ -53,10 +61,10 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
     @Modifying
     @Transactional
     @Query(value = """
-            INSERT INTO agrosys_worker.WORKER (name, notas)
-            VALUES (:name, :notas)
+            INSERT INTO agrosys_worker.WORKER (name, notas, salary, photo)
+            VALUES (:name, :notas, :salary, :photo)
             """, nativeQuery = true)
-    Integer insertWorker(String name, String notas);
+    Integer insertWorker(String name, String notas, java.math.BigDecimal salary, String photo);
 
     @Modifying
     @Transactional
@@ -65,4 +73,18 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
 
     @Query(value = "SELECT COUNT(*) FROM agrosys_worker.WORKER WHERE workerId = :id", nativeQuery = true)
     int countById(@Param("id") Integer id);
+
+    @Query(value = "SELECT workerId FROM agrosys_worker.WORKER WHERE name = :name AND workerId != :excludeId", nativeQuery = true)
+    Integer existsByNameExcludingId(@Param("name") String name, @Param("excludeId") Integer excludeId);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            UPDATE agrosys_worker.WORKER 
+            SET name = :name, notas = :notas, salary = :salary, photo = :photo
+            WHERE workerId = :id
+            """, nativeQuery = true)
+    Integer updateWorker(@Param("id") Integer id, @Param("name") String name, 
+            @Param("notas") String notas, @Param("salary") java.math.BigDecimal salary, 
+            @Param("photo") String photo);
 }

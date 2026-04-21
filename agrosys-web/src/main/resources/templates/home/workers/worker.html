@@ -67,14 +67,24 @@
                                 <div class="invalid-feedback">El nombre es requerido</div>
                             </div>
                             <div>
-                                <label for="apellidoInput" class="form-label mt-4">Notas <span
-                                        class="text-danger">*</span></label>
+                                <label for="apellidoInput" class="form-label mt-4">Notas</label>
                                 <input type="text" class="form-control" id="apellidoInput" name="apellido" minlength="3"
-                                    maxlength="100" placeholder="Ingrese el apellido del usuario" autocomplete="off"
-                                    required>
-                                <div class="invalid-feedback">Las notas son requeridas</div>
+                                    maxlength="100" placeholder="Ingrese notas del trabajador (opcional)" autocomplete="off">
                             </div>
-
+                            <div>
+                                <label for="salaryInput" class="form-label mt-4">Salario <span
+                                        class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="salaryInput" name="salary" 
+                                    min="0" step="0.01" placeholder="Ingrese el salario del trabajador" autocomplete="off"
+                                    required>
+                                <div class="invalid-feedback">El salario es requerido</div>
+                            </div>
+                            <div>
+                                <label for="photoInput" class="form-label mt-4">Foto de Perfil</label>
+                                <input type="file" class="form-control" id="photoInput" name="photo" 
+                                    accept="image/*">
+                                <div class="form-text">Seleccione una imagen (opcional)</div>
+                            </div>
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -97,16 +107,35 @@
                     <div class="modal-body">
                         <form method="post" th:action="@{/config/edit-user}" id="editUserForm" class="needs-validation"
                             novalidate>
-                            <input type="number" id="userIdInputEdit" name="userId" hidden>
+                            <input type="number" id="workerIdInputEdit" name="workerId" hidden>
                             <div>
-                                <label for="nombreInput" class="form-label mt-4">Nombre <span
+                                <label for="nombreInputEdit" class="form-label mt-4">Nombre <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="nombreInputEdit" name="nombre" minlength="3"
                                     maxlength="100" placeholder="Ingrese el nombre del usuario" autocomplete="off"
                                     required>
                                 <div class="invalid-feedback">El nombre es requerido</div>
                             </div>
-                            
+                            <div>
+                                <label for="notasInputEdit" class="form-label mt-4">Notas</label>
+                                <input type="text" class="form-control" id="notasInputEdit" name="notas" 
+                                    maxlength="255" placeholder="Ingrese notas del trabajador (opcional)" autocomplete="off">
+                            </div>
+                            <div>
+                                <label for="salaryInputEdit" class="form-label mt-4">Salario <span
+                                        class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="salaryInputEdit" name="salary" 
+                                    min="0" step="0.01" placeholder="Ingrese el salario del trabajador" autocomplete="off"
+                                    required>
+                                <div class="invalid-feedback">El salario es requerido</div>
+                            </div>
+                            <div>
+                                <label for="photoInputEdit" class="form-label mt-4">Foto de Perfil</label>
+                                <input type="file" class="form-control" id="photoInputEdit" name="photo" 
+                                    accept="image/*">
+                                <div class="form-text">Seleccione una nueva imagen para reemplazar la actual (opcional)</div>
+                                <div id="currentPhotoPreview" class="mt-2"></div>
+                            </div>
                         </form>
                     </div>
                     <div class="modal-footer">

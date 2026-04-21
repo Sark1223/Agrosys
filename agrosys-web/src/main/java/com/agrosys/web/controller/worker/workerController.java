@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -113,6 +114,26 @@ public class workerController {
             log.error("[FAILED] - Error al eliminar worker: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("success", false, "message", "Error al eliminar worker: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/update")
+    @ResponseBody
+    public ResponseEntity<Object> updateWorker(@RequestBody Map<String, Object> body, HttpSession session) {
+        try {
+            String token = (String) session.getAttribute("JWT_TOKEN");
+
+            Object response = gatewayClient.put(
+                    "/api/workers/update",
+                    body,
+                    Object.class,
+                    token);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("[FAILED] - Error al actualizar worker: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "message", "Error al actualizar worker"));
         }
     }
 }
