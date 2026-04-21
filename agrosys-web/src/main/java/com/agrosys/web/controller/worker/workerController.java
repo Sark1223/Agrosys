@@ -3,12 +3,7 @@ package com.agrosys.web.controller.worker;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,9 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
+import com.agrosys.web.utils.GatewayClient;
 import com.agrosys.web.utils.JwtHelper;
 
 import jakarta.servlet.http.HttpSession;
@@ -34,11 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class workerController {
 
-    private final RestTemplate restTemplate;
+    private final GatewayClient gatewayClient;
     private final JwtHelper jwtHelper;
-
-    @Value("${gateway.base-url}")
-    private String gatewayBaseUrl;
 
     @GetMapping
     public String workersPage(
@@ -46,7 +37,7 @@ public class workerController {
             HttpSession session, Model model) {
 
         List<String> modules = jwtHelper.getUserModules(session);
-        log.info("[MODULES] - Módulos del usuario: {}", modules); // 👈 agrega esto
+        log.info("[MODULES] - Módulos del usuario: {}", modules);
 
         if (!modules.contains("MODULE_TRABAJADORES")) {
             return "redirect:/access-denied";
@@ -61,18 +52,15 @@ public class workerController {
     @ResponseBody
     public ResponseEntity<Object> getAllWorkers(HttpSession session) {
         try {
-            String token = (String) session.getAttribute("JWT_TOKEN"); // ✅
+            String token = (String) session.getAttribute("JWT_TOKEN");
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(token);
-            HttpEntity<Void> entity = new HttpEntity<>(headers);
+            Object response = gatewayClient.get(
+                    "/api/workers/get-all",
+                    Object.class,
+                    token);
 
-            return restTemplate.exchange(
-                    gatewayBaseUrl + "/api/workers/get-all",
-                    HttpMethod.GET,
-                    entity,
-                    Object.class);
-        } catch (RestClientException e) {
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
             log.error("[FAILED] - Error al obtener workers: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("success", false, "message", "Error al obtener workers"));
@@ -83,19 +71,16 @@ public class workerController {
     @ResponseBody
     public ResponseEntity<Object> registerWorker(@RequestBody Map<String, String> body, HttpSession session) {
         try {
-            String token = (String) session.getAttribute("JWT_TOKEN"); // ✅
+            String token = (String) session.getAttribute("JWT_TOKEN");
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(token);
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Map<String, String>> entity = new HttpEntity<>(body, headers);
+            Object response = gatewayClient.post(
+                    "/api/workers/register",
+                    body,
+                    Object.class,
+                    token);
 
-            return restTemplate.exchange(
-                    gatewayBaseUrl + "/api/workers/register",
-                    HttpMethod.POST,
-                    entity,
-                    Object.class);
-        } catch (RestClientException e) {
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
             log.error("[FAILED] - Error al registrar worker: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("success", false, "message", "Error al registrar worker"));
@@ -107,7 +92,7 @@ public class workerController {
     public ResponseEntity<Object> deleteWorker(@RequestBody Map<String, Integer> body, HttpSession session) {
         try {
             String token = (String) session.getAttribute("JWT_TOKEN");
-            Integer workerId = body.get("userId");  // ← viene del frontend con clave "userId"
+            Integer workerId = body.get("userId");
             log.info("Intentando eliminar worker con ID: {}", workerId);
 
             if (workerId == null) {
@@ -115,20 +100,16 @@ public class workerController {
                         .body(Map.of("success", false, "message", "ID del worker no proporcionado"));
             }
 
-            // Crear un nuevo mapa con la clave que espera el worker microservice
             Map<String, Integer> requestBody = Map.of("id", workerId);
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(token);
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Map<String, Integer>> entity = new HttpEntity<>(requestBody, headers);
+            Object response = gatewayClient.delete(
+                    "/api/workers/delete",
+                    requestBody,
+                    Object.class,
+                    token);
 
-            return restTemplate.exchange(
-                    gatewayBaseUrl + "/api/workers/delete",
-                    HttpMethod.DELETE,
-                    entity,
-                    Object.class);
-        } catch (RestClientException e) {
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
             log.error("[FAILED] - Error al eliminar worker: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("success", false, "message", "Error al eliminar worker: " + e.getMessage()));

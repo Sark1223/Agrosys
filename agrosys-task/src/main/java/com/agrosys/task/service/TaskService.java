@@ -24,12 +24,7 @@ public class TaskService {
     public TaskResponse createTask(TaskRequest request) {
         log.info("Creando tarea para plantío {}: {}", request.getPlantationId(), request);
 
-        // Validación opcional: verificar si ya existe una tarea con el mismo nombre (si aplica)
-        Integer existingId = taskRepository.existsByName(request.getName());
-        if (existingId != null) {
-            throw new RuntimeException("Ya existe una tarea con el nombre: " + request.getName());
-        }
-
+        // Insertar la tarea
         Integer inserted = taskRepository.insertTask(
                 request.getName(),
                 request.getDescription(),
@@ -42,22 +37,21 @@ public class TaskService {
         if (inserted == null || inserted == 0) {
             throw new RuntimeException("No se pudo crear la tarea");
         }
-        TaskRepository.TaskProjection saved = taskRepository.findTaskById(
-                getLastInsertedId()
-        );
+
+        // Obtener el ID de la tarea recién insertada
+        Integer newTaskId = taskRepository.getLastInsertId();
+        if (newTaskId == null || newTaskId == 0) {
+            throw new RuntimeException("No se pudo obtener el ID de la tarea creada");
+        }
+
+        // Recuperar la tarea usando su ID 
+        TaskRepository.TaskProjection saved = taskRepository.findTaskById(newTaskId);
         if (saved == null) {
             throw new RuntimeException("No se pudo recuperar la tarea creada");
         }
 
         log.info("Tarea creada con ID: {}", saved.getTaskId());
         return mapToResponse(saved);
-    }
-
-    // Método auxiliar para obtener el último ID insertado (usando la conexión actual)
-    // Se puede implementar en el repositorio con una consulta nativa.
-    private Integer getLastInsertedId() {
-
-        return null;
     }
 
     public List<TaskResponse> getAllTasks() {
