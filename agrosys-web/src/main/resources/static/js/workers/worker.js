@@ -2,36 +2,44 @@ let currentWorkerId = null;
 let workersData = [];
 
 function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
+    return new Promise(function(resolve, reject) {
+        var reader = new FileReader();
         reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
+        reader.onload = function() {
+            resolve(reader.result);
+        };
+        reader.onerror = function(error) {
+            reject(error);
+        };
     });
 }
 
-$('#btn-submit-add-user').on('click', async function () {
-    const nombre = $('#nombreInput').val().trim();
-    const notas = $('#apellidoInput').val().trim();
-    const salary = $('#salaryInput').val().trim();
-    const photoFile = $('#photoInput')[0].files[0];
+$('#btn-submit-add-user').on('click', function() {
+    var nombre = $('#nombreInput').val().trim();
+    var notas = $('#apellidoInput').val().trim();
+    var salary = $('#salaryInput').val().trim();
+    var photoFile = $('#photoInput')[0].files[0];
 
     if (!nombre || !salary) {
         $('#addUserForm')[0].reportValidity();
         return;
     }
 
-    let photo = null;
+    var photo = null;
     if (photoFile) {
-        try {
-            photo = await fileToBase64(photoFile);
-        } catch (e) {
+        fileToBase64(photoFile).then(function(base64) {
+            photo = base64;
+            submitAddUser(nombre, notas, salary, photo);
+        }).catch(function(e) {
             Swal.fire({ icon: 'error', title: 'Error', text: 'Error al procesar la imagen' });
-            return;
-        }
+        });
+    } else {
+        submitAddUser(nombre, notas, salary, photo);
     }
+});
 
-    const data = {
+function submitAddUser(nombre, notas, salary, photo) {
+    var data = {
         name: nombre,
         notas: notas || null,
         salary: parseFloat(salary),
@@ -43,13 +51,13 @@ $('#btn-submit-add-user').on('click', async function () {
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(data),
-        success: function (response) {
+        success: function(response) {
             if (response.success) {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Éxito',
+                    title: 'Exito',
                     text: 'Worker registrado exitosamente'
-                }).then(() => {
+                }).then(function() {
                     $('#modalAddUser').modal('hide');
                     $('#addUserForm')[0].reset();
                     $.fn.getAllWorkers();
@@ -58,39 +66,48 @@ $('#btn-submit-add-user').on('click', async function () {
                 Swal.fire({ icon: 'error', title: 'Error', text: response.message });
             }
         },
-        error: function (xhr) {
-            const msg = xhr.responseJSON?.message || 'Error al registrar el worker';
+        error: function(xhr) {
+            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Error al registrar el worker';
             Swal.fire({ icon: 'error', title: 'Error', text: msg });
         }
     });
-});
+}
 
-$('#btn-submit-edit-user').on('click', async function () {
-    const workerId = $('#workerIdInputEdit').val();
-    const nombre = $('#nombreInputEdit').val().trim();
-    const notas = $('#notasInputEdit').val().trim();
-    const salary = $('#salaryInputEdit').val().trim();
-    const photoFile = $('#photoInputEdit')[0].files[0];
+$('#btn-submit-edit-user').on('click', function() {
+    var workerId = $('#workerIdInputEdit').val();
+    var nombre = $('#nombreInputEdit').val().trim();
+    var notas = $('#notasInputEdit').val().trim();
+    var salary = $('#salaryInputEdit').val().trim();
+    var photoFile = $('#photoInputEdit')[0].files[0];
 
     if (!workerId || !nombre || !salary) {
         $('#editUserForm')[0].reportValidity();
         return;
     }
 
-    let photo = null;
+    var photo = null;
     if (photoFile) {
-        try {
-            photo = await fileToBase64(photoFile);
-        } catch (e) {
+        fileToBase64(photoFile).then(function(base64) {
+            photo = base64;
+            submitEditWorker(workerId, nombre, notas, salary, photo);
+        }).catch(function(e) {
             Swal.fire({ icon: 'error', title: 'Error', text: 'Error al procesar la imagen' });
-            return;
-        }
+        });
     } else {
-        const currentWorker = workersData.find(w => w.workerId === parseInt(workerId));
+        var currentWorker = null;
+        for (var i = 0; i < workersData.length; i++) {
+            if (workersData[i].workerId === parseInt(workerId)) {
+                currentWorker = workersData[i];
+                break;
+            }
+        }
         photo = currentWorker ? currentWorker.photo : null;
+        submitEditWorker(workerId, nombre, notas, salary, photo);
     }
+});
 
-    const data = {
+function submitEditWorker(workerId, nombre, notas, salary, photo) {
+    var data = {
         workerId: parseInt(workerId),
         name: nombre,
         notas: notas || null,
@@ -103,13 +120,13 @@ $('#btn-submit-edit-user').on('click', async function () {
         type: 'PUT',
         contentType: 'application/json',
         data: JSON.stringify(data),
-        success: function (response) {
+        success: function(response) {
             if (response.success) {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Éxito',
+                    title: 'Exito',
                     text: 'Worker actualizado exitosamente'
-                }).then(() => {
+                }).then(function() {
                     $('#modalEditUser').modal('hide');
                     $('#editUserForm')[0].reset();
                     $.fn.getAllWorkers();
@@ -118,16 +135,15 @@ $('#btn-submit-edit-user').on('click', async function () {
                 Swal.fire({ icon: 'error', title: 'Error', text: response.message });
             }
         },
-        error: function (xhr) {
-            const msg = xhr.responseJSON?.message || 'Error al actualizar el worker';
+        error: function(xhr) {
+            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Error al actualizar el worker';
             Swal.fire({ icon: 'error', title: 'Error', text: msg });
         }
     });
-});
+}
 
-$('#btn-submit-delete-user').on('click', function () {
-    const id = currentWorkerId;  
-    console.log('ID a eliminar (desde variable global):', id);
+$('#btn-submit-delete-user').on('click', function() {
+    var id = currentWorkerId;
 
     if (!id) {
         Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo obtener el ID del trabajador' });
@@ -139,38 +155,37 @@ $('#btn-submit-delete-user').on('click', function () {
         type: 'DELETE',
         contentType: 'application/json',
         data: JSON.stringify({ userId: parseInt(id) }),
-        success: function (response) {
+        success: function(response) {
             if (response.success) {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Éxito',
+                    title: 'Exito',
                     text: 'Worker eliminado exitosamente'
-                }).then(() => {
+                }).then(function() {
                     $('#modalDeleteUser').modal('hide');
-                    currentWorkerId = null;   
+                    currentWorkerId = null;
                     $.fn.getAllWorkers();
                 });
             } else {
                 Swal.fire({ icon: 'error', title: 'Error', text: response.message });
             }
         },
-        error: function (xhr) {
-            const msg = xhr.responseJSON?.message || 'Error al eliminar el worker';
+        error: function(xhr) {
+            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Error al eliminar el worker';
             Swal.fire({ icon: 'error', title: 'Error', text: msg });
         }
     });
 });
 
-$.fn.getAllWorkers = function () {
+$.fn.getAllWorkers = function() {
     $.ajax({
         url: '/agrosys/workers/get-all',
         type: 'GET',
-        success: function (response) {
-            const cardsContainer = $('#cardsContainerUsers');
-            cardsContainer.html(''); 
+        success: function(response) {
+            var cardsContainer = $('#cardsContainerUsers');
+            cardsContainer.html('');
 
             if (response.success && Array.isArray(response.data)) {
-                console.log('Workers obtenidos:', response.data);
                 workersData = response.data;
 
                 if (response.data.length === 0) {
@@ -178,66 +193,94 @@ $.fn.getAllWorkers = function () {
                     return;
                 }
 
-                response.data.forEach(worker => {
-                    const workerId = worker.workerId || worker.id;
-                    const nombre = worker.name || worker.nombre || 'Sin nombre';
-                    const notas = worker.notas || '';
-                    const salary = worker.salary || 0;
-                    const photo = worker.photo || null;
+                response.data.forEach(function(worker) {
+                    var workerId = worker.workerId || worker.id;
+                    var nombre = worker.name || worker.nombre || 'Sin nombre';
+                    var notas = worker.notas || '';
+                    var salary = worker.salary || 0;
+                    var photo = worker.photo || null;
 
-                    const photoHtml = photo 
-                        ? `<img src="${escapeHtml(photo)}" alt="Foto de ${escapeHtml(nombre)}" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">`
-                        : `<div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;"><i class="ri-user-3-fill text-white"></i></div>`;
+                    var photoHtml;
+                    if (photo) {
+                        photoHtml = '<img src="' + escapeHtml(photo) + '" alt="Foto de ' + escapeHtml(nombre) + '" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">';
+                    } else {
+                        photoHtml = '<div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;"><i class="ri-user-3-fill text-white"></i></div>';
+                    }
 
-                    const workerCard = $(`
-                        <div class="card mb-3 me-2 worker-card" style="width: 300px; cursor: pointer;" data-id="${workerId}">
-                            <div class="card-body d-flex flex-row justify-content-between align-items-start">
-                                <div class="d-flex align-items-center gap-3">
-                                    ${photoHtml}
-                                    <div class="d-flex flex-column">
-                                        <h5 class="card-title text-capitalize mb-0">${escapeHtml(nombre.toLowerCase())}</h5>
-                                        <small class="text-success fw-bold">$${parseFloat(salary).toFixed(2)}</small>
-                                    </div>
-                                </div>
-                                <div class="dropdown">
-                                    <i class="ri-more-2-fill" type="button" id="dropdownMenuButton${workerId}" data-bs-toggle="dropdown" aria-expanded="false"></i>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton${workerId}">
-                                        <li><a class="dropdown-item edit-worker" data-id="${workerId}" href="#"><i class="ri-pencil-fill pe-1"></i>Editar</a></li>
-                                        <li><a class="dropdown-item delete-worker" data-id="${workerId}" href="#"><i class="ri-delete-bin-fill pe-1"></i>Eliminar</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    `);
+                    var workerCard = $(
+                        '<div class="card mb-3 me-2 worker-card" style="width: 300px; cursor: pointer;" data-id="' + workerId + '">' +
+                            '<div class="card-body d-flex flex-row justify-content-between align-items-start">' +
+                                '<div class="d-flex align-items-center gap-3">' +
+                                    photoHtml +
+                                    '<div class="d-flex flex-column">' +
+                                        '<h5 class="card-title text-capitalize mb-0">' + escapeHtml(nombre.toLowerCase()) + '</h5>' +
+                                        '<small class="text-success fw-bold">$' + parseFloat(salary).toFixed(2) + '</small>' +
+                                    '</div>' +
+                                '</div>' +
+                                '<div class="dropdown">' +
+                                    '<i class="ri-more-2-fill" type="button" id="dropdownMenuButton' + workerId + '" data-bs-toggle="dropdown" aria-expanded="false"></i>' +
+                                    '<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton' + workerId + '">' +
+                                        '<li><a class="dropdown-item view-worker" data-id="' + workerId + '" href="#"><i class="ri-eye-fill pe-1"></i>Ver Detalle</a></li>' +
+                                        '<li><a class="dropdown-item edit-worker" data-id="' + workerId + '" href="#"><i class="ri-pencil-fill pe-1"></i>Editar</a></li>' +
+                                        '<li><a class="dropdown-item delete-worker" data-id="' + workerId + '" href="#"><i class="ri-delete-bin-fill pe-1"></i>Eliminar</a></li>' +
+                                    '</ul>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>'
+                    );
 
-                    workerCard.on('click', function (e) {
-                        if ($(e.target).closest('.dropdown').length) return;
-                        mostrarDetallesWorker(workerId, nombre, notas, salary, photo);
+                    workerCard.find('.view-worker').on('click', function(e) {
+                        e.stopPropagation();
+                        var w = null;
+                        for (var i = 0; i < workersData.length; i++) {
+                            if (workersData[i].workerId === workerId) {
+                                w = workersData[i];
+                                break;
+                            }
+                        }
+                        var wPhotoHtml;
+                        if (w.photo) {
+                            wPhotoHtml = '<img src="' + escapeHtml(w.photo) + '" alt="Foto de ' + escapeHtml(w.name) + '" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">';
+                        } else {
+                            wPhotoHtml = '<div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width: 120px; height: 120px; margin: auto;"><i class="ri-user-3-fill text-white" style="font-size: 50px;"></i></div>';
+                        }
+
+                        $('#viewPhotoContainer').html(wPhotoHtml);
+                        $('#viewWorkerName').text(w.name);
+                        $('#viewWorkerId').text(w.workerId);
+                        $('#viewWorkerNotas').text(w.notas || 'Sin notas');
+                        $('#viewWorkerSalary').text(parseFloat(w.salary || 0).toFixed(2));
+
+                        $('#modalViewUser').modal('show');
                     });
 
-
-                    workerCard.find('.edit-worker').on('click', function (e) {
+                    workerCard.find('.edit-worker').on('click', function(e) {
                         e.stopPropagation();
-                        const w = workersData.find(w => w.workerId === workerId);
+                        var w = null;
+                        for (var i = 0; i < workersData.length; i++) {
+                            if (workersData[i].workerId === workerId) {
+                                w = workersData[i];
+                                break;
+                            }
+                        }
                         $('#workerIdInputEdit').val(workerId);
                         $('#nombreInputEdit').val(w.name);
                         $('#notasInputEdit').val(w.notas || '');
                         $('#salaryInputEdit').val(w.salary);
-                        
+
                         if (w.photo) {
-                            $('#currentPhotoPreview').html(`<img src="${escapeHtml(w.photo)}" alt="Foto actual" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">`);
+                            $('#currentPhotoPreview').html('<img src="' + escapeHtml(w.photo) + '" alt="Foto actual" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">');
                         } else {
                             $('#currentPhotoPreview').html('');
                         }
-                        
+
                         $('#modalEditUser').modal('show');
                     });
 
-                    workerCard.find('.delete-worker').on('click', function (e) {
+                    workerCard.find('.delete-worker').on('click', function(e) {
                         e.stopPropagation();
                         currentWorkerId = workerId;
-                        $('#textDelete').text(`¿Está seguro de que desea eliminar al trabajador ${nombre}?`);
-                        console.log('ID guardado en variable global:', currentWorkerId);
+                        $('#textDelete').text('Esta seguro de que desea eliminar al trabajador ' + nombre + '?');
                         $('#modalDeleteUser').modal('show');
                     });
 
@@ -247,37 +290,19 @@ $.fn.getAllWorkers = function () {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: response.message || 'Ocurrió un error inesperado al obtener los trabajadores'
+                    text: response.message || 'Ocurrio un error inesperado al obtener los trabajadores'
                 });
             }
         },
-        error: function (xhr) {
-            console.error('Error en getAllWorkers:', xhr);
-            let msg = 'Error al cargar los trabajadores';
-            if (xhr.responseJSON && xhr.responseJSON.message) msg = xhr.responseJSON.message;
+        error: function(xhr) {
+            var msg = 'Error al cargar los trabajadores';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                msg = xhr.responseJSON.message;
+            }
             Swal.fire({ icon: 'error', title: 'Error', text: msg });
         }
     });
 };
-
-function mostrarDetallesWorker(id, nombre, notas, salary, photo) {
-    const photoHtml = photo 
-        ? `<img src="${escapeHtml(photo)}" alt="Foto" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">`
-        : `<div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mb-3" style="width: 100px; height: 100px;"><i class="ri-user-3-fill text-white" style="font-size: 40px;"></i></div>`;
-    
-    Swal.fire({
-        title: `Detalles de ${nombre}`,
-        html: `
-            ${photoHtml}<br>
-            <strong>ID:</strong> ${id}<br>
-            <strong>Nombre:</strong> ${escapeHtml(nombre)}<br>
-            <strong>Notas:</strong> ${escapeHtml(notas) || 'Sin notas'}<br>
-            <strong>Salario:</strong> $${parseFloat(salary).toFixed(2)}
-        `,
-        icon: 'info',
-        confirmButtonText: 'Cerrar'
-    });
-}
 
 function escapeHtml(str) {
     if (!str) return '';
@@ -289,6 +314,6 @@ function escapeHtml(str) {
     });
 }
 
-$(document).ready(function () {
+$(document).ready(function() {
     $.fn.getAllWorkers();
 });

@@ -148,6 +148,29 @@
             </div>
         </div>
 
+        <div class="modal fade" id="modalViewUser" tabindex="-1" aria-labelledby="modalViewUser" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Detalles del Trabajador</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <div id="viewPhotoContainer" class="mb-3"></div>
+                        <h4 id="viewWorkerName" class="mb-3"></h4>
+                        <div class="text-start">
+                            <p><strong>ID:</strong> <span id="viewWorkerId"></span></p>
+                            <p><strong>Notas:</strong> <span id="viewWorkerNotas"></span></p>
+                            <p><strong>Salario:</strong> $<span id="viewWorkerSalary"></span></p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="modal fade" id="modalDeleteUser" tabindex="-1" aria-labelledby="modalDeleteUser" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content border-danger text-white bg-dark">
