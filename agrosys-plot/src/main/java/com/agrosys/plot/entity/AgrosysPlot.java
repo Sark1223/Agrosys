@@ -11,7 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "ROL")
+@Table(name = "plot")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

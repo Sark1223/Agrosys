@@ -19,43 +19,48 @@ public interface PlotRepository extends JpaRepository<AgrosysPlot, Integer> {
 
                 String getName();
 
-                String getDescription(); 
+                String getDescription();
 
                 String getPlantatios();
         }
 
         @Query(value = """
-                WITH ranked AS (
-                        SELECT
-                                p.*,
-                                ROW_NUMBER() OVER (
-                                        PARTITION BY p.plotId
-                                        ORDER BY p.plantatioId DESC
-                                ) AS rn
-                        FROM agrosys_db.plantatio p
+                        WITH ranked AS (
+                                SELECT
+                                        p.*,
+                                        ROW_NUMBER() OVER (
+                                                PARTITION BY p.plotId
+                                                ORDER BY p.plantatioId DESC
+                                        ) AS rn,
+                                        stage.stageId,
+                                        stage.name as 'stage'
+                                FROM agrosys_db.plantatio p
+                                LEFT JOIN agrosys_db.plantatio_stage_relation relation ON relation.plantatioId = p.plantatioId
+                                LEFT JOIN agrosys_db.plantatio_stage stage ON relation.stageId = stage.stageId
                         )
                         SELECT
                                 plt.plotId,
                                 plt.name,
                                 plt.description,
                                 JSON_ARRAYAGG(
-                                        CASE 
+                                        CASE
                                                 WHEN r.plantatioId IS NOT NULL
                                                 THEN JSON_OBJECT(
                                                         'plantatioId', r.plantatioId,
                                                         'name', r.name,
                                                         'start_at', r.start_at,
                                                         'end_at', COALESCE(r.end_at, 'N/A'),
-                                                        'notas', r.notas
+                                                        'notas', r.notas,
+                                                        'stageId', r.stageId,
+                                                        'stage', r.stage
                                                 )
-                                                -- else '' / JSON_OBJECT()
                                         END
-                        ) AS plantatios
+                                ) AS plantatios
                         FROM agrosys_db.plot plt
                         LEFT JOIN ranked r
-                                ON r.plotId = plt.plotId AND r.rn <= 5
+                                ON r.plotId = plt.plotId AND r.rn <= 10
                         GROUP BY plt.plotId, plt.name, plt.description;
-                                                                                """, nativeQuery = true)
+                                                                                                        """, nativeQuery = true)
         List<PlotProjection> findAllPlots();
 
         @Transactional
