@@ -147,6 +147,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
       SPRING_PROFILES_ACTIVE: docker
+      CLOUDINARY_URL: ${CLOUDINARY_URL}
     depends_on:
       mysql-agrosys:
         condition: service_healthy

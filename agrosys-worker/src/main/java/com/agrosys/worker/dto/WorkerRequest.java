@@ -1,6 +1,10 @@
 package com.agrosys.worker.dto;
 
+import java.math.BigDecimal;
+
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -11,7 +15,12 @@ public class WorkerRequest {
     @Size(max = 50, message = "El nombre no puede superar 50 caracteres")
     private String name;
 
-    @NotBlank(message = "Las notas son obligatorias")
     @Size(max = 255, message = "Las notas no pueden superar 255 caracteres")
     private String notas;
+
+    @NotNull(message = "El salario es obligatorio")
+    @DecimalMin(value = "0.00", message = "El salario no puede ser negativo")
+    private BigDecimal salary;
+
+    private String photo;
 }

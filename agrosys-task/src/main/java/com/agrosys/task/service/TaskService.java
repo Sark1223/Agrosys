@@ -1,0 +1,106 @@
+package com.agrosys.task.service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.agrosys.task.dto.TaskRequest;
+import com.agrosys.task.dto.TaskResponse;
+import com.agrosys.task.repository.TaskRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class TaskService {
+
+    private final TaskRepository taskRepository;
+
+    @Transactional
+    public TaskResponse createTask(TaskRequest request) {
+        log.info("Creando tarea para plantío {}: {}", request.getPlantationId(), request);
+
+        // Insertar la tarea
+        Integer inserted = taskRepository.insertTask(
+                request.getName(),
+                request.getDescription(),
+                request.getCreateAt(),
+                request.getEndAt(),
+                request.getTaskStageId(),
+                request.getPlantationId()
+        );
+
+        if (inserted == null || inserted == 0) {
+            throw new RuntimeException("No se pudo crear la tarea");
+        }
+
+        // Obtener el ID de la tarea recién insertada
+        Integer newTaskId = taskRepository.getLastInsertId();
+        if (newTaskId == null || newTaskId == 0) {
+            throw new RuntimeException("No se pudo obtener el ID de la tarea creada");
+        }
+
+        // Recuperar la tarea usando su ID 
+        TaskRepository.TaskProjection saved = taskRepository.findTaskById(newTaskId);
+        if (saved == null) {
+            throw new RuntimeException("No se pudo recuperar la tarea creada");
+        }
+
+        log.info("Tarea creada con ID: {}", saved.getTaskId());
+        return mapToResponse(saved);
+    }
+
+    public List<TaskResponse> getAllTasks() {
+        List<TaskRepository.TaskProjection> tasks = taskRepository.findAllTasks();
+        return tasks.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public TaskResponse getTaskById(Integer id) {
+        TaskRepository.TaskProjection task = taskRepository.findTaskById(id);
+        if (task == null) {
+            throw new RuntimeException("Tarea no encontrada con id: " + id);
+        }
+        return mapToResponse(task);
+    }
+
+    @Transactional
+    public TaskResponse updateTask(Integer id, TaskRequest request) {
+        // Verificar existencia
+        if (taskRepository.countById(id) == 0) {
+            throw new RuntimeException("Tarea no encontrada con id: " + id);
+        }
+        int updated = taskRepository.updateTask(id, request.getName(), request.getDescription(),
+                request.getCreateAt(), request.getEndAt(), request.getTaskStageId(), request.getPlantationId());
+        if (updated == 0) {
+            throw new RuntimeException("No se pudo actualizar la tarea");
+        }
+        return getTaskById(id);
+    }
+
+    @Transactional
+    public void deleteTask(Integer id) {
+        if (taskRepository.countById(id) == 0) {
+            throw new RuntimeException("Tarea no encontrada con id: " + id);
+        }
+        taskRepository.deleteTaskById(id);
+        log.info("Tarea eliminada con ID: {}", id);
+    }
+
+    private TaskResponse mapToResponse(TaskRepository.TaskProjection proj) {
+        return TaskResponse.builder()
+                .taskId(proj.getTaskId())
+                .name(proj.getName())
+                .description(proj.getDescription())
+                .createAt(proj.getCreateAt())
+                .endAt(proj.getEndAt())
+                .taskStageId(proj.getTaskStageId())
+                .plantationId(proj.getPlantationId())
+                .build();
+    }
+}
