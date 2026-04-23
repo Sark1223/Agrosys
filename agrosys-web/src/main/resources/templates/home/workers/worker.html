@@ -16,29 +16,29 @@
             <div class="page-content">
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link" th:classappend="${activeTab == 'usuarios'} ? 'active' : ''"
-                            data-bs-toggle="tab" href="#usuarios" aria-selected="true" role="tab">Trabajadores actuales</a>
+                        <a class="nav-link" th:classappend="${activeTab == 'workers'} ? 'active' : ''"
+                            data-bs-toggle="tab" href="#workers" aria-selected="true" role="tab">Trabajadores actuales</a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link" th:classappend="${activeTab == 'roles'} ? 'active' : ''"
-                            data-bs-toggle="tab" href="#roles" aria-selected="false" role="tab" tabindex="-1">Asistencia</a>
+                        <a class="nav-link" th:classappend="${activeTab == 'asistencia'} ? 'active' : ''"
+                            data-bs-toggle="tab" href="#asistencia" aria-selected="false" role="tab" tabindex="-1">Asistencia</a>
                     </li>
                 </ul>
                 <div id="myTabContent" class="tab-content">
-                    <div class="tab-pane fade" id="usuarios" role="tabpanel"
-                        th:classappend="${activeTab == 'usuarios'} ? 'show active' : ''">
+                    <div class="tab-pane fade" id="workers" role="tabpanel"
+                        th:classappend="${activeTab == 'workers'} ? 'show active' : ''">
                         <div class="options p-2 d-flex justify-content-end flex-nowrap">
                             <button class="btn btn-primary" data-bs-toggle="modal"
-                                data-bs-target="#modalAddUser">Agregar Trabajador</button>
+                                data-bs-target="#modalAddWorker">Agregar Trabajador</button>
                         </div>
-                        <div class="cards d-flex flex-wrap flex-row g-2" id="cardsContainerUsers">
+                        <div class="cards d-flex flex-wrap flex-row g-2" id="cardsContainerWorkers">
                             <!-- Se carga por JavaScript -->
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="roles" role="tabpanel"
-                        th:classappend="${activeTab == 'roles'} ? 'show active' : ''">
-                       
-                        <div class="cards d-flex flex-wrap flex-row g-2" id="cardsContainerRoles">
+                    <div class="tab-pane fade" id="asistencia" role="tabpanel"
+                        th:classappend="${activeTab == 'asistencia'} ? 'show active' : ''">
+                        
+                        <div class="cards d-flex flex-wrap flex-row g-2" id="cardsContainerAsistencia">
                             <!-- Se carga por JavaScript -->
                         </div>
                     </div>
@@ -47,8 +47,8 @@
             </div>
         </main>
 
-        <!-- USUARIOS -->
-        <div class="modal fade" id="modalAddUser" tabindex="-1" aria-labelledby="modalAddUser" aria-hidden="true">
+        <!-- TRABAJADORES -->
+        <div class="modal fade" id="modalAddWorker" tabindex="-1" aria-labelledby="modalAddWorker" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -56,7 +56,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form method="post" th:action="@{/config/new-user}" id="addUserForm" class="needs-validation"
+                        <form method="post" th:action="@{/workers/register}" id="addWorkerForm" class="needs-validation"
                             novalidate>
                             <div>
                                 <label for="nombreInput" class="form-label mt-4">Nombre <span
@@ -67,11 +67,6 @@
                                 <div class="invalid-feedback">El nombre es requerido</div>
                             </div>
                             <div>
-                                <label for="apellidoInput" class="form-label mt-4">Notas</label>
-                                <input type="text" class="form-control" id="apellidoInput" name="apellido" minlength="3"
-                                    maxlength="100" placeholder="Ingrese notas del trabajador (opcional)" autocomplete="off">
-                            </div>
-                            <div>
                                 <label for="salaryInput" class="form-label mt-4">Salario <span
                                         class="text-danger">*</span></label>
                                 <input type="number" class="form-control" id="salaryInput" name="salary" 
@@ -79,6 +74,12 @@
                                     required>
                                 <div class="invalid-feedback">El salario es requerido</div>
                             </div>
+                            <div>
+                                <label for="notasInput" class="form-label mt-4">Notas</label>
+                                <input type="text" class="form-control" id="notasInput" name="notas"
+                                    maxlength="100" placeholder="Ingrese notas del trabajador (opcional)" autocomplete="off">
+                            </div>
+                            
                             <div>
                                 <label for="photoInput" class="form-label mt-4">Foto de Perfil</label>
                                 <input type="file" class="form-control" id="photoInput" name="photo" 
@@ -89,7 +90,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-success" id="btn-submit-add-user">
+                        <button type="button" class="btn btn-success" id="btn-submit-add-worker">
                             Guardar
                         </button>
                     </div>
@@ -97,7 +98,7 @@
             </div>
         </div>
 
-        <div class="modal fade" id="modalEditUser" tabindex="-1" aria-labelledby="modalEditUser" aria-hidden="true">
+        <div class="modal fade" id="modalEditWorker" tabindex="-1" aria-labelledby="modalEditWorker" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -105,7 +106,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form method="post" th:action="@{/config/edit-user}" id="editUserForm" class="needs-validation"
+                        <form method="post" th:action="@{/workers/update}" id="editWorkerForm" class="needs-validation"
                             novalidate>
                             <input type="number" id="workerIdInputEdit" name="workerId" hidden>
                             <div>
@@ -116,11 +117,7 @@
                                     required>
                                 <div class="invalid-feedback">El nombre es requerido</div>
                             </div>
-                            <div>
-                                <label for="notasInputEdit" class="form-label mt-4">Notas</label>
-                                <input type="text" class="form-control" id="notasInputEdit" name="notas" 
-                                    maxlength="255" placeholder="Ingrese notas del trabajador (opcional)" autocomplete="off">
-                            </div>
+                            
                             <div>
                                 <label for="salaryInputEdit" class="form-label mt-4">Salario <span
                                         class="text-danger">*</span></label>
@@ -128,6 +125,11 @@
                                     min="0" step="0.01" placeholder="Ingrese el salario del trabajador" autocomplete="off"
                                     required>
                                 <div class="invalid-feedback">El salario es requerido</div>
+                            </div>
+                            <div>
+                                <label for="notasInputEdit" class="form-label mt-4">Notas</label>
+                                <input type="text" class="form-control" id="notasInputEdit" name="notas" 
+                                    maxlength="255" placeholder="Ingrese notas del trabajador (opcional)" autocomplete="off">
                             </div>
                             <div>
                                 <label for="photoInputEdit" class="form-label mt-4">Foto de Perfil</label>
@@ -140,7 +142,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-success" id="btn-submit-edit-user">
+                        <button type="button" class="btn btn-success" id="btn-submit-edit-worker">
                             Guardar
                         </button>
                     </div>
@@ -148,7 +150,7 @@
             </div>
         </div>
 
-        <div class="modal fade" id="modalViewUser" tabindex="-1" aria-labelledby="modalViewUser" aria-hidden="true">
+        <div class="modal fade" id="modalViewWorker" tabindex="-1" aria-labelledby="modalViewWorker" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -171,7 +173,7 @@
             </div>
         </div>
 
-        <div class="modal fade" id="modalDeleteUser" tabindex="-1" aria-labelledby="modalDeleteUser" aria-hidden="true">
+        <div class="modal fade" id="modalDeleteWorker" tabindex="-1" aria-labelledby="modalDeleteWorker" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content border-danger text-white bg-dark">
                     <div class="modal-header border-danger">
@@ -180,14 +182,14 @@
                     </div>
                     <div class="modal-body">
                         <p id="textDelete">¿Está seguro de que desea eliminar al trabajador?</p>
-                        <form method="post" th:action="@{/config/delete-user}" id="deleteUserForm"
+                        <form method="post" th:action="@{/workers/delete}" id="deleteWorkerForm"
                             class="needs-validation" novalidate>
-                            <input type="number" id="userIdInputDelete" name="userId" hidden>
+                            <input type="number" id="workerIdInputDelete" name="workerId" hidden required>
                         </form>
                     </div>
                     <div class="modal-footer border-danger fw-bolder">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-danger" id="btn-submit-delete-user">
+                        <button type="button" class="btn btn-danger" id="btn-submit-delete-worker">
                             Eliminar
                         </button>
                     </div>

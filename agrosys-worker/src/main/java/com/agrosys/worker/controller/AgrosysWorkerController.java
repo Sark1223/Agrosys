@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.agrosys.worker.dto.Response;
 import com.agrosys.worker.dto.WorkerRequest;
 import com.agrosys.worker.dto.WorkerResponse;
-import com.agrosys.worker.dto.WorkerUpdateRequest;
 import com.agrosys.worker.repository.WorkerRepository;
 import com.agrosys.worker.service.WorkerService;
 
@@ -77,32 +77,22 @@ public class AgrosysWorkerController {
                     .build());
         } catch (Exception e) {
             log.error("Error al eliminar worker: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Response.builder()
-                            .success(false)
-                            .message("Error al eliminar worker: " + e.getMessage())
-                            .build());
+            throw new RuntimeException("Error al eliminar worker: " + e.getMessage());
+        
         }
     }
 
-    @PutMapping("/update")
+    @PutMapping("/update/{workerId}")
     @PreAuthorize("hasAuthority('MODULE_TRABAJADORES')")
-    public ResponseEntity<Response> updateWorker(@Valid @RequestBody WorkerUpdateRequest request) {
-        log.info("[REQUEST UPDATE] - workerId: {}, request: {}", request.getWorkerId(), request);
+    public ResponseEntity<Response> updateWorker(@PathVariable Integer workerId, 
+        @Valid @RequestBody WorkerRequest request) {
+        log.info("[REQUEST UPDATE] - workerId: {}, request: {}", workerId, request);
         try {
-            WorkerResponse response = workerService.actualizarWorker(request.getWorkerId(), request);
-            return ResponseEntity.ok(Response.builder()
-                    .success(true)
-                    .message("Worker actualizado exitosamente")
-                    .data(response)
-                    .build());
+            Response response = workerService.actualizarWorker(workerId, request);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Error al actualizar worker: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Response.builder()
-                            .success(false)
-                            .message(e.getMessage())
-                            .build());
+            throw new RuntimeException("Error al actualizar worker: " + e.getMessage());
         }
     }
 }
