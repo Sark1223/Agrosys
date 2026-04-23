@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 public class WorkerService {
 
     private final WorkerRepository workerRepository;
+    private final ImageService imageService;
 
     public List<WorkerRepository.WorkerProjection> getAllWorkers() {
         return workerRepository.findAllWorkers();
@@ -33,7 +34,11 @@ public class WorkerService {
         }
 
         String notas = request.getNotas() != null ? request.getNotas() : null;
-        String photo = request.getPhoto() != null ? request.getPhoto() : null;
+        String photo = null;
+
+        if (request.getPhoto() != null && !request.getPhoto().isEmpty()) {
+            photo = imageService.uploadImage(request.getPhoto());
+        }
 
         Integer worker = workerRepository.insertWorker(
                 request.getName(),
@@ -89,7 +94,11 @@ public class WorkerService {
         }
 
         String notas = request.getNotas() != null ? request.getNotas() : null;
-        String photo = request.getPhoto() != null ? request.getPhoto() : null;
+        String photo = null;
+
+        if (request.getPhoto() != null && !request.getPhoto().isEmpty()) {
+            photo = imageService.uploadImage(request.getPhoto());
+        }
 
         Integer updated = workerRepository.updateWorker(
                 workerId,
