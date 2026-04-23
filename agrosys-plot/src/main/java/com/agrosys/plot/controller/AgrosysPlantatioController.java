@@ -18,6 +18,7 @@ import com.agrosys.plot.dto.plantatio.PlantatioRegister;
 import com.agrosys.plot.dto.plantatio.PlantatioStageRegister;
 import com.agrosys.plot.repository.PlantatioRespository;
 import com.agrosys.plot.service.PlantatioService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -70,7 +71,7 @@ public class AgrosysPlantatioController {
 
     @PostMapping("/insert-plantation-stage")
     @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
-    public ResponseEntity<Object> postMethodName(@Valid @RequestBody PlantatioStageRegister request) {
+    public ResponseEntity<Object> postMethodName(@Valid @RequestBody PlantatioStageRegister request) throws JsonProcessingException {
         log.info("[REQUEST] - request:", request);
         Response response = plotService.insertPlantatioStage(request);
         return ResponseEntity.ok(response);

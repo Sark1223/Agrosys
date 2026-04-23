@@ -2,6 +2,7 @@ package com.agrosys.plot.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -9,6 +10,9 @@ import com.agrosys.plot.dto.Response;
 import com.agrosys.plot.dto.plantatio.PlantatioRegister;
 import com.agrosys.plot.dto.plantatio.PlantatioStageRegister;
 import com.agrosys.plot.repository.PlantatioRespository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -85,29 +89,114 @@ public class PlantatioService {
                 .build();
     }
 
+    // ====== Plantatio Stage ======
     @Transactional
-    public Response insertPlantatioStage(PlantatioStageRegister request) {
+    public Response insertPlantatioStage(PlantatioStageRegister request) throws JsonProcessingException {
 
-        if (request.getStageId().equals(1)) {
-            String startAt = plantatioRespository.getStartAtPlantatio(request.getPlantatioId());
-            LocalDate startAtDate = LocalDate.parse(startAt);
-            LocalDate startAtRequest = LocalDate.parse(request.getStartAt());
-            if (!startAtDate.isEqual(startAtRequest)) {
+        PlantatioRespository.DatesPlantationProjection plantation = plantatioRespository
+                .getDatesPlantatioById(request.getPlantatioId());
+        if (plantation == null) {
+            throw new IllegalArgumentException("La plantacion no existe");
+        }
+
+        // Parsear el JSON directamente a una lista de mapas
+        ObjectMapper mapper = new ObjectMapper();
+        log.info("Stages JSON: {}", plantation.getStages());
+        List<Map<String, Object>> stages = mapper.readValue(
+                plantation.getStages(),
+                new TypeReference<List<Map<String, Object>>>() {
+                });
+
+        log.info("Lo converti: {}", plantation.getStages());
+
+        for (Map<String, Object> stage : stages) {
+            Integer stageId = (Integer) stage.get("stageId");
+            String startAtStage = (String) stage.get("startAtStage");
+            String endAtStage = (String) stage.get("endAtStage");
+            System.out.println(stageId + " - " + startAtStage + " - " + endAtStage);
+        }
+
+        LocalDate startAtRequest = LocalDate.parse(request.getStartAt());
+        LocalDate endAtRequest = null;
+        if (!request.getEndAt().equals("false")) {
+            endAtRequest = LocalDate.parse(request.getEndAt());
+
+            if (endAtRequest.isBefore(startAtRequest)) {
                 throw new IllegalArgumentException(
-                        "La fecha de inicio de la etapa debe ser igual a la fecha de inicio de la plantacion");
-            }
-        } else {
-            String endAt = plantatioRespository.getEndAtPlantatioStage(request.getPlantatioId(), request.getStageId());
-            LocalDate endAtDate = LocalDate.parse(endAt);
-            LocalDate startAtRequest = LocalDate.parse(request.getStartAt());
-            if (endAtDate.isBefore(startAtRequest)) {
-                throw new IllegalArgumentException(
-                        "La fecha de inicio de la etapa debe ser posterior a la fecha de fin de la etapa anterior");
+                        "La fecha de fin de la etapa debe ser posterior a la fecha de inicio");
             }
         }
 
-        Integer insert = plantatioRespository.insertPlantatioStage(request.getPlantatioId(), request.getStageId(),
-                request.getStartAt(), request.getNotas());
+        Integer insert;
+        switch (request.getStageId()) {
+            case 1 -> {
+
+                Object stageIdObj = stages.get(0).get("stageId");
+                if (stageIdObj != null) {
+                    throw new IllegalArgumentException(
+                            "No se puede registrar la etapa de PREPARACION porque ya existen etapas registradas para esta plantacion");
+                }
+                // Actualizar fecha de inicio de la plantacion
+                Integer updatePlantatioStartDate = plantatioRespository.updatePlantatioStartDate(
+                        request.getPlantatioId(), request.getStartAt());
+                if (updatePlantatioStartDate.equals(0)) {
+                    throw new RuntimeException("No se pudo actualizar la fecha de inicio de la plantacion");
+                }
+
+            }
+            case 2 -> {
+                Object stageIdObj = stages.get(0).get("stageId");
+                if (stages.size() >= 2 || stageIdObj == null || !stages.get(0).get("stageId").equals(1)) {
+                    throw new IllegalArgumentException(
+                            "No se puede registrar la etapa de SIEMBRA porque no existe la etapa de PREPARACIÓN o se registro la etapa");
+                }
+
+                // verificar que la fecha de inicio de la etapa de siembra sea posterior a la
+                // fecha de inicio de la etapa de preparación
+                String startAtPreparation = (String) stages.get(0).get("startAtStage");
+                LocalDate startAtPreparationDate = LocalDate.parse(startAtPreparation);
+                if (startAtRequest.isBefore(startAtPreparationDate)) {
+                    throw new IllegalArgumentException(
+                            "La fecha de inicio de la etapa de SIEMBRA debe ser posterior a la fecha de inicio de la etapa de PREPARACIÓN");
+                }
+            }
+            case 3 -> {
+                if (stages.size() != 2 || !stages.get(1).get("stageId").equals(2)) {
+                    throw new IllegalArgumentException(
+                            "No se puede registrar la etapa de COCECHA porque no existen las etapas de PREPARACIÓN y SIEMBRA o se registro la etapa");
+                }
+                // verificar que la fecha de inicio de la etapa de cosecha sea posterior a la
+                // fecha de inicio de la etapa de siembra
+                String startAtSembra = (String) stages.get(1).get("startAtStage");
+                LocalDate startAtSembraDate = LocalDate.parse(startAtSembra);
+                if (startAtRequest.isBefore(startAtSembraDate)) {
+                    throw new IllegalArgumentException(
+                            "La fecha de inicio de la etapa de COSECHA debe ser posterior a la fecha de inicio de la etapa de SIEMBRA");
+                }
+
+                if (endAtRequest != null) {
+                    // Actualizar fecha de fin de la plantacion
+                    Integer updatePlantatioEndDate = plantatioRespository.updatePlantatioEndDate(
+                            request.getPlantatioId(),
+                            request.getStageId(), request.getEndAt());
+                    if (updatePlantatioEndDate.equals(0)) {
+                        throw new RuntimeException("No se pudo actualizar la fecha de fin de la plantacion");
+                    }
+                }
+            }
+            default -> {
+
+                throw new IllegalArgumentException(
+                        "La etapa de la plantacion no es valida");
+            }
+        }
+
+        if (endAtRequest == null)
+            insert = plantatioRespository.insertPlantatioStage(request.getPlantatioId(), request.getStageId(),
+                    request.getStartAt(), request.getNotas());
+        else
+            insert = plantatioRespository.insertPlantatioStage(request.getPlantatioId(), request.getStageId(),
+                    request.getStartAt(), request.getEndAt(), request.getNotas());
 
         if (insert.equals(0)) {
             throw new RuntimeException("No se pudo registrar la etapa de la plantacion");

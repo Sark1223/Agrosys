@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.agrosys.web.dto.Response;
 import com.agrosys.web.dto.plot.PlotRegister;
 import com.agrosys.web.dto.plot.plantation.PlantatioRegister;
+import com.agrosys.web.dto.plot.plantation.PlantatioStageRegister;
 import com.agrosys.web.utils.GatewayClient;
 import com.agrosys.web.utils.JwtHelper;
 
@@ -189,6 +190,8 @@ public class PlotController {
         return ResponseEntity.ok(response);
     }
 
+    // ================= PLANTATION STAGES =================
+
     @GetMapping("/plantation/{plantationId}/stages")
     public ResponseEntity<Response> getStagesByPlantationId(
             @PathVariable Integer plantationId,
@@ -208,4 +211,81 @@ public class PlotController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/plantation/stage/new")
+    public ResponseEntity<Response> postPlantationStage(
+            @RequestParam Integer plantationId,
+            @RequestParam Integer stageId,
+            @RequestParam String startAt,
+            @RequestParam(required = false) String endAt,
+            @RequestParam(required = false) String notes,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_PARCELAS"))
+            return ResponseEntity.status(403).build();
+
+        PlantatioStageRegister requestData = new PlantatioStageRegister();
+        requestData.setPlantatioId(plantationId);
+        requestData.setStageId(stageId);
+        requestData.setStartAt(startAt);
+        requestData.setEndAt(endAt.equals("") ? "false" : endAt);
+        requestData.setNotas(notes);
+
+        log.info("Creacion de etapa de plantacion: {}", requestData);
+
+        Response response = gatewayClient.post("/api/plantation/insert-plantation-stage", requestData, Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta del registro: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/plantation/stage/edit")
+    public ResponseEntity<Response> updatePlantationStage(
+            @RequestParam Integer plantationId,
+            @RequestParam Integer stageId,
+            @RequestParam String startAt,
+            @RequestParam(required = false) String endAt,
+            @RequestParam(required = false) String notes,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_PARCELAS"))
+            return ResponseEntity.status(403).build();
+
+        log.info("Modificación de etapa de plantacion: {}", stageId);
+        PlantatioStageRegister requestData = new PlantatioStageRegister();
+        requestData.setPlantatioId(plantationId);
+        requestData.setStageId(stageId);
+        requestData.setStartAt(startAt);
+        requestData.setEndAt(endAt.equals("") ? "false" : endAt);
+        requestData.setNotas(notes);
+
+        Response response = gatewayClient.put("/api/plantation/update/" + plantationId, requestData, Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta del actualización: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/plantation/stage/delete")
+    public ResponseEntity<Response> deletePlantationStage(
+            @RequestParam Integer plantationId,
+            @RequestParam Integer stageId,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_PARCELAS"))
+            return ResponseEntity.status(403).build();  
+
+        log.info("Eliminación de plantacion: {}", plantationId);
+
+        Response response = gatewayClient.delete("/api/plantation/delete/" + plantationId, Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta del eliminación: {}", response);
+        return ResponseEntity.ok(response);
+    }
 }

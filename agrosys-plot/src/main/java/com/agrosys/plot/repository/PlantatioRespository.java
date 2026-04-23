@@ -54,21 +54,11 @@ public interface PlantatioRespository extends JpaRepository<AgrosysPlantatio, In
                         """, nativeQuery = true)
         String getStartAtPlantatio(Integer plantatioId);
 
-                @Query(value = """
+        @Query(value = """
                         SELECT end_at FROM agrosys_db.plantatio WHERE plantatioId = :plantatioId
                         """, nativeQuery = true)
         String getEndAtPlantatio(Integer plantatioId);
 
-        interface DatesProjection {
-                String getStart_at();
-
-                String getEnd_at();
-        }
-        @Query(value = """
-                        SELECT end_at, start_at FROM agrosys_db.plantatio WHERE plantatioId = :plantatioId
-                        """, nativeQuery = true)
-        DatesProjection getStartAndEndAtPlantatio(Integer plantatioId);
-        
         @Transactional
         @Modifying
         @Query(value = """
@@ -100,7 +90,8 @@ public interface PlantatioRespository extends JpaRepository<AgrosysPlantatio, In
                         SET name = :name, start_at = :start_at, end_at = :end_at, notas = :notas, plotId = :plotId
                         WHERE plantatioId = :plantatioId
                         """, nativeQuery = true)
-        Integer updatePlantatio(Integer plantatioId, Integer plotId, String name, String start_at, String end_at, String notas);
+        Integer updatePlantatio(Integer plantatioId, Integer plotId, String name, String start_at, String end_at,
+                        String notas);
 
         @Transactional
         @Modifying
@@ -126,6 +117,33 @@ public interface PlantatioRespository extends JpaRepository<AgrosysPlantatio, In
                         """, nativeQuery = true)
         List<PlotRepository.PlotProjection> getAllPlotsSelected(Integer plotId);
 
+        
+
+        interface DatesPlantationProjection {
+                String getStart_at();
+
+                String getEnd_at();
+
+                String getStages();
+        }
+        @Query(value = """
+                        SELECT
+                                p.start_at,
+                                p.end_at,
+                                json_arrayagg(
+                                        JSON_OBJECT(
+                                                'stageId', r.stageId,
+                                                'startAtStage', r.start_at,
+                                                'endAtStage', r.end_at
+                                        )
+                                ) as 'stages'
+                        FROM agrosys_db.plantatio p
+                        LEFT JOIN agrosys_db.plantatio_stage_relation r ON r.plantatioId = p.plantatioId
+                        WHERE p.plantatioId = :plantatioId
+                        GROUP BY p.plantatioId
+                                                """, nativeQuery = true)
+        DatesPlantationProjection getDatesPlantatioById(Integer plantatioId);
+
         @Query(value = """
                         SELECT start_at FROM agrosys_db.plantatio_stage_relation WHERE plantatioId = :plantatioId AND stageId = :stageId
                         """, nativeQuery = true)
@@ -136,10 +154,19 @@ public interface PlantatioRespository extends JpaRepository<AgrosysPlantatio, In
                         """, nativeQuery = true)
         String getEndAtPlantatioStage(Integer plantatioId, Integer stageId);
 
+        interface DatesProjection {
+                String getStart_at();
+
+                String getEnd_at();
+        }
         @Query(value = """
-                        SELECT end_at, start_at FROM agrosys_db.plantatio_stage_relation WHERE plantatioId = :plantatioId AND stageId = :stageId
+                        SELECT
+                                end_at,
+                                start_at
+                        FROM agrosys_db.plantatio_stage_relation
+                        WHERE plantatioId = :plantatioId AND stageId = :stageId
                         """, nativeQuery = true)
-        DatesProjection getStartAndEndAtPlantatioStage(Integer plantatioId, Integer stageId);
+        DatesProjection getDatesPlantatioStage(Integer plantatioId, Integer stageId);
 
         @Transactional
         @Modifying
@@ -148,6 +175,15 @@ public interface PlantatioRespository extends JpaRepository<AgrosysPlantatio, In
                         VALUES (:plantatioId, :stageId, :start_at, :notas)
                         """, nativeQuery = true)
         Integer insertPlantatioStage(Integer plantatioId, Integer stageId, String start_at, String notas);
+
+        @Transactional
+        @Modifying
+        @Query(value = """
+                        INSERT INTO agrosys_db.plantatio_stage_relation (plantatioId, stageId, start_at, end_at, notes)
+                        VALUES (:plantatioId, :stageId, :start_at, :end_at, :notas)
+                        """, nativeQuery = true)
+        Integer insertPlantatioStage(Integer plantatioId, Integer stageId, String start_at, String end_at,
+                        String notas);
 
         @Transactional
         @Modifying
@@ -165,7 +201,26 @@ public interface PlantatioRespository extends JpaRepository<AgrosysPlantatio, In
                         SET start_at = :start_at, end_at = :end_at, notes = :notas
                         WHERE plantatioId = :plantatioId AND stageId = :stageId
                         """, nativeQuery = true)
-        Integer updatePlantatioStageNotas(Integer plantatioId, Integer stageId, String notas);
+        Integer updatePlantatioStageNotas(Integer plantatioId, Integer stageId, String start_at, String end_at,
+                        String notas);
+
+        @Transactional
+        @Modifying
+        @Query(value = """
+                        UPDATE agrosys_db.plantatio_stage_relation
+                        SET end_at = :end_at
+                        WHERE plantatioId = :plantatioId AND stageId = :stageId
+                        """, nativeQuery = true)
+        Integer updatePlantatioEndDate(Integer plantatioId, Integer stageId, String end_at);
+
+        @Transactional
+        @Modifying
+        @Query(value = """
+                        UPDATE agrosys_db.plantatio
+                        SET start_at = :start_at
+                        WHERE plantatioId = :plantatioId
+                        """, nativeQuery = true)
+        Integer updatePlantatioStartDate(Integer plantatioId, String start_at);
 
         @Transactional
         @Modifying
@@ -186,8 +241,9 @@ public interface PlantatioRespository extends JpaRepository<AgrosysPlantatio, In
 
                 String getNotes();
         }
+
         @Query(value = """
-                        SELECT 
+                        SELECT
                                 r.stageId as id,
                                 s.name,
                                 r.start_at,
