@@ -29,11 +29,6 @@ public class WorkerService {
     public WorkerResponse crearWorker(WorkerRequest request) {
         log.info("[REQUEST] - request: {}", request);
 
-        if (workerRepository.existsByName(request.getName()) != null) {
-            log.warn("[FIELD VIOLATION] - El nombre del worker ya está en uso: {}", request.getName());
-            throw new RuntimeException("El nombre del worker ya está en uso");
-        }
-
         String notas = request.getNotas() != null ? request.getNotas() : null;
 
         Integer worker = workerRepository.insertWorker(
@@ -87,10 +82,27 @@ public class WorkerService {
 
     @Transactional
     public void deleteWorker(Integer workerId) {
-        if (workerRepository.countById(workerId) == 0) {
+        log.info("[DELETE] - Intentando eliminar worker con ID: {}", workerId);
+        WorkerRepository.WorkerProjection worker = workerRepository.findByIdWorker(workerId);
+        if (worker == null) {
+            log.error("[DELETE] - Worker no encontrado con ID: {}", workerId);
             throw new RuntimeException("Worker no encontrado con ID: " + workerId);
         }
+
+        log.info("[DELETE] - Worker encontrado, photoPublicId: {}", worker.getPhotoPublicId());
+        
+        if (worker.getPhotoPublicId() != null && !worker.getPhotoPublicId().isEmpty()) {
+            try {
+                log.info("[DELETE] - Eliminando imagen de Cloudinary: {}", worker.getPhotoPublicId());
+                imageService.deleteImage(worker.getPhotoPublicId());
+                log.info("[DELETE] - Imagen eliminada exitosamente de Cloudinary");
+            } catch (Exception e) {
+                log.error("[DELETE ERROR] - No se pudo eliminar la imagen de Cloudinary: {}", e.getMessage());
+            }
+        }
+
         workerRepository.deleteWorkerById(workerId);
+        log.info("[DELETE] - Worker eliminado de base de datos");
     }
 
     @Transactional
@@ -101,20 +113,28 @@ public class WorkerService {
             throw new RuntimeException("Worker no encontrado con ID: " + workerId);
         }
 
-        Integer existingName = workerRepository.existsByNameExcludingId(request.getName(), workerId);
-        if (existingName != null) {
-            log.warn("[FIELD VIOLATION] - El nombre del worker ya está en uso: {}", request.getName());
-            throw new RuntimeException("El nombre del worker ya está en uso");
-        }
-
         String notas = request.getNotas() != null ? request.getNotas() : null;
         String photo = null;
         String photoPublicId = null;
 
+        WorkerRepository.WorkerProjection existing = workerRepository.findByIdWorker(workerId);
+        boolean removingPhoto = (request.getPhoto() == null || request.getPhoto().isEmpty()) 
+            && existing.getPhoto() != null;
+
         if (request.getPhoto() != null && !request.getPhoto().isEmpty()) {
-            WorkerRepository.WorkerProjection existing = workerRepository.findByIdWorker(workerId);
             photoPublicId = existing.getPhotoPublicId() != null ? existing.getPhotoPublicId() : "worker_" + workerId;
             photo = imageService.uploadImage(request.getPhoto(), photoPublicId);
+        } else if (removingPhoto) {
+            if (existing.getPhotoPublicId() != null && !existing.getPhotoPublicId().isEmpty()) {
+                try {
+                    log.info("[UPDATE] - Eliminando imagen anterior de Cloudinary: {}", existing.getPhotoPublicId());
+                    imageService.deleteImage(existing.getPhotoPublicId());
+                } catch (Exception e) {
+                    log.warn("[UPDATE WARN] - No se pudo eliminar la imagen anterior: {}", e.getMessage());
+                }
+            }
+            photo = null;
+            photoPublicId = null;
         }
 
         Integer updated = workerRepository.updateWorker(

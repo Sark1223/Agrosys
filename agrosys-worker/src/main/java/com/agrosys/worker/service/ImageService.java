@@ -76,10 +76,12 @@ public class ImageService {
 
     public void deleteImage(String publicId) {
         try {
-            cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
-            log.info("[DELETE SUCCESS] - Deleted: {}", publicId);
+            String fullPublicId = "agrosys/workers/" + publicId;
+            Map<String, Object> result = cloudinary.uploader().destroy(fullPublicId, ObjectUtils.emptyMap());
+            log.info("[DELETE SUCCESS] - Deleted: {}, result: {}", fullPublicId, result);
         } catch (IOException e) {
-            log.warn("[DELETE FAILED] - {}", e.getMessage());
+            log.error("[DELETE FAILED] - {}", e.getMessage());
+            throw new RuntimeException("Error al eliminar imagen de Cloudinary: " + e.getMessage());
         }
     }
 }
