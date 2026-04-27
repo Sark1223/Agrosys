@@ -57,6 +57,11 @@ public class workerController {
     @ResponseBody
     public ResponseEntity<Response> getAllWorkers(HttpSession session) {
         try {
+            List<String> modules = jwtHelper.getUserModules(session);
+            if (!modules.contains("MODULE_TRABAJADORES")) {
+                return ResponseEntity.status(403).build();
+            }
+
             String token = (String) session.getAttribute("JWT_TOKEN");
 
             Response response = gatewayClient.get(
@@ -71,15 +76,41 @@ public class workerController {
         }
     }
 
-    @PostMapping("/register")
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
-    public ResponseEntity<Response> registerWorker(@RequestBody Map<String, String> body, HttpSession session) {
+    public ResponseEntity<Response> registerWorker(
+            @RequestParam String nombre,
+            @RequestParam BigDecimal salary,
+            @RequestParam(required = false) String notas,
+            @RequestParam(required = false) MultipartFile photo,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_TRABAJADORES")) {
+            return ResponseEntity.status(403).build();
+        }
+
+        String photoString = null;
+        if (photo != null && !photo.isEmpty()) {
+            try {
+                byte[] photoBytes = photo.getBytes();
+                photoString = java.util.Base64.getEncoder().encodeToString(photoBytes);
+            } catch (IOException e) {
+                log.error("Error al convertir la foto: {}", e.getMessage());
+                throw new RuntimeException("Error al convertir la foto: " + e.getMessage());
+            }
+        }
+
+        WorkerRequest request = new WorkerRequest();
+        request.setName(nombre);
+        request.setSalary(salary);
+        request.setNotas(notas);
+        request.setPhoto(photoString);
 
         String token = (String) session.getAttribute("JWT_TOKEN");
-
         Response response = gatewayClient.post(
                 "/api/workers/register",
-                body,
+                request,
                 Response.class,
                 token);
 
@@ -90,6 +121,11 @@ public class workerController {
     @ResponseBody
     public ResponseEntity<Response> deleteWorker(@RequestBody Map<String, Integer> body, HttpSession session) {
         try {
+            List<String> modules = jwtHelper.getUserModules(session);
+            if (!modules.contains("MODULE_TRABAJADORES")) {
+                return ResponseEntity.status(403).build();
+            }
+
             String token = (String) session.getAttribute("JWT_TOKEN");
             Integer workerId = body.get("workerId");
             log.info("Intentando eliminar worker con ID: {}", workerId);

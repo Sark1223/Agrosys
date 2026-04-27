@@ -45,23 +45,30 @@ public class AgrosysWorkerController {
         return ResponseEntity.ok(successResponse);
     }
 
-    @PostMapping("/register")
+@PostMapping("/register")
     @PreAuthorize("hasAuthority('MODULE_TRABAJADORES')")
     public ResponseEntity<Response> createWorker(@Valid @RequestBody WorkerRequest request) {
         log.info("[REQUEST] - request: {}", request);
-        WorkerResponse response = workerService.crearWorker(request);
-        Response successResponse = Response.builder()
-                .success(true)
-                .message("Worker registrado exitosamente")
-                .data(response)
-                .build();
-        return ResponseEntity.status(HttpStatus.CREATED).body(successResponse);
+        try {
+            WorkerResponse response = workerService.crearWorker(request);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(Response.builder()
+                            .success(true)
+                            .message("Worker registrado exitosamente")
+                            .data(response)
+                            .build());
+        } catch (Exception e) {
+            log.error("Error al registrar worker: {}", e.getMessage());
+            throw new RuntimeException("Error al registrar worker: " + e.getMessage());
+        }
     }
 
-@DeleteMapping("/delete")
+    @DeleteMapping("/delete")
     @PreAuthorize("hasAuthority('MODULE_TRABAJADORES')")
-    public ResponseEntity<Response> deleteWorker(@RequestBody DeleteRequest request) {
+    public ResponseEntity<Response> deleteWorker(@Valid @RequestBody DeleteRequest request) {
         Integer workerId = request.getWorkerId();
+        log.info("[REQUEST DELETE] - workerId: {}", workerId);
+        
         if (workerId == null) {
             return ResponseEntity.badRequest()
                     .body(Response.builder()
@@ -78,14 +85,13 @@ public class AgrosysWorkerController {
         } catch (Exception e) {
             log.error("Error al eliminar worker: {}", e.getMessage());
             throw new RuntimeException("Error al eliminar worker: " + e.getMessage());
-        
         }
     }
 
     @PutMapping("/update/{workerId}")
     @PreAuthorize("hasAuthority('MODULE_TRABAJADORES')")
     public ResponseEntity<Response> updateWorker(@PathVariable Integer workerId, 
-        @Valid @RequestBody WorkerRequest request) {
+            @Valid @RequestBody WorkerRequest request) {
         log.info("[REQUEST UPDATE] - workerId: {}, request: {}", workerId, request);
         try {
             Response response = workerService.actualizarWorker(workerId, request);
