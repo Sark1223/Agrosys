@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.agrosys.worker.dto.Response;
 import com.agrosys.worker.dto.WorkerRequest;
 import com.agrosys.worker.dto.WorkerResponse;
 import com.agrosys.worker.repository.WorkerRepository;
@@ -80,7 +81,7 @@ public class WorkerService {
     }
 
     @Transactional
-    public WorkerResponse actualizarWorker(Integer workerId, WorkerRequest request) {
+    public Response actualizarWorker(Integer workerId, WorkerRequest request) {
         log.info("[REQUEST UPDATE] - workerId: {}, request: {}", workerId, request);
 
         if (workerRepository.countById(workerId) == 0) {
@@ -121,14 +122,10 @@ public class WorkerService {
         log.info("[SUCCESS] - Worker actualizado exitosamente: {} con ID: {}",
                 saved.getName(), saved.getWorkerId());
 
-        return WorkerResponse.builder()
-                .workerId(saved.getWorkerId())
-                .name(saved.getName())
-                .notas(saved.getNotas())
-                .salary(saved.getSalary())
-                .photo(saved.getPhoto())
-                .message("Worker actualizado exitosamente")
+        return Response.builder()
                 .success(true)
+                .message("Worker actualizado exitosamente")
+                .data(null)
                 .build();
     }
 }

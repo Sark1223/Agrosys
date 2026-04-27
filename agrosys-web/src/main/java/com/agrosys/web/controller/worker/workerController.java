@@ -1,21 +1,25 @@
 package com.agrosys.web.controller.worker;
 
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.agrosys.web.dto.Response;
+import com.agrosys.web.dto.worker.WorkerRequest;
 import com.agrosys.web.utils.GatewayClient;
 import com.agrosys.web.utils.JwtHelper;
 
@@ -34,7 +38,7 @@ public class workerController {
 
     @GetMapping
     public String workersPage(
-            @RequestParam(required = false, defaultValue = "usuarios") String tab,
+            @RequestParam(required = false, defaultValue = "workers") String tab,
             HttpSession session, Model model) {
 
         List<String> modules = jwtHelper.getUserModules(session);
@@ -51,89 +55,107 @@ public class workerController {
 
     @GetMapping("/get-all")
     @ResponseBody
-    public ResponseEntity<Object> getAllWorkers(HttpSession session) {
+    public ResponseEntity<Response> getAllWorkers(HttpSession session) {
         try {
             String token = (String) session.getAttribute("JWT_TOKEN");
 
-            Object response = gatewayClient.get(
+            Response response = gatewayClient.get(
                     "/api/workers/get-all",
-                    Object.class,
+                    Response.class,
                     token);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("[FAILED] - Error al obtener workers: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("success", false, "message", "Error al obtener workers"));
+            throw new RuntimeException("Error al obtener workers: " + e.getMessage());
         }
     }
 
     @PostMapping("/register")
     @ResponseBody
-    public ResponseEntity<Object> registerWorker(@RequestBody Map<String, String> body, HttpSession session) {
-        try {
-            String token = (String) session.getAttribute("JWT_TOKEN");
+    public ResponseEntity<Response> registerWorker(@RequestBody Map<String, String> body, HttpSession session) {
 
-            Object response = gatewayClient.post(
-                    "/api/workers/register",
-                    body,
-                    Object.class,
-                    token);
+        String token = (String) session.getAttribute("JWT_TOKEN");
 
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            log.error("[FAILED] - Error al registrar worker: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("success", false, "message", "Error al registrar worker"));
-        }
+        Response response = gatewayClient.post(
+                "/api/workers/register",
+                body,
+                Response.class,
+                token);
+
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/delete")
     @ResponseBody
-    public ResponseEntity<Object> deleteWorker(@RequestBody Map<String, Integer> body, HttpSession session) {
+    public ResponseEntity<Response> deleteWorker(@RequestBody Map<String, Integer> body, HttpSession session) {
         try {
             String token = (String) session.getAttribute("JWT_TOKEN");
             Integer workerId = body.get("userId");
             log.info("Intentando eliminar worker con ID: {}", workerId);
 
             if (workerId == null) {
-                return ResponseEntity.badRequest()
-                        .body(Map.of("success", false, "message", "ID del worker no proporcionado"));
+                throw new IllegalArgumentException("ID del worker no proporcionado");
             }
 
             Map<String, Integer> requestBody = Map.of("id", workerId);
 
-            Object response = gatewayClient.delete(
+            Response response = gatewayClient.delete(
                     "/api/workers/delete",
                     requestBody,
-                    Object.class,
+                    Response.class,
                     token);
 
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
+
+        } catch (IllegalArgumentException e) {
             log.error("[FAILED] - Error al eliminar worker: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("success", false, "message", "Error al eliminar worker: " + e.getMessage()));
+            throw new RuntimeException("Error al eliminar worker: " + e.getMessage());
         }
     }
 
-    @PutMapping("/update")
+    @PostMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
-    public ResponseEntity<Object> updateWorker(@RequestBody Map<String, Object> body, HttpSession session) {
-        try {
-            String token = (String) session.getAttribute("JWT_TOKEN");
+    public ResponseEntity<Response> updateWorker(
+            @RequestParam Integer workerId,
+            @RequestParam String nombre,
+            @RequestParam BigDecimal salary,
+            @RequestParam(required = false) String notas,
+            @RequestParam(required = false) MultipartFile photo,
+            HttpSession session) {
 
-            Object response = gatewayClient.put(
-                    "/api/workers/update",
-                    body,
-                    Object.class,
-                    token);
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_TRABAJADORES"))
+            return ResponseEntity.status(403).build();
 
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            log.error("[FAILED] - Error al actualizar worker: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("success", false, "message", "Error al actualizar worker"));
+        // Convertir MultipartFile a String
+        String photoString = null;
+
+        log.info("[REQUEST UPDATE] - workerId: {}, nombre: {}, salary: {}, notas: {}, photo: {}",
+                workerId, nombre, salary, notas, photo);
+
+        if (photo != null && !photo.isEmpty()) {
+            try {
+                byte[] photoBytes = photo.getBytes();
+                photoString = java.util.Base64.getEncoder().encodeToString(photoBytes);
+            } catch (IOException e) {
+                log.error("Error al convertir la foto: {}", e.getMessage());
+                throw new RuntimeException("Error al convertir la foto: " + e.getMessage());
+            }
         }
+
+        WorkerRequest request = new WorkerRequest();
+        request.setName(nombre);
+        request.setSalary(salary);
+        request.setNotas(notas);
+        request.setPhoto(photoString);
+
+        Response response = gatewayClient.put(
+                "/api/workers/update/" + workerId,
+                request,
+                Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
+
+        return ResponseEntity.ok(response);
     }
 }

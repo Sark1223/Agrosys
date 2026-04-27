@@ -1,6 +1,22 @@
 let currentWorkerId = null;
 let workersData = [];
 
+$('#btn-submit-edit-worker').on('click', function () {
+    const $f = $('#editWorkerForm');
+    const activeTab = getActiveTab();
+    $.fn.postFormData($f, $f.attr('action'), '/agrosys/workers?tab=' + activeTab);
+});
+
+function getActiveTab() {
+    const activeTabLink = document.querySelector('.nav-link.active');
+    if (activeTabLink) {
+        const href = activeTabLink.getAttribute('href');
+        return href.replace('#', '');
+    }
+    return 'workers'; // Valor por defecto si no se encuentra el enlace activo
+}
+
+
 function fileToBase64(file) {
     return new Promise(function(resolve, reject) {
         var reader = new FileReader();
@@ -14,14 +30,14 @@ function fileToBase64(file) {
     });
 }
 
-$('#btn-submit-add-user').on('click', function() {
+$('#btn-submit-add-worker').on('click', function() {
     var nombre = $('#nombreInput').val().trim();
-    var notas = $('#apellidoInput').val().trim();
+    var notas = $('#notasInput').val().trim();
     var salary = $('#salaryInput').val().trim();
     var photoFile = $('#photoInput')[0].files[0];
 
     if (!nombre || !salary) {
-        $('#addUserForm')[0].reportValidity();
+        $('#addWorkerForm')[0].reportValidity();
         return;
     }
 
@@ -29,16 +45,16 @@ $('#btn-submit-add-user').on('click', function() {
     if (photoFile) {
         fileToBase64(photoFile).then(function(base64) {
             photo = base64;
-            submitAddUser(nombre, notas, salary, photo);
+            submitAddWorker(nombre, notas, salary, photo);
         }).catch(function(e) {
             Swal.fire({ icon: 'error', title: 'Error', text: 'Error al procesar la imagen' });
         });
     } else {
-        submitAddUser(nombre, notas, salary, photo);
+        submitAddWorker(nombre, notas, salary, photo);
     }
 });
 
-function submitAddUser(nombre, notas, salary, photo) {
+function submitAddWorker(nombre, notas, salary, photo) {
     var data = {
         name: nombre,
         notas: notas || null,
@@ -58,8 +74,8 @@ function submitAddUser(nombre, notas, salary, photo) {
                     title: 'Exito',
                     text: 'Worker registrado exitosamente'
                 }).then(function() {
-                    $('#modalAddUser').modal('hide');
-                    $('#addUserForm')[0].reset();
+                    $('#modalAddWorker').modal('hide');
+                    $('#addWorkerForm')[0].reset();
                     $.fn.getAllWorkers();
                 });
             } else {
@@ -73,38 +89,38 @@ function submitAddUser(nombre, notas, salary, photo) {
     });
 }
 
-$('#btn-submit-edit-user').on('click', function() {
-    var workerId = $('#workerIdInputEdit').val();
-    var nombre = $('#nombreInputEdit').val().trim();
-    var notas = $('#notasInputEdit').val().trim();
-    var salary = $('#salaryInputEdit').val().trim();
-    var photoFile = $('#photoInputEdit')[0].files[0];
+// $('#btn-submit-edit-worker').on('click', function() {
+//     var workerId = $('#workerIdInputEdit').val();
+//     var nombre = $('#nombreInputEdit').val().trim();
+//     var notas = $('#notasInputEdit').val().trim();
+//     var salary = $('#salaryInputEdit').val().trim();
+//     var photoFile = $('#photoInputEdit')[0].files[0];
 
-    if (!workerId || !nombre || !salary) {
-        $('#editUserForm')[0].reportValidity();
-        return;
-    }
+//     if (!workerId || !nombre || !salary) {
+//         $('#editWorkerForm')[0].reportValidity();
+//         return;
+//     }
 
-    var photo = null;
-    if (photoFile) {
-        fileToBase64(photoFile).then(function(base64) {
-            photo = base64;
-            submitEditWorker(workerId, nombre, notas, salary, photo);
-        }).catch(function(e) {
-            Swal.fire({ icon: 'error', title: 'Error', text: 'Error al procesar la imagen' });
-        });
-    } else {
-        var currentWorker = null;
-        for (var i = 0; i < workersData.length; i++) {
-            if (workersData[i].workerId === parseInt(workerId)) {
-                currentWorker = workersData[i];
-                break;
-            }
-        }
-        photo = currentWorker ? currentWorker.photo : null;
-        submitEditWorker(workerId, nombre, notas, salary, photo);
-    }
-});
+//     var photo = null;
+//     if (photoFile) {
+//         fileToBase64(photoFile).then(function(base64) {
+//             photo = base64;
+//             submitEditWorker(workerId, nombre, notas, salary, photo);
+//         }).catch(function(e) {
+//             Swal.fire({ icon: 'error', title: 'Error', text: 'Error al procesar la imagen' });
+//         });
+//     } else {
+//         var currentWorker = null;
+//         for (var i = 0; i < workersData.length; i++) {
+//             if (workersData[i].workerId === parseInt(workerId)) {
+//                 currentWorker = workersData[i];
+//                 break;
+//             }
+//         }
+//         photo = currentWorker ? currentWorker.photo : null;
+//         submitEditWorker(workerId, nombre, notas, salary, photo);
+//     }
+// });
 
 function submitEditWorker(workerId, nombre, notas, salary, photo) {
     var data = {
@@ -127,8 +143,8 @@ function submitEditWorker(workerId, nombre, notas, salary, photo) {
                     title: 'Exito',
                     text: 'Worker actualizado exitosamente'
                 }).then(function() {
-                    $('#modalEditUser').modal('hide');
-                    $('#editUserForm')[0].reset();
+                    $('#modalEditWorker').modal('hide');
+                    $('#editWorkerForm')[0].reset();
                     $.fn.getAllWorkers();
                 });
             } else {
@@ -162,7 +178,7 @@ $('#btn-submit-delete-user').on('click', function() {
                     title: 'Exito',
                     text: 'Worker eliminado exitosamente'
                 }).then(function() {
-                    $('#modalDeleteUser').modal('hide');
+                    $('#modalDeleteWorker').modal('hide');
                     currentWorkerId = null;
                     $.fn.getAllWorkers();
                 });
@@ -182,14 +198,14 @@ $.fn.getAllWorkers = function() {
         url: '/agrosys/workers/get-all',
         type: 'GET',
         success: function(response) {
-            var cardsContainer = $('#cardsContainerUsers');
+            var cardsContainer = $('#cardsContainerWorkers');
             cardsContainer.html('');
 
             if (response.success && Array.isArray(response.data)) {
                 workersData = response.data;
 
                 if (response.data.length === 0) {
-                    cardsContainer.html('<div class="alert alert-info text-center">No hay trabajadores registrados.</div>');
+                    cardsContainer.html('<div class="d-flex justify-content-center align-items-center text-body-tertiary fs-4 fst-italic w-100" style="height: 100px;">No hay trabajadores registrados.</div>');
                     return;
                 }
 
@@ -251,7 +267,7 @@ $.fn.getAllWorkers = function() {
                         $('#viewWorkerNotas').text(w.notas || 'Sin notas');
                         $('#viewWorkerSalary').text(parseFloat(w.salary || 0).toFixed(2));
 
-                        $('#modalViewUser').modal('show');
+                        $('#modalViewWorker').modal('show');
                     });
 
                     workerCard.find('.edit-worker').on('click', function(e) {
@@ -274,14 +290,14 @@ $.fn.getAllWorkers = function() {
                             $('#currentPhotoPreview').html('');
                         }
 
-                        $('#modalEditUser').modal('show');
+                        $('#modalEditWorker').modal('show');
                     });
 
                     workerCard.find('.delete-worker').on('click', function(e) {
                         e.stopPropagation();
                         currentWorkerId = workerId;
                         $('#textDelete').text('Esta seguro de que desea eliminar al trabajador ' + nombre + '?');
-                        $('#modalDeleteUser').modal('show');
+                        $('#modalDeleteWorker').modal('show');
                     });
 
                     cardsContainer.append(workerCard);

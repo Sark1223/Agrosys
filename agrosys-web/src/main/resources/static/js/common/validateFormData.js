@@ -94,7 +94,12 @@ $.fn.postFormData = function (form, rutaPost, redirectUrl) {
                         formData.append(name, value);
                     }
                 }
-                else {
+                else if ($field.attr("type") === "file") {
+                    if ($field[0].files.length > 0) {
+                        formData.append(name, $field[0].files[0]);
+                        console.log(`Archivo agregado: ${name} = ${$field[0].files[0].name}`);
+                    }
+                } else {
                     formData.append(name, value);
                 }
             } else {

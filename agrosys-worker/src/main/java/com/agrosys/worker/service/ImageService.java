@@ -22,8 +22,7 @@ public class ImageService {
 
     public String uploadImage(String base64Data) {
         try {
-            String base64Image = extractBase64(base64Data);
-            byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+            byte[] imageBytes = Base64.getDecoder().decode(base64Data);
             return uploadBytes(imageBytes, "worker_photo");
         } catch (IllegalArgumentException e) {
             log.error("[INVALID BASE64] - {}", e.getMessage());
@@ -59,12 +58,5 @@ public class ImageService {
         } catch (IOException e) {
             log.warn("[DELETE FAILED] - {}", e.getMessage());
         }
-    }
-
-    private String extractBase64(String dataUrl) {
-        if (dataUrl == null || !dataUrl.contains(",")) {
-            throw new IllegalArgumentException("No se encontró datos Base64 en el string");
-        }
-        return dataUrl.split(",")[1];
     }
 }
