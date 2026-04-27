@@ -118,23 +118,13 @@ public class WorkerService {
         String photoPublicId = null;
 
         WorkerRepository.WorkerProjection existing = workerRepository.findByIdWorker(workerId);
-        boolean removingPhoto = (request.getPhoto() == null || request.getPhoto().isEmpty()) 
-            && existing.getPhoto() != null;
 
         if (request.getPhoto() != null && !request.getPhoto().isEmpty()) {
             photoPublicId = existing.getPhotoPublicId() != null ? existing.getPhotoPublicId() : "worker_" + workerId;
             photo = imageService.uploadImage(request.getPhoto(), photoPublicId);
-        } else if (removingPhoto) {
-            if (existing.getPhotoPublicId() != null && !existing.getPhotoPublicId().isEmpty()) {
-                try {
-                    log.info("[UPDATE] - Eliminando imagen anterior de Cloudinary: {}", existing.getPhotoPublicId());
-                    imageService.deleteImage(existing.getPhotoPublicId());
-                } catch (Exception e) {
-                    log.warn("[UPDATE WARN] - No se pudo eliminar la imagen anterior: {}", e.getMessage());
-                }
-            }
-            photo = null;
-            photoPublicId = null;
+        } else {
+            photo = existing.getPhoto();
+            photoPublicId = existing.getPhotoPublicId();
         }
 
         Integer updated = workerRepository.updateWorker(
