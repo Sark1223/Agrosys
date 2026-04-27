@@ -91,14 +91,14 @@ public class workerController {
     public ResponseEntity<Response> deleteWorker(@RequestBody Map<String, Integer> body, HttpSession session) {
         try {
             String token = (String) session.getAttribute("JWT_TOKEN");
-            Integer workerId = body.get("userId");
+            Integer workerId = body.get("workerId");
             log.info("Intentando eliminar worker con ID: {}", workerId);
 
             if (workerId == null) {
                 throw new IllegalArgumentException("ID del worker no proporcionado");
             }
 
-            Map<String, Integer> requestBody = Map.of("id", workerId);
+            Map<String, Integer> requestBody = Map.of("workerId", workerId);
 
             Response response = gatewayClient.delete(
                     "/api/workers/delete",

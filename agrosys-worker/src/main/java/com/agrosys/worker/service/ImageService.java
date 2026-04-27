@@ -20,10 +20,33 @@ public class ImageService {
 
     private final Cloudinary cloudinary;
 
+    private String extractBase64(String data) {
+        if (data == null) return null;
+        if (data.contains(",")) {
+            return data.substring(data.indexOf(",") + 1);
+        }
+        return data;
+    }
+
     public String uploadImage(String base64Data) {
         try {
-            byte[] imageBytes = Base64.getDecoder().decode(base64Data);
+            String pureBase64 = extractBase64(base64Data);
+            byte[] imageBytes = Base64.getDecoder().decode(pureBase64);
             return uploadBytes(imageBytes, "worker_photo");
+        } catch (IllegalArgumentException e) {
+            log.error("[INVALID BASE64] - {}", e.getMessage());
+            throw new RuntimeException("Formato Base64 inválido");
+        } catch (IOException e) {
+            log.error("[UPLOAD FAILED] - {}", e.getMessage());
+            throw new RuntimeException("Error al subir imagen a Cloudinary");
+        }
+    }
+
+    public String uploadImage(String base64Data, String publicId) {
+        try {
+            String pureBase64 = extractBase64(base64Data);
+            byte[] imageBytes = Base64.getDecoder().decode(pureBase64);
+            return uploadBytes(imageBytes, publicId);
         } catch (IllegalArgumentException e) {
             log.error("[INVALID BASE64] - {}", e.getMessage());
             throw new RuntimeException("Formato Base64 inválido");

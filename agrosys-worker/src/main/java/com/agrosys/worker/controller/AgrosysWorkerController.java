@@ -1,7 +1,6 @@
 package com.agrosys.worker.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.agrosys.worker.dto.DeleteRequest;
 import com.agrosys.worker.dto.Response;
 import com.agrosys.worker.dto.WorkerRequest;
 import com.agrosys.worker.dto.WorkerResponse;
@@ -58,10 +58,10 @@ public class AgrosysWorkerController {
         return ResponseEntity.status(HttpStatus.CREATED).body(successResponse);
     }
 
-    @DeleteMapping("/delete")
+@DeleteMapping("/delete")
     @PreAuthorize("hasAuthority('MODULE_TRABAJADORES')")
-    public ResponseEntity<Response> deleteWorker(@RequestBody Map<String, Integer> body) {
-        Integer workerId = body.get("id");  // ← espera "id"
+    public ResponseEntity<Response> deleteWorker(@RequestBody DeleteRequest request) {
+        Integer workerId = request.getWorkerId();
         if (workerId == null) {
             return ResponseEntity.badRequest()
                     .body(Response.builder()

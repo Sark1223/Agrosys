@@ -35,17 +35,13 @@ public class WorkerService {
         }
 
         String notas = request.getNotas() != null ? request.getNotas() : null;
-        String photo = null;
-
-        if (request.getPhoto() != null && !request.getPhoto().isEmpty()) {
-            photo = imageService.uploadImage(request.getPhoto());
-        }
 
         Integer worker = workerRepository.insertWorker(
                 request.getName(),
                 notas,
                 request.getSalary(),
-                photo);
+                null,
+                null);
 
         if (worker == null || worker == 0) {
             log.error("[FAILED] - No se pudo registrar el worker");
@@ -58,6 +54,22 @@ public class WorkerService {
             throw new RuntimeException("No se pudo recuperar el worker registrado");
         }
 
+        String photo = null;
+        String photoPublicId = null;
+
+        if (request.getPhoto() != null && !request.getPhoto().isEmpty()) {
+            photoPublicId = "worker_" + saved.getWorkerId();
+            photo = imageService.uploadImage(request.getPhoto(), photoPublicId);
+            workerRepository.updateWorker(
+                    saved.getWorkerId(),
+                    saved.getName(),
+                    saved.getNotas(),
+                    saved.getSalary(),
+                    photo,
+                    photoPublicId);
+            saved = workerRepository.findByName(request.getName());
+        }
+
         log.info("[SUCCESS] - Worker registrado exitosamente: {} con ID: {}",
                 saved.getName(), saved.getWorkerId());
 
@@ -67,6 +79,7 @@ public class WorkerService {
                 .notas(saved.getNotas())
                 .salary(saved.getSalary())
                 .photo(saved.getPhoto())
+                .photoPublicId(saved.getPhotoPublicId())
                 .message("Worker registrado exitosamente")
                 .success(true)
                 .build();
@@ -96,9 +109,12 @@ public class WorkerService {
 
         String notas = request.getNotas() != null ? request.getNotas() : null;
         String photo = null;
+        String photoPublicId = null;
 
         if (request.getPhoto() != null && !request.getPhoto().isEmpty()) {
-            photo = imageService.uploadImage(request.getPhoto());
+            WorkerRepository.WorkerProjection existing = workerRepository.findByIdWorker(workerId);
+            photoPublicId = existing.getPhotoPublicId() != null ? existing.getPhotoPublicId() : "worker_" + workerId;
+            photo = imageService.uploadImage(request.getPhoto(), photoPublicId);
         }
 
         Integer updated = workerRepository.updateWorker(
@@ -106,7 +122,8 @@ public class WorkerService {
                 request.getName(),
                 notas,
                 request.getSalary(),
-                photo);
+                photo,
+                photoPublicId);
 
         if (updated == null || updated == 0) {
             log.error("[FAILED] - No se pudo actualizar el worker");

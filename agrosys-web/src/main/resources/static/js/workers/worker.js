@@ -158,7 +158,7 @@ function submitEditWorker(workerId, nombre, notas, salary, photo) {
     });
 }
 
-$('#btn-submit-delete-user').on('click', function() {
+$('#btn-submit-delete-worker').on('click', function() {
     var id = currentWorkerId;
 
     if (!id) {
@@ -170,7 +170,7 @@ $('#btn-submit-delete-user').on('click', function() {
         url: '/agrosys/workers/delete',
         type: 'DELETE',
         contentType: 'application/json',
-        data: JSON.stringify({ userId: parseInt(id) }),
+        data: JSON.stringify({ workerId: parseInt(id) }),
         success: function(response) {
             if (response.success) {
                 Swal.fire({
