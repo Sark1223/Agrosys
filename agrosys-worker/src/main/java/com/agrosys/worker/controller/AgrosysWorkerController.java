@@ -39,7 +39,7 @@ public class AgrosysWorkerController {
         List<WorkerRepository.WorkerProjection> workers = workerService.getAllWorkers();
         Response successResponse = Response.builder()
                 .success(true)
-                .message("Workers obtenidos exitosamente")
+                .message("Trabajadores obtenidos exitosamente")
                 .data(workers)
                 .build();
         return ResponseEntity.ok(successResponse);
@@ -54,12 +54,12 @@ public class AgrosysWorkerController {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(Response.builder()
                             .success(true)
-                            .message("Worker registrado exitosamente")
+                            .message("Trabajador registrado exitosamente")
                             .data(response)
                             .build());
         } catch (Exception e) {
-            log.error("Error al registrar worker: {}", e.getMessage());
-            throw new RuntimeException("Error al registrar worker: " + e.getMessage());
+            log.error("Error al registrar trabajador: {}", e.getMessage());
+            throw new RuntimeException("Error al registrar trabajador: " + e.getMessage());
         }
     }
 
@@ -70,21 +70,17 @@ public class AgrosysWorkerController {
         log.info("[REQUEST DELETE] - workerId: {}", workerId);
         
         if (workerId == null) {
-            return ResponseEntity.badRequest()
-                    .body(Response.builder()
-                            .success(false)
-                            .message("ID del worker no proporcionado")
-                            .build());
+            throw new IllegalArgumentException("Trabajador no proporcionado");
         }
         try {
             workerService.deleteWorker(workerId);
             return ResponseEntity.ok(Response.builder()
                     .success(true)
-                    .message("Worker eliminado exitosamente")
+                    .message("Trabajador eliminado exitosamente")
                     .build());
         } catch (Exception e) {
-            log.error("Error al eliminar worker: {}", e.getMessage());
-            throw new RuntimeException("Error al eliminar worker: " + e.getMessage());
+            log.error("Error al eliminar trabajador: {}", e.getMessage());
+            throw new RuntimeException("Error al eliminar trabajador: " + e.getMessage());
         }
     }
 
@@ -97,8 +93,8 @@ public class AgrosysWorkerController {
             Response response = workerService.actualizarWorker(workerId, request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            log.error("Error al actualizar worker: {}", e.getMessage());
-            throw new RuntimeException("Error al actualizar worker: " + e.getMessage());
+            log.error("Error al actualizar trabajador: {}", e.getMessage());
+            throw new RuntimeException("Error al actualizar trabajador: " + e.getMessage());
         }
     }
 }

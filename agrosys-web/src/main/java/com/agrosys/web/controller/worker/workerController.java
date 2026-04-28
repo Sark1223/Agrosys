@@ -71,8 +71,8 @@ public class workerController {
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            log.error("[FAILED] - Error al obtener workers: {}", e.getMessage());
-            throw new RuntimeException("Error al obtener workers: " + e.getMessage());
+            log.error("[FAILED] - Error al obtener trabajadores: {}", e.getMessage());
+            throw new RuntimeException("Error al obtener trabajadores: " + e.getMessage());
         }
     }
 
@@ -128,10 +128,10 @@ public class workerController {
 
             String token = (String) session.getAttribute("JWT_TOKEN");
             Integer workerId = body.get("workerId");
-            log.info("Intentando eliminar worker con ID: {}", workerId);
+            log.info("Intentando eliminar trabajador con ID: {}", workerId);
 
             if (workerId == null) {
-                throw new IllegalArgumentException("ID del worker no proporcionado");
+                throw new IllegalArgumentException("ID del trabajador no proporcionado");
             }
 
             Map<String, Integer> requestBody = Map.of("workerId", workerId);
@@ -145,8 +145,8 @@ public class workerController {
             return ResponseEntity.ok(response);
 
         } catch (IllegalArgumentException e) {
-            log.error("[FAILED] - Error al eliminar worker: {}", e.getMessage());
-            throw new RuntimeException("Error al eliminar worker: " + e.getMessage());
+            log.error("[FAILED] - Error al eliminar trabajador: {}", e.getMessage());
+            throw new RuntimeException("Error al eliminar trabajador: " + e.getMessage());
         }
     }
 

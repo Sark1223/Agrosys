@@ -55,7 +55,7 @@ function submitEditWorker(workerId, nombre, notas, salary, photo) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Exito',
-                    text: 'Worker actualizado exitosamente'
+                    text: response.message || 'Trabajador actualizado exitosamente'
                 }).then(function() {
                     $('#modalEditWorker').modal('hide');
                     $('#editWorkerForm')[0].reset();
@@ -66,7 +66,7 @@ function submitEditWorker(workerId, nombre, notas, salary, photo) {
             }
         },
         error: function(xhr) {
-            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Error al actualizar el worker';
+            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Error al actualizar el trabajador';
             Swal.fire({ icon: 'error', title: 'Error', text: msg });
         }
     });
@@ -90,7 +90,7 @@ $('#btn-submit-delete-worker').on('click', function() {
                 Swal.fire({
                     icon: 'success',
                     title: 'Exito',
-                    text: 'Worker eliminado exitosamente'
+                    text: response.message || 'Trabajador eliminado exitosamente'
                 }).then(function() {
                     $('#modalDeleteWorker').modal('hide');
                     currentWorkerId = null;
@@ -101,7 +101,7 @@ $('#btn-submit-delete-worker').on('click', function() {
             }
         },
         error: function(xhr) {
-            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Error al eliminar el worker';
+            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Error al eliminar el trabajador';
             Swal.fire({ icon: 'error', title: 'Error', text: msg });
         }
     });
