@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+    <div th:fragment="plotModals">
+        <div class="modal fade" id="modalAddPlot" tabindex="-1" aria-labelledby="modalAddPlot" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Agregar Parcela</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/new}" id="addPlotForm" class="needs-validation"
+                            novalidate>
+                            <div>
+                                <label for="nombrePlotInput" class="form-label mt-4">Nombre <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nombrePlotInput" name="plotName"
+                                    minlength="2" maxlength="50" placeholder="Ingrese el nombre de la parcela"
+                                    autocomplete="off" required>
+                                <div class="invalid-feedback">El nombre es requerido</div>
+                            </div>
+                            <div>
+                                <label for="descripcionPlotInput" class="form-label mt-4">Descripción </label>
+                                <textarea type="text" class="form-control" id="descripcionPlotInput" name="description"
+                                    maxlength="100" placeholder="Ingrese la descripción de la parcela"
+                                    autocomplete="off"></textarea>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-add-plot">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalEditPlot" tabindex="-1" aria-labelledby="modalEditPlotLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Parcela</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/edit}" id="editPlotForm" class="needs-validation"
+                            novalidate>
+                            <input type="number" id="plotIdInputEdit" name="plotId" hidden required>
+                            <div>
+                                <label for="nombrePlotInputEdit" class="form-label mt-4">Nombre <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nombrePlotInputEdit" name="plotName"
+                                    minlength="2" maxlength="50" placeholder="Ingrese el nombre de la parcela"
+                                    autocomplete="off" required>
+                                <div class="invalid-feedback">El nombre es requerido</div>
+                            </div>
+                            <div>
+                                <label for="descripcionPlotInputEdit" class="form-label mt-4">Descripción </label>
+                                <textarea type="text" class="form-control" id="descripcionPlotInputEdit"
+                                    name="description" maxlength="100"
+                                    placeholder="Ingrese la descripción de la parcela" autocomplete="off"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-edit-plot">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:fragment="plantationModals">
+        <div class="modal fade" id="modalAddPlantation" tabindex="-1" aria-labelledby="modalAddPlantation"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Agregar Plantación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/plantations/new}" id="addPlantationForm"
+                            class="needs-validation" novalidate>
+                            <input type="number" id="plotIdInputPlantation" name="plotId" hidden required>
+                            <div>
+                                <label for="nombrePlantationInput" class="form-label mt-4">Nombre <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nombrePlantationInput" name="plantationName"
+                                    minlength="2" maxlength="50" placeholder="Ingrese el nombre de la plantación"
+                                    autocomplete="off" required>
+                                <div class="invalid-feedback">El nombre es requerido</div>
+                            </div>
+                            <!-- <div>
+                                <label for="fechaInicioPlantationInput" class="form-label mt-4">Fecha de Inicio <span
+                                        class="text-danger">*</span></label></label>
+                                <input type="date" class="form-control" id="fechaInicioPlantationInput" name="startAt"
+                                    autocomplete="off" required>
+                            </div>
+                            <div>
+                                <label for="fechaFinalizacionPlantationInput" class="form-label mt-4">Fecha de
+                                    Finalización </label>
+                                <input type="date" class="form-control" id="fechaFinalizacionPlantationInput"
+                                    name="endAt" autocomplete="off">
+                            </div> -->
+                            <div>
+                                <label for="notasPlantationInput" class="form-label mt-4">Notas </label>
+                                <textarea type="text" class="form-control" id="notasPlantationInput" name="notes"
+                                    maxlength="500" placeholder="Notas adicionales sobre la plantación"
+                                    autocomplete="off"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-add-plantation">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalEditPlantation" tabindex="-1" aria-labelledby="modalEditPlotLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Plantación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/plantation/edit}" id="editPlantationForm"
+                            class="needs-validation" novalidate>
+                            <input type="number" id="plotIdInputPlantationEdit" name="plotId" hidden required>
+                            <input type="number" id="plantationIdInputEdit" name="plantationId" hidden required>
+                            <div>
+                                <label for="nombrePlantationInputEdit" class="form-label mt-4">Nombre <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nombrePlantationInputEdit"
+                                    name="plantationName" minlength="2" maxlength="50"
+                                    placeholder="Ingrese el nombre de la plantación" autocomplete="off" required>
+                                <div class="invalid-feedback">El nombre es requerido</div>
+                            </div>
+                            <!-- <div>
+                                <label for="fechaInicioPlantationInputEdit" class="form-label mt-4">Fecha de Inicio
+                                    <span class="text-danger">*</span></label></label>
+                                <input type="date" class="form-control" id="fechaInicioPlantationInputEdit"
+                                    name="startAt" autocomplete="off" required>
+                            </div>
+                            <div>
+                                <label for="fechaFinalizacionPlantationInputEdit" class="form-label mt-4">Fecha de
+                                    Finalización </label>
+                                <input type="date" class="form-control" id="fechaFinalizacionPlantationInputEdit"
+                                    name="endAt" autocomplete="off">
+                            </div> -->
+                            <div>
+                                <label for="notasPlantationInputEdit" class="form-label mt-4">Notas </label>
+                                <textarea type="text" class="form-control" id="notasPlantationInputEdit" name="notes"
+                                    maxlength="500" placeholder="Notas adicionales sobre la plantación"
+                                    autocomplete="off"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-edit-plantation">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalDeletePlantation" tabindex="-1" aria-labelledby="modalDeleteUser"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content border-danger text-white bg-dark">
+                    <div class="modal-header border-danger">
+                        <h5 class="modal-title">Eliminar Plantación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="textDeletePlantation">¿Está seguro de que desea eliminar la plantación?</p>
+                        <form method="post" th:action="@{/plots/plantations/delete}" id="deletePlantationForm"
+                            class="needs-validation" novalidate>
+                            <input type="number" id="plantationIdInputDelete" name="plantationId" hidden required>
+                        </form>
+                    </div>
+                    <div class="modal-footer border-danger fw-bolder">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" id="btn-submit-delete-plantation">
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalDetailsPlantation" tabindex="-1" aria-labelledby="modalDetailsPlantation"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Detalles de la Plantación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-capitalize"><strong>Plantacion:</strong> <span id="plantationDetailsName"></span></p>
+                        <div class="d-flex gap-5 justify-content-between flex-wrap">
+                            <p><strong>Fecha de Inicio:</strong> <span id="plantationDetailsStartAt"></span></p>
+                            <p><strong>Fecha de Finalización:</strong> <span id="plantationDetailsEndAt"></span></p>
+                        </div>
+                        <p class="mb-0"><strong>Notas:</strong></p>
+                        <pre id="plantationDetailsNotes" style="font-family: var(--bs-body-font-family);"></pre>
+
+                        <div class="mt-4">
+                            <div class="d-flex justify-content-end align-items-center mb-2">
+                                <button class="btn btn-sm btn-outline-success" id="btnAddStateToPlantation" data-bs-toggle="modal" data-bs-target="#modalAddPlantationStage" data-bs-dismiss="modal">
+                                    <i class="bi bi-plus pe-2"></i> Agregar Etapa
+                                </button>
+                            </div>
+                            <h6 class="text-center mb-3"><strong>Etapas de la Plantación:</strong></h6>
+                            <div id="containerEstados" > <!-- class="d-flex flex-column gap-3 px-2" -->
+                                <!-- Se cargan las etapas de la plantación por JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:fragment="plantationStageModals">
+        <div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="modalAddPlantationStage" tabindex="-1" aria-labelledby="modalAddPlantationStage" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Agregar Etapa a Plantación</h5>
+                        <button type="button" class="btn-close" data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"  data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/plantation/stage/new}" id="addStateForm"
+                            class="needs-validation" novalidate>
+                            <input type="number" id="plantationIdInputState" name="plantationId" hidden required>
+                            <div>
+                                <label for="nombreStateInput" class="form-label mt-4">Etapa <span class="text-danger">*</span></label>
+                                <select class="form-select" id="nombreStateInput" name="stageId" required>
+                                    <option value="" disabled selected>Seleccione un etapa</option>
+                                    <option value="1">Preparación</option>
+                                    <option value="2">Siembra</option>
+                                    <option value="3">Cocecha</option>
+                                </select>
+                                <div class="invalid-feedback">El estado es requerido</div>
+                            </div>
+                            <div>
+                                <label for="fechaInicioStateInput" class="form-label mt-4">Fecha de Inicio <span class="text-danger">*</span></label></label>
+                                <input type="date" class="form-control" id="fechaInicioStateInput" name="startAt" autocomplete="off" required>
+                            </div>
+                            <div>
+                                <label for="fechaFinalizacionStateInput" class="form-label mt-4">Fecha de Finalización </label>
+                                <input type="date" class="form-control" id="fechaFinalizacionStateInput" name="endAt" autocomplete="off">
+                            </div>
+                            <div>
+                                <label for="notasStateInput" class="form-label mt-4">Notas </label>
+                                <textarea type="text" class="form-control" id="notasStateInput" name="notes" maxlength="500" placeholder="Notas adicionales sobre la etapa" autocomplete="off"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="btn-close-add-state" data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"  data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-add-state">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalEditPlantationStage" tabindex="-1" aria-labelledby="modalEditPlantationStage" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Etapa de Plantación</h5>
+                        <button type="button" class="btn-close" data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"  data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/plantation/stage/edit}" id="editStateForm"
+                            class="needs-validation" novalidate>
+                            <input type="number" id="plantationIdInputStateEdit" name="plantationId" hidden required>
+                            <div>
+                                <label for="nombreStateInputEdit" class="form-label mt-4">Etapa <span class="text-danger">*</span></label>
+                                <select class="form-select" id="nombreStateInputEdit" name="stageId" required disabled>
+                                    <option value="" selected>Seleccione un estado</option>
+                                    <option value="1">Preparación</option>
+                                    <option value="2">Siembra</option>
+                                    <option value="3">Cocecha</option>
+                                </select>
+                                <div class="invalid-feedback">El estado es requerido</div>
+                            </div>
+                            <div>
+                                <label for="fechaInicioStateInputEdit" class="form-label mt-4">Fecha de Inicio <span class="text-danger">*</span></label></label>
+                                <input type="date" class="form-control" id="fechaInicioStateInputEdit" name="startAt" autocomplete="off" required>
+                            </div>
+                            <div>
+                                <label for="fechaFinalizacionStateInputEdit" class="form-label mt-4">Fecha de Finalización<span class="text-danger">*</span> </label>
+                                <input type="date" class="form-control" id="fechaFinalizacionStateInputEdit" name="endAt" autocomplete="off">
+                            </div>
+                            <div>
+                                <label for="notasStateInputEdit" class="form-label mt-4">Notas </label>
+                                <textarea type="text" class="form-control" id="notasStateInputEdit" name="notes" maxlength="500" placeholder="Notas adicionales sobre el estado" autocomplete="off"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="btn-close-edit-state" data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"  data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-edit-state">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalDeletePlantationStage" tabindex="-1" aria-labelledby="modalDeletePlantationStage" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content border-danger text-white bg-dark">
+                    <div class="modal-header border-danger">
+                        <h5 class="modal-title">Eliminar Etapa de Plantación</h5>
+                        <button type="button" class="btn-close" data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"  data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="textDeletePlantationStage">¿Está seguro de que desea eliminar la etapa de la plantación?</p>
+                        <form method="post" th:action="@{/plots/plantation/stage/delete}" id="deleteStateForm" class="needs-validation" novalidate>
+                            <input type="number" id="plantationIdInputStateDelete" name="plantationId" hidden required>
+                            <input type="number" id="stageIdInputStateDelete" name="stageId" hidden required>
+                        </form>
+                    </div>
+                    <div class="modal-footer border-danger fw-bolder">
+                        <button type="button" class="btn btn-secondary" id="btn-close-delete-state" data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"  data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" id="btn-submit-delete-state">
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

@@ -130,7 +130,7 @@ $.fn.postFormData = function (form, rutaPost, redirectUrl) {
     console.log('Datos del formulario:', Object.fromEntries(formData));
 
     // 4. Ejecución del AJAX
-    $.ajax({
+    return $.ajax({
         url: rutaPost,
         type: 'POST',
         data: formData,

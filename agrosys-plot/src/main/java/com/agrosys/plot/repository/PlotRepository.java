@@ -1,0 +1,115 @@
+package com.agrosys.plot.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import com.agrosys.plot.entity.AgrosysPlot;
+
+import jakarta.transaction.Transactional;
+
+@Repository
+public interface PlotRepository extends JpaRepository<AgrosysPlot, Integer> {
+
+        interface PlotProjection {
+                Integer getPlotId();
+
+                String getName();
+
+                String getDescription();
+
+                String getPlantatios();
+        }
+
+        @Query(value = """
+                        WITH ranked AS (
+                                SELECT 
+                                        p.*,
+                                        stage.stageId,
+                                        stage.name AS stage,
+                                        ROW_NUMBER() OVER (
+                                        PARTITION BY p.plantatioId 
+                                        ORDER BY relation.stageId DESC
+                                        ) AS rn
+                                FROM agrosys_db.plantatio p
+                                LEFT JOIN agrosys_db.plantatio_stage_relation relation 
+                                        ON relation.plantatioId = p.plantatioId
+                                LEFT JOIN agrosys_db.plantatio_stage stage 
+                                        ON relation.stageId = stage.stageId
+                                )
+                                , last_states AS (
+                                SELECT *
+                                FROM ranked
+                                WHERE rn = 1
+                                )
+                                SELECT 
+                                plt.plotId, 
+                                plt.name, 
+                                plt.description,
+                                JSON_ARRAYAGG(
+                                        JSON_OBJECT(
+                                        'plantatioId', ls.plantatioId,
+                                        'name', ls.name,
+                                        'start_at', ls.start_at,
+                                        'end_at', COALESCE(ls.end_at, 'N/A'),
+                                        'notas', ls.notas,
+                                        'stageId', ls.stageId,
+                                        'stage', ls.stage
+                                        )
+                                ) AS plantatios
+                                FROM agrosys_db.plot plt
+                                LEFT JOIN (
+                                SELECT *
+                                FROM last_states
+                                ORDER BY plantatioId DESC
+                                LIMIT 10
+                                ) ls ON ls.plotId = plt.plotId
+                                GROUP BY plt.plotId, plt.name, plt.description;
+                                                                                                        """, nativeQuery = true)
+        List<PlotProjection> findAllPlots();
+
+        @Transactional
+        @Modifying
+        @Query(value = """
+                        INSERT INTO agrosys_db.plot (name, description)
+                        VALUES (:name, :description)
+                        """, nativeQuery = true)
+        Integer insertPlot(String name, String description);
+
+        @Query(value = """
+                        SELECT plotId
+                        FROM agrosys_db.plot
+                        WHERE name = :name
+                        """, nativeQuery = true)
+        Integer existsByName(String name);
+
+        @Query(value = """
+                        SELECT plotId
+                        FROM agrosys_db.plot
+                        WHERE name = :name AND plotId != :excludePlotId
+                        """, nativeQuery = true)
+        Integer existsByName(String name, Integer excludePlotId);
+
+        @Transactional
+        @Modifying
+        @Query(value = """
+                        UPDATE agrosys_db.plot
+                        SET
+                                name = :name,
+                                description = :description
+                        WHERE plotId = :plotId
+                        """, nativeQuery = true)
+        Integer updatePlot(Integer plotId, String name, String description);
+
+        // @Transactional
+        // @Modifying
+        // @Query(value = """
+        // DELETE FROM agrosys_auth.ROL
+        // WHERE rolId = :rolId AND rolId NOT IN (SELECT DISTINCT rolId FROM
+        // agrosys_auth.USER)
+        // """, nativeQuery = true)
+        // Integer deleteRol(Integer rolId);
+}
