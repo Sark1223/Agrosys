@@ -33,7 +33,32 @@ $(document).ready(function () {
 
     $('#btn-submit-add-state').on('click', function () {
         const $f = $('#addStateForm');
-        $.fn.postFormData($f, $f.attr('action'));
+        $.fn.postFormData($f, $f.attr('action'))
+            .done(function(response) {
+            if(response.success){
+                //Cerrar modal y recargar información de details
+                $.fn.getStagesByPlantation($('#plantationIdInputState').val());
+                $.fn.getAllPlots();
+
+                $('#btn-close-add-state').trigger('click');
+            }
+        });
+
+        
+    });
+
+    $('#btn-submit-edit-state').on('click', function () {
+        const $f = $('#editStateForm');
+        $.fn.postFormData($f, $f.attr('action'))
+            .done(function(response) {
+            if(response.success){
+                //Cerrar modal y recargar información de details
+                $.fn.getStagesByPlantation($('#plantationIdInputState').val());
+                $.fn.getAllPlots();
+
+                $('#btn-close-edit-state').trigger('click');
+            }
+        });
 
         
     });
@@ -62,11 +87,14 @@ $(document).ready(function () {
                 console.log('Respuesta de etapas:', response);
 
                 if (response.success) {
-                    if (response.data.length > 0) {
+                    const stages = response.data;
+                    const stagesSize = stages.length;
+                    if (stagesSize > 0) {
                         const $containerStages = $('#containerEstados');
                         $containerStages.html('');
 
-                        response.data.forEach(stage => {
+                        stages.forEach(stage => {
+                            let display = stage.id === stagesSize ? 'block' : 'none';
                             const $cardStage = $(`
                                 <div class="card mb-2" id="card-stage${stage.id}-p${plantationId}">
                                     <div class="card-body d-flex flex-row justify-content-between align-items-center gap-3 overflow-auto">
@@ -82,9 +110,11 @@ $(document).ready(function () {
                                                 <i class="ri-more-2-fill" type="button" id="dropdownMenuButton${stage.id}" data-bs-toggle="dropdown" aria-expanded="false">
                                                 </i>
                                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton${stage.id}">
-                                                    <li><a class="dropdown-item edit-plantation-stage" data-bs-toggle="modal" data-bs-target="#modalEditPlantationStage" href="#"><i
+                                                <li><a class="dropdown-item details-plantation-stage" data-bs-toggle="modal" data-bs-target="#modalDetailsPlantationStage" href="#"><i
+                                                                class="ri-eye-line pe-1"></i>Ver detalles</a></li>
+                                                    <li style="display: ${display};"><a class="dropdown-item edit-plantation-stage" data-bs-toggle="modal" data-bs-target="#modalEditPlantationStage" href="#" data-bs-dismiss="modal"><i
                                                                 class="ri-pencil-fill pe-1"></i>Editar</a></li>
-                                                    <li><a class="dropdown-item delete-plantation-stage" data-bs-toggle="modal" data-bs-target="#modalDeletePlantationStage" href="#"><i
+                                                    <li style="display: ${display};"><a class="dropdown-item delete-plantation-stage" data-bs-toggle="modal" data-bs-target="#modalDeletePlantationStage" href="#" data-bs-dismiss="modal"><i
                                                                 class="ri-delete-bin-fill pe-1"></i>Eliminar</a></li>
                                                 </ul>
                                             </div>
@@ -95,7 +125,6 @@ $(document).ready(function () {
 
                             $cardStage.find('.edit-plantation-stage').on('click', function () {
                                 const stageId = stage.id;
-                                const plantationId = plot.id;
                                 
                                 $('#plantationIdInputStateEdit').val(plantationId);
                                 $('#nombreStateInputEdit').val(stageId);
@@ -154,7 +183,6 @@ $(document).ready(function () {
                     console.log('Parcelas obtenidas:', response.data);
 
                     response.data.forEach(plot => {
-                        $('#plotIdInputPlantation').val(plot.plotId);
                         const accordionItem = $(`
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="heading-${plot.plotId}">
@@ -177,7 +205,7 @@ $(document).ready(function () {
                                         <div class="d-flex flex-row justify-content-end align-items-center gap-4 mt-2 mb-3">
                                             <button class="edit-plot btn btn-outline-info btn-sm py-0 px-3" data-bs-toggle="modal"
                                                     data-bs-target="#modalEditPlot">Editar Parcela</button>
-                                            <button class="btn btn-outline-primary btn-sm py-0 px-3" data-bs-toggle="modal"
+                                            <button class="btn btn-outline-primary btn-sm py-0 px-3 btn-agregar-plantacion-parcela" data-bs-toggle="modal"
                                                 data-bs-target="#modalAddPlantation">Agregar Plantación</button>
                                         </div>
                                     </div>
@@ -202,7 +230,7 @@ $(document).ready(function () {
                                 const cardPlantacion = $(`
                                     <div class="card mb-2">
                                         <div class="card-body d-flex flex-row justify-content-between align-items-center gap-3 overflow-auto">
-                                            <p class="card-title text-capitalize p-0 m-0">${plantacion.name.toLowerCase()}</p>
+                                            <p class="card-title text-capitalize p-0 m-0 w-25">${plantacion.name.toLowerCase()}</p>
                                             <p class="card-text p-0 m-0">Fecha de inicio: ${new Date(plantacion.start_at).toLocaleDateString()}</p>
                                             <p class="card-text p-0 m-0">Fecha de finalización: ${plantacion.end_at !== 'N/A' ? new Date(plantacion.end_at).toLocaleDateString() : plantacion.end_at}</p>
                                             <div class="d-flex flex-row justify-content-end align-items-center gap-4">
@@ -215,7 +243,7 @@ $(document).ready(function () {
                                                     </i>
                                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton${plot.plotId}">
                                                         <li><a class="dropdown-item details-plantation" data-bs-toggle="modal" data-bs-target="#modalDetailsPlantation" href="#"><i
-                                                                    class="ri-eye-line pe-1"></i>Detalles</a></li>
+                                                                    class="ri-eye-line pe-1"></i>Ver detalles</a></li>
                                                         <li><a class="dropdown-item edit-plantation" data-bs-toggle="modal" data-bs-target="#modalEditPlantation" href="#"><i
                                                                     class="ri-pencil-fill pe-1"></i>Editar</a></li>
                                                         <li><a class="dropdown-item delete-plantation" data-bs-toggle="modal" data-bs-target="#modalDeletePlantation" href="#"><i
@@ -232,8 +260,8 @@ $(document).ready(function () {
                                         $('#plotIdInputPlantationEdit').val(plot.plotId);
                                         $('#plantationIdInputEdit').val(plantacion.plantatioId);
                                         $('#nombrePlantationInputEdit').val(plantacion.name);
-                                        $('#fechaInicioPlantationInputEdit').val(plantacion.start_at);
-                                        $('#fechaFinalizacionPlantationInputEdit').val(plantacion.end_at);
+                                        // $('#fechaInicioPlantationInputEdit').val(plantacion.start_at);
+                                        // $('#fechaFinalizacionPlantationInputEdit').val(plantacion.end_at);
                                         $('#notasPlantationInputEdit').val(plantacion.notas);
                                     } else {
                                         Swal.fire({
@@ -262,7 +290,7 @@ $(document).ready(function () {
                                     if (plantacion) {
                                         $('#plantationDetailsName').text(`${plantacion.name}`);
                                         $('#plantationDetailsStartAt').text(plantacion.start_at);
-                                        $('#plantationDetailsEndAt').text(plantacion.start_at);
+                                        $('#plantationDetailsEndAt').text(plantacion.end_at);
                                         $('#plantationDetailsNotes').text(plantacion.notas);
                                         $('#plantationIdInputState').val(plantacion.plantatioId);
                                         $('#plantationIdInputStateEdit').val(plantacion.plantatioId);
@@ -284,6 +312,8 @@ $(document).ready(function () {
                             statusDiv.removeAttr('class').addClass('btn border-secondary px-2 py-0 me-5');
                         }
 
+                        
+
                         accordionItem.find('.edit-plot').on('click', function (e) {
                             if (plot) {
                                 $('#plotIdInputEdit').val(plot.plotId);
@@ -296,6 +326,10 @@ $(document).ready(function () {
                                     text: 'No se pudo cargar la información de la parcela para editar'
                                 });
                             }
+                        });
+
+                        accordionItem.find('.btn-agregar-plantacion-parcela').on('click', function(e){
+                            $('#plotIdInputPlantation').val(plot.plotId);
                         });
 
 

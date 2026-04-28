@@ -12,12 +12,12 @@ public class PlantatioRegister {
     @Size(min = 3, max = 50, message = "El nombre debe tener entre 3 y 50 caracteres")
     private String name;
 
-    @NotBlank(message = "La fecha de inicio es requerida")
-    @Size(min = 10, max = 30, message = "La fecha de inicio debe tener entre 10 y 30 caracteres")
-    private String startAt;
+    // @NotBlank(message = "La fecha de inicio es requerida")
+    // @Size(min = 10, max = 30, message = "La fecha de inicio debe tener entre 10 y 30 caracteres")
+    // private String startAt;
 
-    @Size(max = 30, message = "La fecha de fin debe tener entre 10 y 30 caracteres")
-    private String endAt;
+    // @Size(max = 30, message = "La fecha de fin debe tener entre 10 y 30 caracteres")
+    // private String endAt;
 
     @Size(max = 500, message = "Las notas deben tener maximo 500 caracteres")
     private String notas;

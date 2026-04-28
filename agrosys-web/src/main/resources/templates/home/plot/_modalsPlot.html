@@ -101,7 +101,7 @@
                                     autocomplete="off" required>
                                 <div class="invalid-feedback">El nombre es requerido</div>
                             </div>
-                            <div>
+                            <!-- <div>
                                 <label for="fechaInicioPlantationInput" class="form-label mt-4">Fecha de Inicio <span
                                         class="text-danger">*</span></label></label>
                                 <input type="date" class="form-control" id="fechaInicioPlantationInput" name="startAt"
@@ -112,7 +112,7 @@
                                     Finalización </label>
                                 <input type="date" class="form-control" id="fechaFinalizacionPlantationInput"
                                     name="endAt" autocomplete="off">
-                            </div>
+                            </div> -->
                             <div>
                                 <label for="notasPlantationInput" class="form-label mt-4">Notas </label>
                                 <textarea type="text" class="form-control" id="notasPlantationInput" name="notes"
@@ -152,7 +152,7 @@
                                     placeholder="Ingrese el nombre de la plantación" autocomplete="off" required>
                                 <div class="invalid-feedback">El nombre es requerido</div>
                             </div>
-                            <div>
+                            <!-- <div>
                                 <label for="fechaInicioPlantationInputEdit" class="form-label mt-4">Fecha de Inicio
                                     <span class="text-danger">*</span></label></label>
                                 <input type="date" class="form-control" id="fechaInicioPlantationInputEdit"
@@ -163,7 +163,7 @@
                                     Finalización </label>
                                 <input type="date" class="form-control" id="fechaFinalizacionPlantationInputEdit"
                                     name="endAt" autocomplete="off">
-                            </div>
+                            </div> -->
                             <div>
                                 <label for="notasPlantationInputEdit" class="form-label mt-4">Notas </label>
                                 <textarea type="text" class="form-control" id="notasPlantationInputEdit" name="notes"
@@ -216,7 +216,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p class="text-capitalize"><strong>Nombre:</strong> <span id="plantationDetailsName"></span></p>
+                        <p class="text-capitalize"><strong>Plantacion:</strong> <span id="plantationDetailsName"></span></p>
                         <div class="d-flex gap-5 justify-content-between flex-wrap">
                             <p><strong>Fecha de Inicio:</strong> <span id="plantationDetailsStartAt"></span></p>
                             <p><strong>Fecha de Finalización:</strong> <span id="plantationDetailsEndAt"></span></p>
@@ -281,7 +281,7 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"  data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-secondary" id="btn-close-add-state" data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"  data-bs-dismiss="modal">Cancelar</button>
                         <button type="button" class="btn btn-success" id="btn-submit-add-state">
                             Guardar
                         </button>
@@ -295,19 +295,19 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Editar Etapa de Plantación</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"  data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form method="post" th:action="@{/plots/plantation/stage/edit}" id="addStateForm"
+                        <form method="post" th:action="@{/plots/plantation/stage/edit}" id="editStateForm"
                             class="needs-validation" novalidate>
                             <input type="number" id="plantationIdInputStateEdit" name="plantationId" hidden required>
                             <div>
                                 <label for="nombreStateInputEdit" class="form-label mt-4">Etapa <span class="text-danger">*</span></label>
-                                <select class="form-select" id="nombreStateInputEdit" name="stageId" required>
-                                    <option value="" disabled selected>Seleccione un estado</option>
-                                    <options value="1">Preparación</options>
-                                    <options value="2">Siembra</options>
-                                    <options value="3">Cocecha</options>
+                                <select class="form-select" id="nombreStateInputEdit" name="stageId" required disabled>
+                                    <option value="" selected>Seleccione un estado</option>
+                                    <option value="1">Preparación</option>
+                                    <option value="2">Siembra</option>
+                                    <option value="3">Cocecha</option>
                                 </select>
                                 <div class="invalid-feedback">El estado es requerido</div>
                             </div>
@@ -316,7 +316,7 @@
                                 <input type="date" class="form-control" id="fechaInicioStateInputEdit" name="startAt" autocomplete="off" required>
                             </div>
                             <div>
-                                <label for="fechaFinalizacionStateInputEdit" class="form-label mt-4">Fecha de Finalización </label>
+                                <label for="fechaFinalizacionStateInputEdit" class="form-label mt-4">Fecha de Finalización<span class="text-danger">*</span> </label>
                                 <input type="date" class="form-control" id="fechaFinalizacionStateInputEdit" name="endAt" autocomplete="off">
                             </div>
                             <div>
@@ -326,7 +326,7 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-secondary" id="btn-close-edit-state" data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"  data-bs-dismiss="modal">Cancelar</button>
                         <button type="button" class="btn btn-success" id="btn-submit-edit-state">
                             Guardar
                         </button>
@@ -340,7 +340,7 @@
                 <div class="modal-content border-danger text-white bg-dark">
                     <div class="modal-header border-danger">
                         <h5 class="modal-title">Eliminar Etapa de Plantación</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"  data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <p id="textDeletePlantationStage">¿Está seguro de que desea eliminar la etapa de la plantación?</p>
@@ -350,7 +350,7 @@
                         </form>
                     </div>
                     <div class="modal-footer border-danger fw-bolder">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-secondary" id="btn-close-delete-state" data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"  data-bs-dismiss="modal">Cancelar</button>
                         <button type="button" class="btn btn-danger" id="btn-submit-delete-state">
                             Eliminar
                         </button>

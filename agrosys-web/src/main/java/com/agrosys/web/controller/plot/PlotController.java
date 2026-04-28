@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 @RequestMapping("/plots")
 @RequiredArgsConstructor
+@Validated
 @Slf4j
 public class PlotController {
 
@@ -116,8 +118,8 @@ public class PlotController {
     public ResponseEntity<Response> postPlantation(
             @RequestParam Integer plotId,
             @RequestParam String plantationName,
-            @RequestParam String startAt,
-            @RequestParam(required = false) String endAt,
+            // @RequestParam String startAt,
+            // @RequestParam(required = false) String endAt,
             @RequestParam(required = false) String notes,
             HttpSession session) {
 
@@ -127,8 +129,8 @@ public class PlotController {
 
         PlantatioRegister requestData = new PlantatioRegister();
         requestData.setName(plantationName);
-        requestData.setStartAt(startAt);
-        requestData.setEndAt(endAt);
+        // requestData.setStartAt(startAt);
+        // requestData.setEndAt(endAt);
         requestData.setNotas(notes);
         requestData.setPlotId(plotId);
 
@@ -147,8 +149,8 @@ public class PlotController {
             @RequestParam Integer plantationId,
             @RequestParam Integer plotId,
             @RequestParam String plantationName,
-            @RequestParam String startAt,
-            @RequestParam(required = false) String endAt,
+            // @RequestParam String startAt,
+            // @RequestParam(required = false) String endAt,
             @RequestParam(required = false) String notes,
             HttpSession session) {
 
@@ -159,8 +161,6 @@ public class PlotController {
         log.info("Modificación de plantacion: {}", plantationName);
         PlantatioRegister requestData = new PlantatioRegister();
         requestData.setName(plantationName);
-        requestData.setStartAt(startAt);
-        requestData.setEndAt(endAt.equals("") ? "false" : endAt);
         requestData.setNotas(notes);
         requestData.setPlotId(plotId);
 
@@ -246,7 +246,7 @@ public class PlotController {
             @RequestParam Integer plantationId,
             @RequestParam Integer stageId,
             @RequestParam String startAt,
-            @RequestParam(required = false) String endAt,
+            @RequestParam String endAt,
             @RequestParam(required = false) String notes,
             HttpSession session) {
 
@@ -259,10 +259,10 @@ public class PlotController {
         requestData.setPlantatioId(plantationId);
         requestData.setStageId(stageId);
         requestData.setStartAt(startAt);
-        requestData.setEndAt(endAt.equals("") ? "false" : endAt);
+        requestData.setEndAt(endAt);
         requestData.setNotas(notes);
 
-        Response response = gatewayClient.put("/api/plantation/update/" + plantationId, requestData, Response.class,
+        Response response = gatewayClient.put("/api/plantation/update-plantation-stage", requestData, Response.class,
                 session.getAttribute("JWT_TOKEN").toString());
 
         log.info("Respuesta del actualización: {}", response);
