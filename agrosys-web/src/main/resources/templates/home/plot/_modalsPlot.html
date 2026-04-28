@@ -212,22 +212,24 @@
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Detalles de la Plantación</h5>
+                        <h5 class="modal-title">Detalles de la Plantación <span id="plantationDetailsCurrentState"></span></h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <p class="text-capitalize"><strong>Plantacion:</strong> <span id="plantationDetailsName"></span></p>
+                        <!-- <p class="text-capitalize"><strong>Etapa Actual:</strong> <span id="plantationDetailsCurrentState"></span></p> -->
+                        <p class="text-capitalize"><strong>Parcela de origen:</strong> <span id="plantationDetailsOriginPlot"></span></p>
                         <div class="d-flex gap-5 justify-content-between flex-wrap">
-                            <p><strong>Fecha de Inicio:</strong> <span id="plantationDetailsStartAt"></span></p>
-                            <p><strong>Fecha de Finalización:</strong> <span id="plantationDetailsEndAt"></span></p>
+                            <p><strong>Fecha de Inicio:</strong> <span id="plantationDetailsStartAt" class="text-capitalize"></span></p>
+                            <p><strong>Fecha de Finalización:</strong> <span id="plantationDetailsEndAt" class="text-capitalize"></span></p>
                         </div>
                         <p class="mb-0"><strong>Notas:</strong></p>
                         <pre id="plantationDetailsNotes" style="font-family: var(--bs-body-font-family);"></pre>
 
                         <div class="mt-4">
                             <div class="d-flex justify-content-end align-items-center mb-2">
-                                <button class="btn btn-sm btn-outline-success" id="btnAddStateToPlantation" data-bs-toggle="modal" data-bs-target="#modalAddPlantationStage" data-bs-dismiss="modal">
-                                    <i class="bi bi-plus pe-2"></i> Agregar Etapa
+                                <button class="btn btn-sm btn-success" id="btnAddStateToPlantation" data-bs-toggle="modal" data-bs-target="#modalAddPlantationStage" data-bs-dismiss="modal">
+                                    <i class="ri-add-line pe-1"></i>Agregar Etapa
                                 </button>
                             </div>
                             <h6 class="text-center mb-3"><strong>Etapas de la Plantación:</strong></h6>

@@ -178,13 +178,13 @@ public class PlantatioService {
                     if (updatePlantatioEndDate.equals(0)) {
                         throw new RuntimeException("No se pudo actualizar la fecha de fin de la plantacion");
                     }
+                }
 
-                    // Actualizar fecha de fin de la etapa de siembra
-                    Integer updateSembraEndDate = plantatioRespository.updatePlantatioStageEndDate(
-                            request.getPlantatioId(), 2, request.getStartAt());
-                    if (updateSembraEndDate.equals(0)) {
-                        throw new RuntimeException("No se pudo actualizar la fecha de fin de la etapa de siembra");
-                    }
+                // Actualizar fecha de fin de la etapa de siembra
+                Integer updateSembraEndDate = plantatioRespository.updatePlantatioStageEndDate(
+                        request.getPlantatioId(), 2, request.getStartAt());
+                if (updateSembraEndDate.equals(0)) {
+                    throw new RuntimeException("No se pudo actualizar la fecha de fin de la etapa de siembra");
                 }
             }
             default -> {
@@ -243,12 +243,12 @@ public class PlantatioService {
 
         Integer noStages = stages.size();
         Object stageIdObj = stages.get(0).get("stageId");
-        if(noStages == 0 || stageIdObj == null) {
+        if (noStages == 0 || stageIdObj == null) {
             throw new IllegalArgumentException("No se han registrado etapas para esta plantacion");
         }
         switch (request.getStageId()) {
             case 1 -> {
-                if(noStages > 1) {
+                if (noStages > 1) {
                     throw new IllegalArgumentException(
                             "No se puede actualizar la etapa de PREPARACIÓN porque ya existe la etapa de SIEMBRA registrada");
                 }
@@ -264,12 +264,12 @@ public class PlantatioService {
                 }
             }
             case 2 -> {
-                if(noStages < 2 || !stages.get(1).get("stageId").equals(2)) {
+                if (noStages < 2 || !stages.get(1).get("stageId").equals(2)) {
                     throw new IllegalArgumentException(
                             "La etapa de SIEMBRA no existe para esta plantación");
                 }
 
-                if(noStages > 2) {
+                if (noStages > 2) {
                     throw new IllegalArgumentException(
                             "No se puede actualizar la etapa de SIEMBRA porque ya existe la etapa de COSECHA registrada");
                 }
@@ -287,13 +287,13 @@ public class PlantatioService {
                     // Actualizar fecha de fin de la etapa de preparación
                     Integer updatePreparationEndDate = plantatioRespository.updatePlantatioStageEndDate(
                             request.getPlantatioId(), 1, request.getStartAt());
-                    if (updatePreparationEndDate.equals(0)){
+                    if (updatePreparationEndDate.equals(0)) {
                         throw new RuntimeException("No se pudo actualizar la fecha de fin de la etapa de preparación");
                     }
                 }
             }
-            case 3 ->{
-                if(noStages < 3 || !stages.get(2).get("stageId").equals(3)) {
+            case 3 -> {
+                if (noStages < 3 || !stages.get(2).get("stageId").equals(3)) {
                     throw new IllegalArgumentException(
                             "La etapa de COSECHA no existe para esta plantación");
                 }
@@ -317,7 +317,7 @@ public class PlantatioService {
                 }
 
                 String endAtPlantation = plantation.getEnd_at();
-                if(endAtPlantation != null) {
+                if (endAtPlantation != null) {
                     LocalDate endAtPlantationDate = LocalDate.parse(endAtPlantation);
                     if (!endAtRequest.isEqual(endAtPlantationDate)) {
                         // Actualizar fecha de fin de la plantacion
@@ -327,8 +327,7 @@ public class PlantatioService {
                             throw new RuntimeException("No se pudo actualizar la fecha de fin de la plantacion");
                         }
                     }
-                }
-                else{
+                } else {
                     // Actualizar fecha de fin de la plantacion
                     Integer updatePlantatioEndDate = plantatioRespository.updatePlantatioEndDate(
                             request.getPlantatioId(), request.getStageId(), request.getEndAt());

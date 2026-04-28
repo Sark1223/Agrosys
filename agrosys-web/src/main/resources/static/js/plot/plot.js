@@ -34,33 +34,33 @@ $(document).ready(function () {
     $('#btn-submit-add-state').on('click', function () {
         const $f = $('#addStateForm');
         $.fn.postFormData($f, $f.attr('action'))
-            .done(function(response) {
-            if(response.success){
-                //Cerrar modal y recargar información de details
-                $.fn.getStagesByPlantation($('#plantationIdInputState').val());
-                $.fn.getAllPlots();
+            .done(function (response) {
+                if (response.success) {
+                    //Cerrar modal y recargar información de details
+                    $.fn.getStagesByPlantation($('#plantationIdInputState').val());
+                    $.fn.getAllPlots();
 
-                $('#btn-close-add-state').trigger('click');
-            }
-        });
+                    $('#btn-close-add-state').trigger('click');
+                }
+            });
 
-        
+
     });
 
     $('#btn-submit-edit-state').on('click', function () {
         const $f = $('#editStateForm');
         $.fn.postFormData($f, $f.attr('action'))
-            .done(function(response) {
-            if(response.success){
-                //Cerrar modal y recargar información de details
-                $.fn.getStagesByPlantation($('#plantationIdInputState').val());
-                $.fn.getAllPlots();
+            .done(function (response) {
+                if (response.success) {
+                    //Cerrar modal y recargar información de details
+                    $.fn.getStagesByPlantation($('#plantationIdInputState').val());
+                    $.fn.getAllPlots();
 
-                $('#btn-close-edit-state').trigger('click');
-            }
-        });
+                    $('#btn-close-edit-state').trigger('click');
+                }
+            });
 
-        
+
     });
 
     function getActiveTab() {
@@ -70,6 +70,14 @@ $(document).ready(function () {
             return href.replace('#', '');
         }
         return 'plot';
+    }
+
+    $.fn.formatDate = function (dateString) {
+        const [year, month, day] = dateString.split("-");
+        const localDate = new Date(year, month - 1, day); // mes es base 0
+        const monthName = localDate.toLocaleString('es-ES', { month: 'short' });
+
+        return `${day}/${monthName}/${year}`;
     }
 
     const disenioStages = {
@@ -89,7 +97,9 @@ $(document).ready(function () {
                 if (response.success) {
                     const stages = response.data;
                     const stagesSize = stages.length;
+                    
                     if (stagesSize > 0) {
+                        $('#plantationDetailsCurrentState').text(stages[stagesSize - 1].name).removeAttr('class').addClass(disenioStages[stagesSize].classText + ' btn px-3 py-0 ms-4 ' + disenioStages[stagesSize].classBorder).css('pointer-events', 'none');
                         const $containerStages = $('#containerEstados');
                         $containerStages.html('');
 
@@ -102,8 +112,8 @@ $(document).ready(function () {
                                             style="pointer-events: none; width: 125px;">
                                             ${`<span class="${disenioStages[stage.id].classText}">${stage.name}</span>`}
                                         </div>
-                                        <p class="card-text p-0 m-0">Fecha de inicio: ${new Date(stage.start_at).toLocaleDateString()}</p>
-                                        <p class="card-text p-0 m-0">Fecha de finalización: ${stage.end_at !== 'Sin fecha' ? new Date(stage.end_at).toLocaleDateString() : stage.end_at}</p>
+                                        <p class="card-text p-0 m-0">Fecha de inicio: <span class="text-capitalize">${$.fn.formatDate(stage.start_at)}</span></p>
+                                        <p class="card-text p-0 m-0">Fecha de finalización: <span class="text-capitalize">${stage.end_at !== 'Sin fecha' ? $.fn.formatDate(stage.end_at) : stage.end_at}</span></p>
                                         <div class="d-flex flex-row justify-content-end align-items-center gap-4">
                                             
                                             <div class="dropdown position-static">
@@ -125,7 +135,7 @@ $(document).ready(function () {
 
                             $cardStage.find('.edit-plantation-stage').on('click', function () {
                                 const stageId = stage.id;
-                                
+
                                 $('#plantationIdInputStateEdit').val(plantationId);
                                 $('#nombreStateInputEdit').val(stageId);
                                 $('#fechaInicioStateInputEdit').val(stage.start_at);
@@ -204,9 +214,9 @@ $(document).ready(function () {
                                         <p class="mb-0">${plot.description}</p>
                                         <div class="d-flex flex-row justify-content-end align-items-center gap-4 mt-2 mb-3">
                                             <button class="edit-plot btn btn-outline-info btn-sm py-0 px-3" data-bs-toggle="modal"
-                                                    data-bs-target="#modalEditPlot">Editar Parcela</button>
+                                                    data-bs-target="#modalEditPlot"><i class="ri-edit-2-fill pe-1"></i>Editar Parcela</button>
                                             <button class="btn btn-outline-primary btn-sm py-0 px-3 btn-agregar-plantacion-parcela" data-bs-toggle="modal"
-                                                data-bs-target="#modalAddPlantation">Agregar Plantación</button>
+                                                data-bs-target="#modalAddPlantation"> <i class="ri-add-line pe-1"></i>Agregar Plantación</button>
                                         </div>
                                     </div>
                                 </div>
@@ -231,8 +241,8 @@ $(document).ready(function () {
                                     <div class="card mb-2">
                                         <div class="card-body d-flex flex-row justify-content-between align-items-center gap-3 overflow-auto">
                                             <p class="card-title text-capitalize p-0 m-0 w-25">${plantacion.name.toLowerCase()}</p>
-                                            <p class="card-text p-0 m-0">Fecha de inicio: ${new Date(plantacion.start_at).toLocaleDateString()}</p>
-                                            <p class="card-text p-0 m-0">Fecha de finalización: ${plantacion.end_at !== 'N/A' ? new Date(plantacion.end_at).toLocaleDateString() : plantacion.end_at}</p>
+                                            <p class="card-text p-0 m-0">Fecha de inicio: <span class="text-capitalize">${$.fn.formatDate(plantacion.start_at)}</span></p>
+                                            <p class="card-text p-0 m-0">Fecha de finalización: <span class="text-capitalize">${plantacion.end_at !== 'N/A' ? $.fn.formatDate(plantacion.end_at) : plantacion.end_at}</span></p>
                                             <div class="d-flex flex-row justify-content-end align-items-center gap-4">
                                                 <div class="${plantacion.stageId === null ? disenioStages[0].classBorder : disenioStages[plantacion.stageId].classBorder} btn px-1 py-0" id="status-plantacion-${plantacion.plantacioId}"
                                                     style="pointer-events: none; width: 125px;">
@@ -289,8 +299,9 @@ $(document).ready(function () {
                                 cardPlantacion.find('.details-plantation').on('click', function () {
                                     if (plantacion) {
                                         $('#plantationDetailsName').text(`${plantacion.name}`);
-                                        $('#plantationDetailsStartAt').text(plantacion.start_at);
-                                        $('#plantationDetailsEndAt').text(plantacion.end_at);
+                                        $('#plantationDetailsOriginPlot').text(`${plot.name}`);
+                                        $('#plantationDetailsStartAt').text($.fn.formatDate(plantacion.start_at));
+                                        $('#plantationDetailsEndAt').text(plantacion.end_at !== 'N/A' ? $.fn.formatDate(plantacion.end_at) : plantacion.end_at);
                                         $('#plantationDetailsNotes').text(plantacion.notas);
                                         $('#plantationIdInputState').val(plantacion.plantatioId);
                                         $('#plantationIdInputStateEdit').val(plantacion.plantatioId);
@@ -312,7 +323,7 @@ $(document).ready(function () {
                             statusDiv.removeAttr('class').addClass('btn border-secondary px-2 py-0 me-5');
                         }
 
-                        
+
 
                         accordionItem.find('.edit-plot').on('click', function (e) {
                             if (plot) {
@@ -328,7 +339,7 @@ $(document).ready(function () {
                             }
                         });
 
-                        accordionItem.find('.btn-agregar-plantacion-parcela').on('click', function(e){
+                        accordionItem.find('.btn-agregar-plantacion-parcela').on('click', function (e) {
                             $('#plotIdInputPlantation').val(plot.plotId);
                         });
 
