@@ -27,72 +27,119 @@ public class TaskController {
     @PostMapping("/register")
     @PreAuthorize("hasAuthority('MODULE_TAREAS')")
     public ResponseEntity<Response> createTask(@Valid @RequestBody TaskRequest request) {
-        TaskResponse response = taskService.createTask(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Response.builder()
-                        .success(true)
-                        .message("Tarea creada exitosamente")
-                        .data(response)
-                        .build());
+        log.info("[REQUEST CREATE] - request: {}", request);
+        try {
+            TaskResponse response = taskService.createTask(request);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(Response.builder()
+                            .success(true)
+                            .message("Tarea creada exitosamente")
+                            .data(response)
+                            .build());
+        } catch (Exception e) {
+            log.error("[ERROR] - Error al crear tarea: {}", e.getMessage());
+            throw new RuntimeException("Error al crear tarea: " + e.getMessage());
+        }
     }
 
     @GetMapping("/get-all")
     @PreAuthorize("hasAuthority('MODULE_TAREAS')")
     public ResponseEntity<Response> getAllTasks() {
-        List<TaskResponse> tasks = taskService.getAllTasks();
-        return ResponseEntity.ok(Response.builder()
-                .success(true)
-                .message("Tareas obtenidas exitosamente")
-                .data(tasks)
-                .build());
+        try {
+            List<TaskResponse> tasks = taskService.getAllTasks();
+            return ResponseEntity.ok(Response.builder()
+                    .success(true)
+                    .message("Tareas obtenidas exitosamente")
+                    .data(tasks)
+                    .build());
+        } catch (Exception e) {
+            log.error("[ERROR] - Error al obtener tareas: {}", e.getMessage());
+            throw new RuntimeException("Error al obtener tareas: " + e.getMessage());
+        }
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('MODULE_TAREAS')")
     public ResponseEntity<Response> getTaskById(@PathVariable Integer id) {
-        TaskResponse task = taskService.getTaskById(id);
-        return ResponseEntity.ok(Response.builder()
-                .success(true)
-                .message("Tarea obtenida exitosamente")
-                .data(task)
-                .build());
+        log.info("[REQUEST GET] - id: {}", id);
+        try {
+            TaskResponse task = taskService.getTaskById(id);
+            return ResponseEntity.ok(Response.builder()
+                    .success(true)
+                    .message("Tarea obtenida exitosamente")
+                    .data(task)
+                    .build());
+        } catch (IllegalArgumentException e) {
+            log.error("[ERROR] - Tarea no encontrada: {}", e.getMessage());
+            throw new IllegalArgumentException("Tarea no encontrada con id: " + id);
+        } catch (Exception e) {
+            log.error("[ERROR] - Error al obtener tarea: {}", e.getMessage());
+            throw new RuntimeException("Error al obtener tarea: " + e.getMessage());
+        }
     }
 
     @PutMapping("/edit/{id}")
     @PreAuthorize("hasAuthority('MODULE_TAREAS')")
     public ResponseEntity<Response> updateTask(@PathVariable Integer id, @Valid @RequestBody TaskRequest request) {
-        TaskResponse updated = taskService.updateTask(id, request);
-        return ResponseEntity.ok(Response.builder()
-                .success(true)
-                .message("Tarea actualizada exitosamente")
-                .data(updated)
-                .build());
+        log.info("[REQUEST UPDATE] - id: {}, request: {}", id, request);
+        try {
+            TaskResponse updated = taskService.updateTask(id, request);
+            return ResponseEntity.ok(Response.builder()
+                    .success(true)
+                    .message("Tarea actualizada exitosamente")
+                    .data(updated)
+                    .build());
+        } catch (Exception e) {
+            log.error("[ERROR] - Error al actualizar tarea: {}", e.getMessage());
+            throw new RuntimeException("Error al actualizar tarea: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAuthority('MODULE_TAREAS')")
     public ResponseEntity<Response> deleteTask(@PathVariable Integer id) {
-        taskService.deleteTask(id);
-        return ResponseEntity.ok(Response.builder()
-                .success(true)
-                .message("Tarea eliminada exitosamente")
-                .build());
+        log.info("[REQUEST DELETE] - id: {}", id);
+        try {
+            taskService.deleteTask(id);
+            return ResponseEntity.ok(Response.builder()
+                    .success(true)
+                    .message("Tarea eliminada exitosamente")
+                    .build());
+        } catch (Exception e) {
+            log.error("[ERROR] - Error al eliminar tarea: {}", e.getMessage());
+            throw new RuntimeException("Error al eliminar tarea: " + e.getMessage());
+        }
     }
 
     @GetMapping("/stages")
     @PreAuthorize("hasAuthority('MODULE_TAREAS')")
     public ResponseEntity<Response> getStages() {
-        return ResponseEntity.ok(Response.builder()
-                .success(true)
-                .message("Estados obtenidos exitosamente")
-                .data(taskService.getStages())
-                .build());
+        try {
+            return ResponseEntity.ok(Response.builder()
+                    .success(true)
+                    .message("Estados obtenidos exitosamente")
+                    .data(taskService.getStages())
+                    .build());
+        } catch (Exception e) {
+            log.error("[ERROR] - Error al obtener estados: {}", e.getMessage());
+            throw new RuntimeException("Error al obtener estados: " + e.getMessage());
+        }
     }
 
     @PutMapping("/status/{id}")
     @PreAuthorize("hasAuthority('MODULE_TAREAS')")
-    public ResponseEntity<Response> updateTaskStage(@PathVariable Integer id, @RequestParam Integer stage) {
-        return ResponseEntity.ok(taskService.updateTaskStage(id, stage));
+    public ResponseEntity<Response> updateTaskStage(@PathVariable Integer id, 
+            @RequestParam Integer stage) {
+log.info("[REQUEST STATUS] - id: {}, stage: {}", id, stage);
+        try {
+            return ResponseEntity.ok(taskService.updateTaskStage(id, stage));
+        } catch (IllegalArgumentException e) {
+            log.error("[ERROR] - Tarea no encontrada: {}", e.getMessage());
+            throw new IllegalArgumentException("Tarea no encontrada con id: " + id);
+        } catch (Exception e) {
+            log.error("[ERROR] - Error al actualizar estado: {}", e.getMessage());
+            throw new RuntimeException("Error al actualizar estado: " + e.getMessage());
+        }
     }
 
     // Special Tasks
@@ -100,46 +147,75 @@ public class TaskController {
     @PostMapping("/special/register")
     @PreAuthorize("hasAuthority('MODULE_TAREAS')")
     public ResponseEntity<Response> createSpecialTask(@Valid @RequestBody SpecialTaskRequest request) {
-        SpecialTaskResponse response = taskService.createSpecialTask(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Response.builder()
-                        .success(true)
-                        .message("Tarea especial creada exitosamente")
-                        .data(response)
-                        .build());
+        log.info("[REQUEST SPECIAL CREATE] - request: {}", request);
+        try {
+            SpecialTaskResponse response = taskService.createSpecialTask(request);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(Response.builder()
+                            .success(true)
+                            .message("Tarea especial creada exitosamente")
+                            .data(response)
+                            .build());
+        } catch (IllegalArgumentException e) {
+            log.error("[ERROR] - Validation error: {}", e.getMessage());
+            throw new IllegalArgumentException(e.getMessage());
+        } catch (Exception e) {
+            log.error("[ERROR] - Error al crear tarea especial: {}", e.getMessage());
+            throw new RuntimeException("Error al crear tarea especial: " + e.getMessage());
+        }
     }
 
     @GetMapping("/special/get-all")
     @PreAuthorize("hasAuthority('MODULE_TAREAS')")
     public ResponseEntity<Response> getAllSpecialTasks() {
-        List<SpecialTaskResponse> tasks = taskService.getAllSpecialTasks();
-        return ResponseEntity.ok(Response.builder()
-                .success(true)
-                .message("Tareas especiales obtenidas exitosamente")
-                .data(tasks)
-                .build());
+        try {
+            List<SpecialTaskResponse> tasks = taskService.getAllSpecialTasks();
+            return ResponseEntity.ok(Response.builder()
+                    .success(true)
+                    .message("Tareas especiales obtenidas exitosamente")
+                    .data(tasks)
+                    .build());
+        } catch (Exception e) {
+            log.error("[ERROR] - Error al obtener tareas especiales: {}", e.getMessage());
+            throw new RuntimeException("Error al obtener tareas especiales: " + e.getMessage());
+        }
     }
 
     @GetMapping("/special/by-worker/{workerId}")
     @PreAuthorize("hasAuthority('MODULE_TAREAS')")
     public ResponseEntity<Response> getSpecialTasksByWorker(@PathVariable Integer workerId) {
-        List<SpecialTaskResponse> tasks = taskService.getSpecialTasksByWorker(workerId);
-        return ResponseEntity.ok(Response.builder()
-                .success(true)
-                .message("Tareas especiales del worker obtenidas exitosamente")
-                .data(tasks)
-                .build());
+        log.info("[REQUEST SPECIAL BY WORKER] - workerId: {}", workerId);
+        try {
+            List<SpecialTaskResponse> tasks = taskService.getSpecialTasksByWorker(workerId);
+            return ResponseEntity.ok(Response.builder()
+                    .success(true)
+                    .message("Tareas especiales del worker obtenidas exitosamente")
+                    .data(tasks)
+                    .build());
+        } catch (Exception e) {
+            log.error("[ERROR] - Error al obtener tareas del worker: {}", e.getMessage());
+            throw new RuntimeException("Error al obtener tareas del worker: " + e.getMessage());
+        }
     }
 
     @PutMapping("/special/edit/{taskId}")
     @PreAuthorize("hasAuthority('MODULE_TAREAS')")
     public ResponseEntity<Response> updateSpecialTask(@PathVariable Integer taskId, 
             @Valid @RequestBody SpecialTaskRequest request) {
-        SpecialTaskResponse updated = taskService.updateSpecialTask(taskId, request);
-        return ResponseEntity.ok(Response.builder()
-                .success(true)
-                .message("Tarea especial actualizada exitosamente")
-                .data(updated)
-                .build());
+        log.info("[REQUEST SPECIAL UPDATE] - taskId: {}, request: {}", taskId, request);
+        try {
+            SpecialTaskResponse updated = taskService.updateSpecialTask(taskId, request);
+            return ResponseEntity.ok(Response.builder()
+                    .success(true)
+                    .message("Tarea especial actualizada exitosamente")
+                    .data(updated)
+                    .build());
+        } catch (IllegalArgumentException e) {
+            log.error("[ERROR] - Tarea especial no encontrada: {}", e.getMessage());
+            throw new IllegalArgumentException("Tarea especial no encontrada con id: " + taskId);
+        } catch (Exception e) {
+            log.error("[ERROR] - Error al actualizar tarea especial: {}", e.getMessage());
+            throw new RuntimeException("Error al actualizar tarea especial: " + e.getMessage());
+        }
     }
 }
