@@ -219,13 +219,13 @@ $.fn.getAllTasks = function() {
             const accordion = $('#accordionContainerTasks');
             accordion.html('');
 
-            $("#message-tasks").attr("style", "display:none !important;");
+            $("#message-tasks").attr("style", "display:none !important; height: 100px;");
 
             if (response.success) {
                 tasksData = response.data;
 
                 if (response.data.length === 0) {
-                    $('#message-tasks').show();
+                    $('#message-tasks').html('Sin tareas registradas. Cree una nueva tarea para comenzar.').show();
                     return;
                 }
 
