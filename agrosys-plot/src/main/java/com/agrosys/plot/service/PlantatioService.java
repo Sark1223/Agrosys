@@ -136,7 +136,7 @@ public class PlantatioService {
                 Object stageIdObj = stages.get(0).get("stageId");
                 if (stages.size() >= 2 || stageIdObj == null || !stages.get(0).get("stageId").equals(1)) {
                     throw new IllegalArgumentException(
-                            "No se puede registrar la etapa de SIEMBRA porque no existe la etapa de PREPARACIÓN o se registro la etapa");
+                            "No se puede registrar la etapa de SIEMBRA porque no existe la etapa de PREPARACIÓN ó ya existe la etapa de SIEMBRA registrada");
                 }
 
                 // verificar que la fecha de inicio de la etapa de siembra sea posterior a la
@@ -158,7 +158,7 @@ public class PlantatioService {
             case 3 -> {
                 if (stages.size() != 2 || !stages.get(1).get("stageId").equals(2)) {
                     throw new IllegalArgumentException(
-                            "No se puede registrar la etapa de COCECHA porque no existen las etapas de PREPARACIÓN y SIEMBRA o se registro la etapa");
+                            "No se puede registrar la etapa de COCECHA porque no existen la etapa de SIEMBRA ó ya existe la etapa de COSECHA registrada");
                 }
                 // verificar que la fecha de inicio de la etapa de cosecha sea posterior a la
                 // fecha de inicio de la etapa de siembra
@@ -168,6 +168,28 @@ public class PlantatioService {
                     throw new IllegalArgumentException(
                             "La fecha de inicio de la etapa de COSECHA debe ser posterior a " + startAtSiembraDate
                                     + " fecha de SIEMBRA");
+                }
+
+                // Actualizar fecha de fin de la etapa de siembra
+                Integer updateSembraEndDate = plantatioRespository.updatePlantatioStageEndDate(
+                        request.getPlantatioId(), 2, request.getStartAt());
+                if (updateSembraEndDate.equals(0)) {
+                    throw new RuntimeException("No se pudo actualizar la fecha de fin de la etapa de siembra");
+                }
+            }
+            case 4 -> {
+                if (stages.size() != 3 || !stages.get(2).get("stageId").equals(3)) {
+                    throw new IllegalArgumentException(
+                            "No se puede registrar la etapa de FINALIZADO porque no existe la etapa de COSECHA ó ya existe la etapa de FINALIZADO");
+                }
+                // verificar que la fecha de inicio de la etapa de finalizado sea posterior a la
+                // fecha de inicio de la etapa de cosecha
+                String startAtCosecha = (String) stages.get(2).get("startAtStage");
+                LocalDate startAtCosechaDate = LocalDate.parse(startAtCosecha);
+                if (startAtRequest.isBefore(startAtCosechaDate)) {
+                    throw new IllegalArgumentException(
+                            "La fecha de inicio de la etapa de FINALIZADO debe ser posterior a " + startAtCosechaDate
+                                    + " fecha de COSECHA");
                 }
 
                 if (endAtRequest != null) {
@@ -180,11 +202,11 @@ public class PlantatioService {
                     }
                 }
 
-                // Actualizar fecha de fin de la etapa de siembra
-                Integer updateSembraEndDate = plantatioRespository.updatePlantatioStageEndDate(
-                        request.getPlantatioId(), 2, request.getStartAt());
-                if (updateSembraEndDate.equals(0)) {
-                    throw new RuntimeException("No se pudo actualizar la fecha de fin de la etapa de siembra");
+                // Actualizar fecha de fin de la etapa de cosecha
+                Integer updateCosechaEndDate = plantatioRespository.updatePlantatioStageEndDate(
+                        request.getPlantatioId(), 3, request.getStartAt());
+                if (updateCosechaEndDate.equals(0)) {
+                    throw new RuntimeException("No se pudo actualizar la fecha de fin de la etapa de cosecha");
                 }
             }
             default -> {
@@ -314,6 +336,19 @@ public class PlantatioService {
                     if (updateSembraEndDate.equals(0)) {
                         throw new RuntimeException("No se pudo actualizar la fecha de fin de la etapa de siembra");
                     }
+                }
+            }
+            case 4 -> {
+                if (noStages < 4 || !stages.get(3).get("stageId").equals(4)) {
+                    throw new IllegalArgumentException(
+                            "La etapa de FINALIZADO no existe para esta plantación");
+                }
+
+                String startAtCosecha = (String) stages.get(2).get("startAtStage");
+                LocalDate startAtCosechaDate = LocalDate.parse(startAtCosecha);
+                if (startAtRequest.isBefore(startAtCosechaDate)) {
+                    throw new IllegalArgumentException(
+                            "La fecha de inicio de la etapa de FINALIZADO debe ser posterior a la fecha de inicio de la etapa de COSECHA");
                 }
 
                 String endAtPlantation = plantation.getEnd_at();

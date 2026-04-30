@@ -50,15 +50,18 @@ public interface PlotRepository extends JpaRepository<AgrosysPlot, Integer> {
                                 plt.name, 
                                 plt.description,
                                 JSON_ARRAYAGG(
-                                        JSON_OBJECT(
-                                        'plantatioId', ls.plantatioId,
-                                        'name', ls.name,
-                                        'start_at', ls.start_at,
-                                        'end_at', COALESCE(ls.end_at, 'N/A'),
-                                        'notas', ls.notas,
-                                        'stageId', ls.stageId,
-                                        'stage', ls.stage
-                                        )
+                                        CASE 
+                                                WHEN ls.plantatioId IS NOT NULL 
+                                                THEN JSON_OBJECT(
+                                                                'plantatioId', ls.plantatioId,
+                                                                'name', ls.name,
+                                                                'start_at', ls.start_at,
+                                                                'end_at', COALESCE(ls.end_at, 'N/A'),
+                                                                'notas', ls.notas,
+                                                                'stageId', ls.stageId,
+                                                                'stage', ls.stage
+                                                        )
+                                        END
                                 ) AS plantatios
                                 FROM agrosys_db.plot plt
                                 LEFT JOIN (

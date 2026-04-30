@@ -178,3 +178,11 @@ $.fn.postFormData = function (form, rutaPost, redirectUrl) {
         }
     });
 };
+
+$.fn.errorAlert = function (message) {
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: message || 'Ocurrió un error inesperado al procesar la solicitud'
+    });
+}
