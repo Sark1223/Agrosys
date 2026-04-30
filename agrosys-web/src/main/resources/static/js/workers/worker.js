@@ -115,6 +115,8 @@ $.fn.getAllWorkers = function() {
             var cardsContainer = $('#cardsContainerWorkers');
             cardsContainer.html('');
 
+            $('#message-workers').attr("style", "display:none !important; height: 100px;");; // Eliminar mensaje de carga o vacío
+
             if (response.success && Array.isArray(response.data)) {
                 workersData = response.data;
                 $.fn.fillWorkerFilter(response.data);
@@ -248,21 +250,16 @@ function escapeHtml(str) {
 $(document).ready(function() {
     $.fn.getAllWorkers();
 
-    // Inicializar la pestaña de asistencia cuando se haga clic en ella para no cargarla de golpe
     $('a[data-bs-toggle="tab"][href="#asistencia"]').on('shown.bs.tab', function (e) {
-        // Poner la fecha de hoy por defecto (Criterio de tu HU)
         var hoy = new Date().toISOString().split('T')[0];
         $('#attendanceDate').val(hoy);
         
-        // Traer la lista de trabajadores
         $.fn.getWorkersForAttendance();
     });
 
-    // Inicializar el historial al cambiar de pestaña
     $('a[data-bs-toggle="tab"][href="#historial"]').on('shown.bs.tab', function (e) {
         const hoy = new Date().toISOString().split('T')[0];
     
-    // Solo ponemos fechas por defecto si los campos están vacíos
     if (!$('#filterStartDate').val()) $('#filterStartDate').val(hoy);
     if (!$('#filterEndDate').val()) $('#filterEndDate').val(hoy);
         $.fn.getAttendanceHistory();
@@ -333,7 +330,6 @@ $.fn.getWorkersForAttendance = function() {
                         </div>
                     `);
 
-                    // ÚNICA Lógica del Checkbox clásico
                     rowHtml.find('.attendance-checkbox').on('change', function() {
                         var isChecked = $(this).is(':checked');
                         var row = $(this).closest('.attendance-row');
@@ -379,10 +375,8 @@ $('#btnSaveAttendance').on('click', function(e) {
         return;
     }
 
-    // Recorremos cada fila para armar el paquete de datos
     $rows.each(function() {
         var workerId = $(this).data('worker-id');
-        // AQUI ESTABA EL ERROR DEL SWITCH: Lo cambiamos a buscar el checkbox
         var asistio = $(this).find('.attendance-checkbox').is(':checked');
         var horas = parseInt($(this).find('.hours-select').val());
 
