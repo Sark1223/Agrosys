@@ -1,5 +1,6 @@
 package com.agrosys.worker.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -111,7 +112,7 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
         // la tabla WORKER, podríamos agregar un método como este:
         @Query(value = "SELECT COUNT(*) FROM agrosys_worker.ATTENDANCE WHERE workerId = :workerId AND date = :date", nativeQuery = true)
         int existsAttendanceByWorkerAndDate(@Param("workerId") Integer workerId,
-                        @Param("date") java.time.LocalDate date);
+                        @Param("date") LocalDate date);
 
         @Modifying
         @Transactional
@@ -119,7 +120,7 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
                         INSERT INTO agrosys_worker.ATTENDANCE (workerId, date, attended, hoursWorked)
                         VALUES (:workerId, :date, :attended, :hoursWorked)
                         """, nativeQuery = true)
-        Integer insertAttendance(@Param("workerId") Integer workerId, @Param("date") java.time.LocalDate date,
+        Integer insertAttendance(@Param("workerId") Integer workerId, @Param("date") LocalDate date,
                         @Param("attended") Boolean attended, @Param("hoursWorked") Integer hoursWorked);
 
         // =========================================================================
@@ -134,7 +135,7 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
 
                 String getWorkerName();
 
-                java.time.LocalDate getDate();
+                LocalDate getDate();
 
                 Boolean getAttended();
 
