@@ -73,6 +73,7 @@ $(document).ready(function () {
     }
 
     $.fn.formatDate = function (dateString) {
+        if (!dateString) return 'N/A';
         const [year, month, day] = dateString.split("-");
         const localDate = new Date(year, month - 1, day); // mes es base 0
         const monthName = localDate.toLocaleString('es-ES', { month: 'short' });
@@ -240,7 +241,7 @@ $(document).ready(function () {
                                 const cardPlantacion = $(`
                                     <div class="card mb-2">
                                         <div class="card-body d-flex flex-row justify-content-between align-items-center gap-3 overflow-auto">
-                                            <p class="card-title text-capitalize p-0 m-0 w-25">${plantacion.name.toLowerCase()}</p>
+                                            <p class="card-title text-capitalize p-0 m-0 w-25">${plantacion.name ? plantacion.name.toLowerCase() : 'Sin nombre'}</p>
                                             <p class="card-text p-0 m-0">Fecha de inicio: <span class="text-capitalize">${$.fn.formatDate(plantacion.start_at)}</span></p>
                                             <p class="card-text p-0 m-0">Fecha de finalización: <span class="text-capitalize">${plantacion.end_at !== 'N/A' ? $.fn.formatDate(plantacion.end_at) : plantacion.end_at}</span></p>
                                             <div class="d-flex flex-row justify-content-end align-items-center gap-4">

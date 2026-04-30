@@ -20,7 +20,7 @@ import java.util.List;
 @RequestMapping("/api/tasks")
 @RequiredArgsConstructor
 @Slf4j
-public class TaskController {
+public class AgosysTaskController {
 
     private final TaskService taskService;
 
@@ -37,8 +37,12 @@ public class TaskController {
                             .data(response)
                             .build());
         } catch (Exception e) {
-            log.error("[ERROR] - Error al crear tarea: {}", e.getMessage());
-            throw new RuntimeException("Error al crear tarea: " + e.getMessage());
+            log.error("[ERROR] - Error al crear tarea: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Error al crear tarea: " + e.getMessage())
+                            .build());
         }
     }
 
@@ -53,8 +57,12 @@ public class TaskController {
                     .data(tasks)
                     .build());
         } catch (Exception e) {
-            log.error("[ERROR] - Error al obtener tareas: {}", e.getMessage());
-            throw new RuntimeException("Error al obtener tareas: " + e.getMessage());
+            log.error("[ERROR] - Error al obtener tareas: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Error al obtener tareas: " + e.getMessage())
+                            .build());
         }
     }
 
@@ -71,10 +79,18 @@ public class TaskController {
                     .build());
         } catch (IllegalArgumentException e) {
             log.error("[ERROR] - Tarea no encontrada: {}", e.getMessage());
-            throw new IllegalArgumentException("Tarea no encontrada con id: " + id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Tarea no encontrada con id: " + id)
+                            .build());
         } catch (Exception e) {
-            log.error("[ERROR] - Error al obtener tarea: {}", e.getMessage());
-            throw new RuntimeException("Error al obtener tarea: " + e.getMessage());
+            log.error("[ERROR] - Error al obtener tarea: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Error al obtener tarea: " + e.getMessage())
+                            .build());
         }
     }
 
@@ -90,8 +106,12 @@ public class TaskController {
                     .data(updated)
                     .build());
         } catch (Exception e) {
-            log.error("[ERROR] - Error al actualizar tarea: {}", e.getMessage());
-            throw new RuntimeException("Error al actualizar tarea: " + e.getMessage());
+            log.error("[ERROR] - Error al actualizar tarea: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Error al actualizar tarea: " + e.getMessage())
+                            .build());
         }
     }
 
@@ -106,8 +126,12 @@ public class TaskController {
                     .message("Tarea eliminada exitosamente")
                     .build());
         } catch (Exception e) {
-            log.error("[ERROR] - Error al eliminar tarea: {}", e.getMessage());
-            throw new RuntimeException("Error al eliminar tarea: " + e.getMessage());
+            log.error("[ERROR] - Error al eliminar tarea: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Error al eliminar tarea: " + e.getMessage())
+                            .build());
         }
     }
 
@@ -121,24 +145,36 @@ public class TaskController {
                     .data(taskService.getStages())
                     .build());
         } catch (Exception e) {
-            log.error("[ERROR] - Error al obtener estados: {}", e.getMessage());
-            throw new RuntimeException("Error al obtener estados: " + e.getMessage());
+            log.error("[ERROR] - Error al obtener estados: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Error al obtener estados: " + e.getMessage())
+                            .build());
         }
     }
 
     @PutMapping("/status/{id}")
     @PreAuthorize("hasAuthority('MODULE_TAREAS')")
-    public ResponseEntity<Response> updateTaskStage(@PathVariable Integer id, 
+    public ResponseEntity<Response> updateTaskStage(@PathVariable Integer id,
             @RequestParam Integer stage) {
-log.info("[REQUEST STATUS] - id: {}, stage: {}", id, stage);
+        log.info("[REQUEST STATUS] - id: {}, stage: {}", id, stage);
         try {
             return ResponseEntity.ok(taskService.updateTaskStage(id, stage));
         } catch (IllegalArgumentException e) {
             log.error("[ERROR] - Tarea no encontrada: {}", e.getMessage());
-            throw new IllegalArgumentException("Tarea no encontrada con id: " + id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Tarea no encontrada con id: " + id)
+                            .build());
         } catch (Exception e) {
-            log.error("[ERROR] - Error al actualizar estado: {}", e.getMessage());
-            throw new RuntimeException("Error al actualizar estado: " + e.getMessage());
+            log.error("[ERROR] - Error al actualizar estado: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Error al actualizar estado: " + e.getMessage())
+                            .build());
         }
     }
 
@@ -158,10 +194,18 @@ log.info("[REQUEST STATUS] - id: {}, stage: {}", id, stage);
                             .build());
         } catch (IllegalArgumentException e) {
             log.error("[ERROR] - Validation error: {}", e.getMessage());
-            throw new IllegalArgumentException(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message(e.getMessage())
+                            .build());
         } catch (Exception e) {
-            log.error("[ERROR] - Error al crear tarea especial: {}", e.getMessage());
-            throw new RuntimeException("Error al crear tarea especial: " + e.getMessage());
+            log.error("[ERROR] - Error al crear tarea especial: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Error al crear tarea especial: " + e.getMessage())
+                            .build());
         }
     }
 
@@ -176,8 +220,12 @@ log.info("[REQUEST STATUS] - id: {}, stage: {}", id, stage);
                     .data(tasks)
                     .build());
         } catch (Exception e) {
-            log.error("[ERROR] - Error al obtener tareas especiales: {}", e.getMessage());
-            throw new RuntimeException("Error al obtener tareas especiales: " + e.getMessage());
+            log.error("[ERROR] - Error al obtener tareas especiales: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Error al obtener tareas especiales: " + e.getMessage())
+                            .build());
         }
     }
 
@@ -193,8 +241,12 @@ log.info("[REQUEST STATUS] - id: {}, stage: {}", id, stage);
                     .data(tasks)
                     .build());
         } catch (Exception e) {
-            log.error("[ERROR] - Error al obtener tareas del worker: {}", e.getMessage());
-            throw new RuntimeException("Error al obtener tareas del worker: " + e.getMessage());
+            log.error("[ERROR] - Error al obtener tareas del worker: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Error al obtener tareas del worker: " + e.getMessage())
+                            .build());
         }
     }
 

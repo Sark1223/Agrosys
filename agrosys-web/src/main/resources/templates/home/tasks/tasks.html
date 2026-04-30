@@ -5,10 +5,10 @@
 
 <body>
 
-    <div class="d-flex vh-100">
+    <div class="d-flex vh-100 overflow-hidden">
         <div th:replace="~{fragments :: sidebar}"></div>
 
-        <main class="content-area p-4 w-100 bg-light">
+        <main class="content-area p-4 w-100 bg-light overflow-auto">
             <header class="d-flex justify-content-between">
                 <h1>Tareas Agrosys</h1>
                 <i class="ri-user-3-fill profile-icon"></i>
@@ -29,9 +29,11 @@
                         th:classappend="${activeTab == 'generales'} ? 'show active' : ''">
                         <div class="options p-2 d-flex justify-content-end flex-nowrap">
                             <button class="btn btn-primary" data-bs-toggle="modal"
-                                data-bs-target="#modalAddTask">Agregar Tarea</button>
+                                data-bs-target="#modalAddTask"><i class="ri-add-line pe-1"></i>Agregar Tarea</button>
                         </div>
-                        <div class="cards d-flex flex-wrap flex-row g-2" id="cardsContainerTasks">
+                        <div class="d-flex justify-content-center align-items-center text-body-tertiary fs-4 fst-italic w-100"
+                            style="height: 100px;" id="message-tasks">Cargando información...</div>
+                        <div class="accordion p-2" id="accordionContainerTasks">
                             <!-- Se carga por JavaScript -->
                         </div>
                     </div>
@@ -39,8 +41,10 @@
                         th:classappend="${activeTab == 'especiales'} ? 'show active' : ''">
                         <div class="options p-2 d-flex justify-content-end flex-nowrap">
                             <button class="btn btn-primary" data-bs-toggle="modal"
-                                data-bs-target="#modalAddSpecialTask">Agregar Tarea Especial</button>
+                                data-bs-target="#modalAddSpecialTask"><i class="ri-add-line pe-1"></i>Agregar Tarea Especial</button>
                         </div>
+                        <div class="d-flex justify-content-center align-items-center text-body-tertiary fs-4 fst-italic w-100"
+                            style="height: 100px; display: none;" id="message-special-tasks">No hay tareas especiales registradas.</div>
                         <div class="cards d-flex flex-wrap flex-row g-2" id="cardsContainerSpecialTasks">
                             <!-- Se carga por JavaScript -->
                         </div>
@@ -82,9 +86,16 @@
                                 <input type="date" class="form-control" id="endAtInput" name="endAt" autocomplete="off">
                             </div>
                             <div>
+                                <label for="plotIdInput" class="form-label mt-4">Parcela <span class="text-danger">*</span></label>
+                                <select class="form-select" id="plotIdInput" name="plotId" >
+                                    <option value="">Seleccione una parcela</option>
+                                </select>
+                            </div>
+                            <div>
                                 <label for="plantationIdInput" class="form-label mt-4">Plantío <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="plantationIdInput" name="plantationId" 
-                                    placeholder="Ingrese el ID del plantío" autocomplete="off" required>
+                                <select class="form-select" id="plantationIdInput" name="plantationId" required>
+                                    <option value="">Seleccione un plantío</option>
+                                </select>
                                 <div class="invalid-feedback">El plantío es requerido</div>
                             </div>
                         </form>
@@ -136,6 +147,20 @@
                                     <option value="2">En Proceso</option>
                                     <option value="3">Finalizada</option>
                                 </select>
+                            </div>
+                            <div>
+                                <label for="plotIdInputEdit" class="form-label mt-4">Parcela <span class="text-danger">*</span></label>
+                                <select class="form-select" id="plotIdInputEdit" name="plotId" required>
+                                    <option value="">Seleccione una parcela</option>
+                                </select>
+                                <div class="invalid-feedback">La parcela es requerida</div>
+                            </div>
+                            <div>
+                                <label for="plantationIdInputEdit" class="form-label mt-4">Plantío <span class="text-danger">*</span></label>
+                                <select class="form-select" id="plantationIdInputEdit" name="plantationId" required>
+                                    <option value="">Seleccione un plantío</option>
+                                </select>
+                                <div class="invalid-feedback">El plantío es requerido</div>
                             </div>
                         </form>
                     </div>
