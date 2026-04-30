@@ -23,6 +23,9 @@
                         <a class="nav-link" th:classappend="${activeTab == 'asistencia'} ? 'active' : ''"
                             data-bs-toggle="tab" href="#asistencia" aria-selected="false" role="tab" tabindex="-1">Asistencia</a>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" data-bs-toggle="tab" href="#historial" aria-selected="false" role="tab" tabindex="-1">Historial de Asistencias</a>
+                    </li>
                 </ul>
                 <div id="myTabContent" class="tab-content">
                     <div class="tab-pane fade" id="workers" role="tabpanel"
@@ -38,8 +41,57 @@
                     <div class="tab-pane fade" id="asistencia" role="tabpanel"
                         th:classappend="${activeTab == 'asistencia'} ? 'show active' : ''">
                         
-                        <div class="cards d-flex flex-wrap flex-row g-2" id="cardsContainerAsistencia">
-                            <!-- Se carga por JavaScript -->
+                        <div class="options p-2 d-flex justify-content-between align-items-center mb-3 border-bottom pb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <label for="attendanceDate" class="fw-bold mb-0">Fecha de Registro:</label>
+                                <input type="date" id="attendanceDate" class="form-control" style="max-width: 200px;">
+                            </div>
+                            <button class="btn btn-success" id="btnSaveAttendance">
+                                <i class="ri-save-line me-1"></i> Guardar Asistencia
+                            </button>
+                        </div>
+
+                        <form id="attendanceForm">
+                            <div class="cards d-flex flex-column gap-2" id="cardsContainerAsistencia">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="historial" role="tabpanel">
+                        <div class="options p-3 mb-3 border-bottom pb-3">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-3">
+                                    <label class="fw-bold small">Trabajador:</label>
+                                    <select id="filterWorker" class="form-select"></select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="fw-bold small">Desde:</label>
+                                    <input type="date" id="filterStartDate" class="form-control" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="fw-bold small">Hasta:</label>
+                                    <input type="date" id="filterEndDate" class="form-control" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <button class="btn btn-primary w-100" id="btnFiltrarHistorial">
+                                        <i class="ri-search-line"></i> Filtrar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Trabajador</th>
+                                        <th>Estado</th>
+                                        <th>Horas</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyHistorial">
+                                    <!-- Se carga por JS -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
