@@ -398,7 +398,7 @@ $.fn.getWorkersForAttendance = function() {
                                 
                                 <div class="form-check mb-0 d-flex align-items-center">
                                     <input class="form-check-input attendance-checkbox me-2" type="checkbox" checked id="chk_${workerId}" style="width: 1.3rem; height: 1.3rem; cursor:pointer;">
-                                    <label class="form-check-label text-success fw-bold attendance-label mt-1" for="chk_${workerId}">Asistió</label>
+                                    <label class="form-check-label text-success attendance-label mt-1" for="chk_${workerId}" style="width: 50px;">Asistió</label>
                                 </div>
 
                                 <div class="d-flex align-items-center gap-2">
@@ -541,9 +541,9 @@ $.fn.getAttendanceHistory = function() {
                                 <div class="fw-bold">${reg.date}</div>
                                 <small class="text-muted">${nombreDia}</small>
                             </td>
-                            <td class="text-capitalize">${reg.workerName.toLowerCase()}</td>
-                            <td><span class="${statusClass}">${statusText}</span></td>
-                            <td>${reg.hoursWorked} hrs</td>
+                            <td class="text-capitalize align-content-center">${reg.workerName.toLowerCase()}</td>
+                            <td class="align-content-center"><span class="${statusClass}">${statusText}</span></td>
+                            <td class="align-content-center">${reg.hoursWorked} hrs</td>
                         </tr>
                     `);
                 });

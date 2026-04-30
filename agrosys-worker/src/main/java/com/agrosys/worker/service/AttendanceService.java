@@ -1,13 +1,16 @@
 package com.agrosys.worker.service;
 
-import org.springframework.stereotype.Service;
-import com.agrosys.worker.repository.WorkerRepository;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.stereotype.Service;
+
+import com.agrosys.worker.repository.WorkerRepository;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Service
@@ -34,7 +37,6 @@ public class AttendanceService {
                 throw new RuntimeException("El trabajador con ID " + workerId + " ya tiene un registro para la fecha " + date);
             }
 
-            // Guardar usando tu consulta nativa
             workerRepository.insertAttendance(workerId, date, attended, hoursWorked);
         }
         

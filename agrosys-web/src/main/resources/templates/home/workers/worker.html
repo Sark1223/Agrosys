@@ -42,8 +42,8 @@
                         th:classappend="${activeTab == 'asistencia'} ? 'show active' : ''">
                         
                         <div class="options p-2 d-flex justify-content-between align-items-center mb-3 border-bottom pb-3">
-                            <div class="d-flex align-items-center gap-2">
-                                <label for="attendanceDate" class="fw-bold mb-0">Fecha de Registro:</label>
+                            <div class="d-flex align-items-center gap-2 w-auto mt-1">
+                                <label for="attendanceDate" class="fw-bold mb-0 text-nowrap w-auto">Fecha de Registro:</label>
                                 <input type="date" id="attendanceDate" class="form-control" style="max-width: 200px;">
                             </div>
                             <button class="btn btn-success" id="btnSaveAttendance">
