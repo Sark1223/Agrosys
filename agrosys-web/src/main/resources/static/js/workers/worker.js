@@ -30,97 +30,11 @@ function fileToBase64(file) {
     });
 }
 
-$('#btn-submit-add-worker').on('click', function() {
-    var nombre = $('#nombreInput').val().trim();
-    var notas = $('#notasInput').val().trim();
-    var salary = $('#salaryInput').val().trim();
-    var photoFile = $('#photoInput')[0].files[0];
-
-    if (!nombre || !salary) {
-        $('#addWorkerForm')[0].reportValidity();
-        return;
-    }
-
-    var photo = null;
-    if (photoFile) {
-        fileToBase64(photoFile).then(function(base64) {
-            photo = base64;
-            submitAddWorker(nombre, notas, salary, photo);
-        }).catch(function(e) {
-            Swal.fire({ icon: 'error', title: 'Error', text: 'Error al procesar la imagen' });
-        });
-    } else {
-        submitAddWorker(nombre, notas, salary, photo);
-    }
+$('#btn-submit-add-worker').on('click', function () {
+    const $f = $('#addWorkerForm');
+    const activeTab = getActiveTab();
+    $.fn.postFormData($f, $f.attr('action'), '/agrosys/workers?tab=' + activeTab);
 });
-
-function submitAddWorker(nombre, notas, salary, photo) {
-    var data = {
-        name: nombre,
-        notas: notas || null,
-        salary: parseFloat(salary),
-        photo: photo
-    };
-
-    $.ajax({
-        url: '/agrosys/workers/register',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(data),
-        success: function(response) {
-            if (response.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Exito',
-                    text: 'Worker registrado exitosamente'
-                }).then(function() {
-                    $('#modalAddWorker').modal('hide');
-                    $('#addWorkerForm')[0].reset();
-                    $.fn.getAllWorkers();
-                });
-            } else {
-                Swal.fire({ icon: 'error', title: 'Error', text: response.message });
-            }
-        },
-        error: function(xhr) {
-            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Error al registrar el worker';
-            Swal.fire({ icon: 'error', title: 'Error', text: msg });
-        }
-    });
-}
-
-// $('#btn-submit-edit-worker').on('click', function() {
-//     var workerId = $('#workerIdInputEdit').val();
-//     var nombre = $('#nombreInputEdit').val().trim();
-//     var notas = $('#notasInputEdit').val().trim();
-//     var salary = $('#salaryInputEdit').val().trim();
-//     var photoFile = $('#photoInputEdit')[0].files[0];
-
-//     if (!workerId || !nombre || !salary) {
-//         $('#editWorkerForm')[0].reportValidity();
-//         return;
-//     }
-
-//     var photo = null;
-//     if (photoFile) {
-//         fileToBase64(photoFile).then(function(base64) {
-//             photo = base64;
-//             submitEditWorker(workerId, nombre, notas, salary, photo);
-//         }).catch(function(e) {
-//             Swal.fire({ icon: 'error', title: 'Error', text: 'Error al procesar la imagen' });
-//         });
-//     } else {
-//         var currentWorker = null;
-//         for (var i = 0; i < workersData.length; i++) {
-//             if (workersData[i].workerId === parseInt(workerId)) {
-//                 currentWorker = workersData[i];
-//                 break;
-//             }
-//         }
-//         photo = currentWorker ? currentWorker.photo : null;
-//         submitEditWorker(workerId, nombre, notas, salary, photo);
-//     }
-// });
 
 function submitEditWorker(workerId, nombre, notas, salary, photo) {
     var data = {
@@ -141,7 +55,7 @@ function submitEditWorker(workerId, nombre, notas, salary, photo) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Exito',
-                    text: 'Worker actualizado exitosamente'
+                    text: response.message || 'Trabajador actualizado exitosamente'
                 }).then(function() {
                     $('#modalEditWorker').modal('hide');
                     $('#editWorkerForm')[0].reset();
@@ -152,13 +66,13 @@ function submitEditWorker(workerId, nombre, notas, salary, photo) {
             }
         },
         error: function(xhr) {
-            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Error al actualizar el worker';
+            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Error al actualizar el trabajador';
             Swal.fire({ icon: 'error', title: 'Error', text: msg });
         }
     });
 }
 
-$('#btn-submit-delete-user').on('click', function() {
+$('#btn-submit-delete-worker').on('click', function() {
     var id = currentWorkerId;
 
     if (!id) {
@@ -170,13 +84,13 @@ $('#btn-submit-delete-user').on('click', function() {
         url: '/agrosys/workers/delete',
         type: 'DELETE',
         contentType: 'application/json',
-        data: JSON.stringify({ userId: parseInt(id) }),
+        data: JSON.stringify({ workerId: parseInt(id) }),
         success: function(response) {
             if (response.success) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Exito',
-                    text: 'Worker eliminado exitosamente'
+                    text: response.message || 'Trabajador eliminado exitosamente'
                 }).then(function() {
                     $('#modalDeleteWorker').modal('hide');
                     currentWorkerId = null;
@@ -187,7 +101,7 @@ $('#btn-submit-delete-user').on('click', function() {
             }
         },
         error: function(xhr) {
-            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Error al eliminar el worker';
+            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Error al eliminar el trabajador';
             Swal.fire({ icon: 'error', title: 'Error', text: msg });
         }
     });

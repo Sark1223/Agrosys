@@ -34,7 +34,7 @@ public class AgrosysUserController {
     private final UserService userService;
 
     @GetMapping("/get-all")
-    @PreAuthorize("hasAuthority('MODULE_USUARIOS')")
+    @PreAuthorize("hasAuthority('MODULE_CONFIG')")
     public ResponseEntity<Response> getAllUsers() {
         List<UserRepository.getUser> users = userService.getAllUsers();
         Response successResponse = Response.builder()
@@ -46,7 +46,7 @@ public class AgrosysUserController {
     }
 
     @PostMapping("/register")
-    @PreAuthorize("hasAuthority('MODULE_USUARIOS')")
+    @PreAuthorize("hasAuthority('MODULE_CONFIG')")
     public ResponseEntity<Object> register(@Valid @RequestBody RegisterRequest request) {
         log.info("[REQUEST] - request: {}", request);
         RegisterResponse response = userService.register(request);
@@ -59,7 +59,7 @@ public class AgrosysUserController {
     }
 
     @PutMapping("/update")
-    @PreAuthorize("hasAuthority('MODULE_USUARIOS')")
+    @PreAuthorize("hasAuthority('MODULE_CONFIG')")
     public ResponseEntity<Object> updateUser(@Valid @RequestBody RegisterRequest request) {
         log.info("[REQUEST] - request: {}", request);
         RegisterResponse response = userService.updateUser(request);
@@ -72,7 +72,7 @@ public class AgrosysUserController {
     }
 
     @PatchMapping("/update-password")
-    @PreAuthorize("hasAuthority('MODULE_USUARIOS')")
+    @PreAuthorize("hasAuthority('MODULE_CONFIG')")
     public ResponseEntity<Object> updatePasswordUser(@Valid @RequestBody UserPatch request) {
         log.info("[REQUEST] - userId: {}", request.getUserId());
         
@@ -81,7 +81,7 @@ public class AgrosysUserController {
     }
 
     @DeleteMapping("/delete")
-    @PreAuthorize("hasAuthority('MODULE_USUARIOS')")
+    @PreAuthorize("hasAuthority('MODULE_CONFIG')")
     public ResponseEntity<Object> deleteUser(@Valid @RequestBody UserPatch request) {
         log.info("[REQUEST] - userId: {}", request.getUserId());
         Response response = userService.deleteUser(request.getUserId());

@@ -1,0 +1,199 @@
+.content-area {
+    background-color: #f7f5f2;
+    overflow-y: auto;
+}
+
+.content-area h1 {
+    font-size: 30px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #1f2937;
+}
+
+.content-area p {
+    color: #374151;
+    margin-bottom: 24px;
+}
+
+.profile-icon {
+    font-size: 22px;
+    color: #1f2937;
+}
+
+.dashboard-actions {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 38px;
+    margin-bottom: 22px;
+}
+
+.dashboard-btn {
+    height: 24px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.btn-asistencia {
+    border: 1px solid #8b7cf6;
+    color: #6d5dfc;
+}
+
+.btn-lote {
+    border: 1px solid #2f80ed;
+    color: #2f80ed;
+}
+
+.btn-transaccion {
+    border: 1px solid #4caf50;
+    color: #4caf50;
+}
+
+.btn-salarios {
+    border: 1px solid #555555;
+    color: #333333;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 160px 1fr 1fr 250px;
+    grid-template-rows: 180px 180px;
+    gap: 28px;
+}
+
+.dashboard-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.dashboard-card h3 {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #111111;
+}
+
+.filtros-card h3 {
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.filtros-card {
+    display: flex;
+    flex-direction: column;
+    height: 190px;
+}
+
+.filtros-card label {
+    font-size: 9px;
+    color: #777777;
+    margin-bottom: 3px;
+}
+
+.filtros-card select {
+    width: 100%;
+    height: 22px;
+    border: 1px solid #cfd8dc;
+    border-radius: 5px;
+    padding: 0 6px;
+    margin-bottom: 6px;
+    background-color: #f9fbfb;
+    font-size: 11px;
+}
+
+.btn-aplicar {
+    width: 100%;
+    height: 22px;
+    border: none;
+    border-radius: 14px;
+    background-color: #f4e4ff;
+    color: #b55eea;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 2px;
+}
+
+.clima-card {
+    grid-column: 4;
+    grid-row: 1 / 3;
+}
+
+.tareas-card {
+    grid-column: 1 / 3;
+}
+
+.grafica-card {
+    grid-column: 3 / 4;
+}
+
+@media (max-width: 992px) {
+    .dashboard-actions {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+
+    .clima-card,
+    .tareas-card,
+    .grafica-card {
+        grid-column: auto;
+        grid-row: auto;
+    }
+}
+
+.clima-contenido {
+    text-align: center;
+    margin-top: 18px;
+}
+
+.clima-icono {
+    font-size: 36px;
+    margin-bottom: 8px;
+}
+
+.clima-contenido h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #111111;
+}
+
+.clima-temperatura {
+    font-size: 32px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: #111111;
+}
+
+.clima-descripcion {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #222222;
+}
+
+.clima-detalles {
+    font-size: 12px;
+    color: #333333;
+    line-height: 1.6;
+}
+
+.clima-detalles p {
+    margin: 2px 0;
+}
+
+.clima-error {
+    font-size: 13px;
+    color: #d32f2f;
+    margin-top: 20px;
+}

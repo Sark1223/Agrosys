@@ -235,7 +235,7 @@ public class ConfigController {
         requestData.setDescription(description);
         requestData.setModulos(modulos);
 
-        log.info("Creando nuevo rol: {} - Description: {} - Modulos: {}", roleName, description, modulos);
+        log.info("Modificando rol: {} - Description: {} - Modulos: {}", roleName, description, modulos);
 
         Response response = gatewayClient.put("/api/roles/update/" + roleId, requestData,
         Response.class,

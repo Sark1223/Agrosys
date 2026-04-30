@@ -30,7 +30,7 @@ public class SecurityConfig {
                 // Configurar autorización de endpoints
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
-                        .requestMatchers("/api/plot/**").authenticated()
+                        .requestMatchers("/api/workers/**").authenticated()
                         .anyRequest().authenticated())
 
                 // Agregar filtro JWT antes del filtro de autenticación por username/password

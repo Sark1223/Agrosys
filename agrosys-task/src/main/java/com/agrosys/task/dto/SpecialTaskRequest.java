@@ -17,4 +17,6 @@ public class SpecialTaskRequest {
 
     @Positive(message = "El monto de pago debe ser positivo")
     private BigDecimal paymentAmount;
+
+    private Integer taskStageId;
 }

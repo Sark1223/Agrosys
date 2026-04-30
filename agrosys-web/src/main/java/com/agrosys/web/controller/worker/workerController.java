@@ -57,6 +57,11 @@ public class workerController {
     @ResponseBody
     public ResponseEntity<Response> getAllWorkers(HttpSession session) {
         try {
+            List<String> modules = jwtHelper.getUserModules(session);
+            if (!modules.contains("MODULE_TRABAJADORES")) {
+                return ResponseEntity.status(403).build();
+            }
+
             String token = (String) session.getAttribute("JWT_TOKEN");
 
             Response response = gatewayClient.get(
@@ -66,20 +71,46 @@ public class workerController {
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            log.error("[FAILED] - Error al obtener workers: {}", e.getMessage());
-            throw new RuntimeException("Error al obtener workers: " + e.getMessage());
+            log.error("[FAILED] - Error al obtener trabajadores: {}", e.getMessage());
+            throw new RuntimeException("Error al obtener trabajadores: " + e.getMessage());
         }
     }
 
-    @PostMapping("/register")
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
-    public ResponseEntity<Response> registerWorker(@RequestBody Map<String, String> body, HttpSession session) {
+    public ResponseEntity<Response> registerWorker(
+            @RequestParam String nombre,
+            @RequestParam BigDecimal salary,
+            @RequestParam(required = false) String notas,
+            @RequestParam(required = false) MultipartFile photo,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_TRABAJADORES")) {
+            return ResponseEntity.status(403).build();
+        }
+
+        String photoString = null;
+        if (photo != null && !photo.isEmpty()) {
+            try {
+                byte[] photoBytes = photo.getBytes();
+                photoString = java.util.Base64.getEncoder().encodeToString(photoBytes);
+            } catch (IOException e) {
+                log.error("Error al convertir la foto: {}", e.getMessage());
+                throw new RuntimeException("Error al convertir la foto: " + e.getMessage());
+            }
+        }
+
+        WorkerRequest request = new WorkerRequest();
+        request.setName(nombre);
+        request.setSalary(salary);
+        request.setNotas(notas);
+        request.setPhoto(photoString);
 
         String token = (String) session.getAttribute("JWT_TOKEN");
-
         Response response = gatewayClient.post(
                 "/api/workers/register",
-                body,
+                request,
                 Response.class,
                 token);
 
@@ -90,15 +121,20 @@ public class workerController {
     @ResponseBody
     public ResponseEntity<Response> deleteWorker(@RequestBody Map<String, Integer> body, HttpSession session) {
         try {
-            String token = (String) session.getAttribute("JWT_TOKEN");
-            Integer workerId = body.get("userId");
-            log.info("Intentando eliminar worker con ID: {}", workerId);
-
-            if (workerId == null) {
-                throw new IllegalArgumentException("ID del worker no proporcionado");
+            List<String> modules = jwtHelper.getUserModules(session);
+            if (!modules.contains("MODULE_TRABAJADORES")) {
+                return ResponseEntity.status(403).build();
             }
 
-            Map<String, Integer> requestBody = Map.of("id", workerId);
+            String token = (String) session.getAttribute("JWT_TOKEN");
+            Integer workerId = body.get("workerId");
+            log.info("Intentando eliminar trabajador con ID: {}", workerId);
+
+            if (workerId == null) {
+                throw new IllegalArgumentException("ID del trabajador no proporcionado");
+            }
+
+            Map<String, Integer> requestBody = Map.of("workerId", workerId);
 
             Response response = gatewayClient.delete(
                     "/api/workers/delete",
@@ -109,8 +145,8 @@ public class workerController {
             return ResponseEntity.ok(response);
 
         } catch (IllegalArgumentException e) {
-            log.error("[FAILED] - Error al eliminar worker: {}", e.getMessage());
-            throw new RuntimeException("Error al eliminar worker: " + e.getMessage());
+            log.error("[FAILED] - Error al eliminar trabajador: {}", e.getMessage());
+            throw new RuntimeException("Error al eliminar trabajador: " + e.getMessage());
         }
     }
 
