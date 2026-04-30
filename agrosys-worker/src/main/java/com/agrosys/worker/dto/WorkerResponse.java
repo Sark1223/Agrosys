@@ -13,6 +13,7 @@ public class WorkerResponse {
     private String notas;
     private BigDecimal salary;
     private String photo;
+    private String photoPublicId;
     private String message;
     private boolean success;
 }

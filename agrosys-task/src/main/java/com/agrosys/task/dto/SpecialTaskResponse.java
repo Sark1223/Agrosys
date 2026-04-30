@@ -11,4 +11,5 @@ public class SpecialTaskResponse {
     private Integer taskId;
     private Integer workerId;
     private BigDecimal paymentAmount;
+    private Integer taskStageId;
 }

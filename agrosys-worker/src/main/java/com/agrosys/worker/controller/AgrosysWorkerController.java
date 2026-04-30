@@ -1,7 +1,6 @@
 package com.agrosys.worker.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.agrosys.worker.dto.DeleteRequest;
 import com.agrosys.worker.dto.Response;
 import com.agrosys.worker.dto.WorkerRequest;
 import com.agrosys.worker.dto.WorkerResponse;
@@ -39,60 +39,62 @@ public class AgrosysWorkerController {
         List<WorkerRepository.WorkerProjection> workers = workerService.getAllWorkers();
         Response successResponse = Response.builder()
                 .success(true)
-                .message("Workers obtenidos exitosamente")
+                .message("Trabajadores obtenidos exitosamente")
                 .data(workers)
                 .build();
         return ResponseEntity.ok(successResponse);
     }
 
-    @PostMapping("/register")
+@PostMapping("/register")
     @PreAuthorize("hasAuthority('MODULE_TRABAJADORES')")
     public ResponseEntity<Response> createWorker(@Valid @RequestBody WorkerRequest request) {
         log.info("[REQUEST] - request: {}", request);
-        WorkerResponse response = workerService.crearWorker(request);
-        Response successResponse = Response.builder()
-                .success(true)
-                .message("Worker registrado exitosamente")
-                .data(response)
-                .build();
-        return ResponseEntity.status(HttpStatus.CREATED).body(successResponse);
+        try {
+            WorkerResponse response = workerService.crearWorker(request);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(Response.builder()
+                            .success(true)
+                            .message("Trabajador registrado exitosamente")
+                            .data(response)
+                            .build());
+        } catch (Exception e) {
+            log.error("Error al registrar trabajador: {}", e.getMessage());
+            throw new RuntimeException("Error al registrar trabajador: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/delete")
     @PreAuthorize("hasAuthority('MODULE_TRABAJADORES')")
-    public ResponseEntity<Response> deleteWorker(@RequestBody Map<String, Integer> body) {
-        Integer workerId = body.get("id");  // ← espera "id"
+    public ResponseEntity<Response> deleteWorker(@Valid @RequestBody DeleteRequest request) {
+        Integer workerId = request.getWorkerId();
+        log.info("[REQUEST DELETE] - workerId: {}", workerId);
+        
         if (workerId == null) {
-            return ResponseEntity.badRequest()
-                    .body(Response.builder()
-                            .success(false)
-                            .message("ID del worker no proporcionado")
-                            .build());
+            throw new IllegalArgumentException("Trabajador no proporcionado");
         }
         try {
             workerService.deleteWorker(workerId);
             return ResponseEntity.ok(Response.builder()
                     .success(true)
-                    .message("Worker eliminado exitosamente")
+                    .message("Trabajador eliminado exitosamente")
                     .build());
         } catch (Exception e) {
-            log.error("Error al eliminar worker: {}", e.getMessage());
-            throw new RuntimeException("Error al eliminar worker: " + e.getMessage());
-        
+            log.error("Error al eliminar trabajador: {}", e.getMessage());
+            throw new RuntimeException("Error al eliminar trabajador: " + e.getMessage());
         }
     }
 
     @PutMapping("/update/{workerId}")
     @PreAuthorize("hasAuthority('MODULE_TRABAJADORES')")
     public ResponseEntity<Response> updateWorker(@PathVariable Integer workerId, 
-        @Valid @RequestBody WorkerRequest request) {
+            @Valid @RequestBody WorkerRequest request) {
         log.info("[REQUEST UPDATE] - workerId: {}, request: {}", workerId, request);
         try {
             Response response = workerService.actualizarWorker(workerId, request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            log.error("Error al actualizar worker: {}", e.getMessage());
-            throw new RuntimeException("Error al actualizar worker: " + e.getMessage());
+            log.error("Error al actualizar trabajador: {}", e.getMessage());
+            throw new RuntimeException("Error al actualizar trabajador: " + e.getMessage());
         }
     }
 }

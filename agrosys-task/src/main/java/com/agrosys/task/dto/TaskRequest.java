@@ -2,6 +2,8 @@ package com.agrosys.task.dto;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -18,8 +20,10 @@ public class TaskRequest {
     private String description;
 
     @NotNull(message = "La fecha de creación es obligatoria")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate createAt;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endAt;
 
     private Integer taskStageId;

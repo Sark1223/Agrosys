@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: html_head}"></head>
+
+<body>
+
+    <div class="d-flex vh-100 overflow-hidden">
+        <div th:replace="~{fragments :: sidebar}"></div>
+
+        <main class="content-area p-4 w-100 bg-light overflow-auto">
+            <header class="d-flex justify-content-between">
+                <h1>Tareas Agrosys</h1>
+                <i class="ri-user-3-fill profile-icon"></i>
+            </header>
+            <div class="page-content">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" th:classappend="${activeTab == 'generales'} ? 'active' : ''"
+                            data-bs-toggle="tab" href="#generales" aria-selected="true" role="tab">Tareas Generales</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" th:classappend="${activeTab == 'especiales'} ? 'active' : ''"
+                            data-bs-toggle="tab" href="#especiales" aria-selected="false" role="tab" tabindex="-1">Tareas por Worker</a>
+                    </li>
+                </ul>
+                <div id="myTabContent" class="tab-content">
+                    <div class="tab-pane fade" id="generales" role="tabpanel"
+                        th:classappend="${activeTab == 'generales'} ? 'show active' : ''">
+                        <div class="options p-2 d-flex justify-content-end flex-nowrap">
+                            <button class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#modalAddTask"><i class="ri-add-line pe-1"></i>Agregar Tarea</button>
+                        </div>
+                        <div class="d-flex justify-content-center align-items-center text-body-tertiary fs-4 fst-italic w-100"
+                            style="height: 100px;" id="message-tasks">Cargando información...</div>
+                        <div class="accordion p-2" id="accordionContainerTasks">
+                            <!-- Se carga por JavaScript -->
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="especiales" role="tabpanel"
+                        th:classappend="${activeTab == 'especiales'} ? 'show active' : ''">
+                        <div class="options p-2 d-flex justify-content-end flex-nowrap">
+                            <button class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#modalAddSpecialTask"><i class="ri-add-line pe-1"></i>Agregar Tarea Especial</button>
+                        </div>
+                        <div class="d-flex justify-content-center align-items-center text-body-tertiary fs-4 fst-italic w-100"
+                            style="height: 100px; display: none;" id="message-special-tasks">No hay tareas especiales registradas.</div>
+                        <div class="cards d-flex flex-wrap flex-row g-2" id="cardsContainerSpecialTasks">
+                            <!-- Se carga por JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- TAREA GENERAL -->
+        <div class="modal fade" id="modalAddTask" tabindex="-1" aria-labelledby="modalAddTask" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Agregar Tarea</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/tasks/register}" id="addTaskForm" class="needs-validation"
+                            novalidate>
+                            <div>
+                                <label for="nameInput" class="form-label mt-4">Nombre <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nameInput" name="name" minlength="3"
+                                    maxlength="100" placeholder="Ingrese el nombre de la tarea" autocomplete="off"
+                                    required>
+                                <div class="invalid-feedback">El nombre es requerido</div>
+                            </div>
+                            <div>
+                                <label for="descriptionInput" class="form-label mt-4">Descripción</label>
+                                <input type="text" class="form-control" id="descriptionInput" name="description" 
+                                    maxlength="256" placeholder="Ingrese la descripción (opcional)" autocomplete="off">
+                            </div>
+                            <div>
+                                <label for="createAtInput" class="form-label mt-4">Fecha de inicio <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="createAtInput" name="createAt" autocomplete="off" required>
+                                <div class="invalid-feedback">La fecha es requerida</div>
+                            </div>
+                            <div>
+                                <label for="endAtInput" class="form-label mt-4">Fecha estimada:</label>
+                                <input type="date" class="form-control" id="endAtInput" name="endAt" autocomplete="off">
+                            </div>
+                            <div>
+                                <label for="plotIdInput" class="form-label mt-4">Parcela <span class="text-danger">*</span></label>
+                                <select class="form-select" id="plotIdInput" name="plotId" >
+                                    <option value="">Seleccione una parcela</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="plantationIdInput" class="form-label mt-4">Plantío <span class="text-danger">*</span></label>
+                                <select class="form-select" id="plantationIdInput" name="plantationId" required>
+                                    <option value="">Seleccione un plantío</option>
+                                </select>
+                                <div class="invalid-feedback">El plantío es requerido</div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-add-task">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalEditTask" tabindex="-1" aria-labelledby="modalEditTask" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Tarea</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/tasks/edit}" id="editTaskForm" class="needs-validation"
+                            novalidate>
+                            <input type="number" id="taskIdInputEdit" name="id" hidden>
+                            <div>
+                                <label for="nameInputEdit" class="form-label mt-4">Nombre <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nameInputEdit" name="name" minlength="3"
+                                    maxlength="100" placeholder="Ingrese el nombre de la tarea" autocomplete="off" required>
+                                <div class="invalid-feedback">El nombre es requerido</div>
+                            </div>
+                            <div>
+                                <label for="descriptionInputEdit" class="form-label mt-4">Descripción</label>
+                                <input type="text" class="form-control" id="descriptionInputEdit" name="description" 
+                                    maxlength="256" placeholder="Ingrese la descripción" autocomplete="off">
+                            </div>
+                            <div>
+                                <label for="createAtInputEdit" class="form-label mt-4">Fecha de inicio <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="createAtInputEdit" name="createAt" autocomplete="off" required>
+                            </div>
+                            <div>
+                                <label for="endAtInputEdit" class="form-label mt-4">Fecha estimada:</label>
+                                <input type="date" class="form-control" id="endAtInputEdit" name="endAt" autocomplete="off">
+                            </div>
+                            <div>
+                                <label for="taskStageSelectEdit" class="form-label mt-4">Estado</label>
+                                <select class="form-select" id="taskStageSelectEdit" name="taskStageId">
+                                    <option value="1">Pendiente</option>
+                                    <option value="2">En Proceso</option>
+                                    <option value="3">Finalizada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="plotIdInputEdit" class="form-label mt-4">Parcela <span class="text-danger">*</span></label>
+                                <select class="form-select" id="plotIdInputEdit" name="plotId" required>
+                                    <option value="">Seleccione una parcela</option>
+                                </select>
+                                <div class="invalid-feedback">La parcela es requerida</div>
+                            </div>
+                            <div>
+                                <label for="plantationIdInputEdit" class="form-label mt-4">Plantío <span class="text-danger">*</span></label>
+                                <select class="form-select" id="plantationIdInputEdit" name="plantationId" required>
+                                    <option value="">Seleccione un plantío</option>
+                                </select>
+                                <div class="invalid-feedback">El plantío es requerido</div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-edit-task">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalViewTask" tabindex="-1" aria-labelledby="modalViewTask" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Detalles de la Tarea</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <h4 id="viewTaskName" class="mb-3"></h4>
+                        <div class="text-start">
+                            <p><strong>ID:</strong> <span id="viewTaskId"></span></p>
+                            <p><strong>Descripción:</strong> <span id="viewTaskDescription"></span></p>
+                            <p><strong>Fecha inicio:</strong> <span id="viewTaskCreateAt"></span></p>
+                            <p><strong>Fecha estimada:</strong> <span id="viewTaskEndAt"></span></p>
+                            <p><strong>Estado:</strong> <span id="viewTaskStage"></span></p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalDeleteTask" tabindex="-1" aria-labelledby="modalDeleteTask" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content border-danger text-white bg-dark">
+                    <div class="modal-header border-danger">
+                        <h5 class="modal-title">Eliminar Tarea</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="textDeleteTask">¿Está seguro de que desea eliminar la tarea?</p>
+                    </div>
+                    <div class="modal-footer border-danger fw-bolder">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" id="btn-submit-delete-task">
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAREA ESPECIAL -->
+        <div class="modal fade" id="modalAddSpecialTask" tabindex="-1" aria-labelledby="modalAddSpecialTask" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Agregar Tarea Especial</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/tasks/special/register}" id="addSpecialTaskForm" class="needs-validation"
+                            novalidate>
+                            <div>
+                                <label for="taskIdInputSpecial" class="form-label mt-4">Tarea General <span class="text-danger">*</span></label>
+                                <select class="form-select" id="taskIdInputSpecial" name="taskId" required>
+                                    <option value="">Seleccione una tarea</option>
+                                </select>
+                                <div class="invalid-feedback">La tarea es requerida</div>
+                            </div>
+                            <div>
+                                <label for="workerIdInputSpecial" class="form-label mt-4">Worker <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="workerIdInputSpecial" name="workerId" 
+                                    placeholder="Ingrese el ID del worker" autocomplete="off" required>
+                                <div class="invalid-feedback">El worker es requerido</div>
+                            </div>
+                            <div>
+                                <label for="paymentAmountInputSpecial" class="form-label mt-4">Pago <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="paymentAmountInputSpecial" name="paymentAmount" 
+                                    min="0" step="0.01" placeholder="Ingrese el monto de pago" autocomplete="off" required>
+                                <div class="invalid-feedback">El pago es requerido</div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-add-special-task">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script th:src="@{/js/tasks/tasks.js}"></script>
+</body>
+
+</html>

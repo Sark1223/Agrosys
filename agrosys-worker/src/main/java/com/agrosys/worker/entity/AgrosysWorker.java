@@ -35,4 +35,7 @@ public class AgrosysWorker {
 
     @Column(name = "photo", columnDefinition = "LONGTEXT")
     private String photo;
+
+    @Column(name = "photo_public_id", length = 255)
+    private String photoPublicId;
 }

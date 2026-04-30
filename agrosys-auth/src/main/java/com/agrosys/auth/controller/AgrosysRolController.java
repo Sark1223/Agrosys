@@ -18,6 +18,7 @@ import com.agrosys.auth.dto.Rol.RolRegister;
 import com.agrosys.auth.repository.RolRepository;
 import com.agrosys.auth.service.RolService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,14 +56,14 @@ public class AgrosysRolController {
 
     @PostMapping("/post")
     @PreAuthorize("hasAuthority('MODULE_CONFIG')")
-    public ResponseEntity<Response> postMethodName(@RequestBody RolRegister entity) {
+    public ResponseEntity<Response> postMethodName(@Valid @RequestBody RolRegister entity) {
         Response response = rolService.createRol(entity);
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("update/{id}")
+    @PutMapping("/update/{id}")
     @PreAuthorize("hasAuthority('MODULE_CONFIG')")
-    public ResponseEntity<Response> putMethodName(@PathVariable Integer id, @RequestBody RolRegister entity) {
+    public ResponseEntity<Response> putMethodName(@PathVariable Integer id, @Valid @RequestBody RolRegister entity) {
         
         Response response = rolService.updateRol(id, entity);  
         return ResponseEntity.ok(response);

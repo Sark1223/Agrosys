@@ -122,4 +122,13 @@ public interface TaskRepository extends JpaRepository<AgrosysTask, Integer> {
             @Param("taskStageId") Integer taskStageId,
             @Param("plantationId") Integer plantationId
     );
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+        UPDATE agrosys_task.TASK
+        SET task_stage_id = :taskStageId
+        WHERE task_id = :id
+        """, nativeQuery = true)
+    int updateTaskStage(@Param("id") Integer id, @Param("taskStageId") Integer taskStageId);
 }
