@@ -417,6 +417,7 @@ pre {
   margin-bottom: 1rem;
   overflow: auto;
   font-size: 0.875em;
+  font-family: var(--bs-body-font-family);
 }
 
 pre code {

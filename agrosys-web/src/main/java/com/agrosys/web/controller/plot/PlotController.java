@@ -112,7 +112,6 @@ public class PlotController {
         return ResponseEntity.ok(response);
     }
 
-
     // ==================== PLANTACIONES ====================
     @PostMapping("/plantations/new")
     public ResponseEntity<Response> postPlantation(
@@ -179,7 +178,7 @@ public class PlotController {
 
         List<String> modules = jwtHelper.getUserModules(session);
         if (!modules.contains("MODULE_PARCELAS"))
-            return ResponseEntity.status(403).build();  
+            return ResponseEntity.status(403).build();
 
         log.info("Eliminación de plantacion: {}", plantationId);
 
@@ -228,7 +227,12 @@ public class PlotController {
         requestData.setPlantatioId(plantationId);
         requestData.setStageId(stageId);
         requestData.setStartAt(startAt);
-        requestData.setEndAt(endAt.equals("") ? "false" : endAt);
+        if (stageId == 4) {
+            requestData.setEndAt(startAt);
+        } else {
+            requestData.setEndAt(endAt.equals("") ? "false" : endAt);
+        }
+
         requestData.setNotas(notes);
 
         log.info("Creacion de etapa de plantacion: {}", requestData);
@@ -259,7 +263,11 @@ public class PlotController {
         requestData.setPlantatioId(plantationId);
         requestData.setStageId(stageId);
         requestData.setStartAt(startAt);
-        requestData.setEndAt(endAt);
+        if (stageId == 4) {
+            requestData.setEndAt(startAt);
+        } else {
+            requestData.setEndAt(endAt);
+        }
         requestData.setNotas(notes);
 
         Response response = gatewayClient.put("/api/plantation/update-plantation-stage", requestData, Response.class,
@@ -278,7 +286,7 @@ public class PlotController {
 
         List<String> modules = jwtHelper.getUserModules(session);
         if (!modules.contains("MODULE_PARCELAS"))
-            return ResponseEntity.status(403).build();  
+            return ResponseEntity.status(403).build();
 
         log.info("Eliminación de plantacion: {}", plantationId);
 

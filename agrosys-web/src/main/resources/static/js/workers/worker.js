@@ -115,8 +115,11 @@ $.fn.getAllWorkers = function() {
             var cardsContainer = $('#cardsContainerWorkers');
             cardsContainer.html('');
 
+            $('#message-workers').attr("style", "display:none !important; height: 100px;");; // Eliminar mensaje de carga o vacío
+
             if (response.success && Array.isArray(response.data)) {
                 workersData = response.data;
+                $.fn.fillWorkerFilter(response.data);
 
                 if (response.data.length === 0) {
                     cardsContainer.html('<div class="d-flex justify-content-center align-items-center text-body-tertiary fs-4 fst-italic w-100" style="height: 100px;">No hay trabajadores registrados.</div>');
@@ -246,4 +249,236 @@ function escapeHtml(str) {
 
 $(document).ready(function() {
     $.fn.getAllWorkers();
+
+    $('a[data-bs-toggle="tab"][href="#asistencia"]').on('shown.bs.tab', function (e) {
+        var hoy = new Date().toISOString().split('T')[0];
+        $('#attendanceDate').val(hoy);
+        
+        $.fn.getWorkersForAttendance();
+    });
+
+    $('a[data-bs-toggle="tab"][href="#historial"]').on('shown.bs.tab', function (e) {
+        const hoy = new Date().toISOString().split('T')[0];
+    
+    if (!$('#filterStartDate').val()) $('#filterStartDate').val(hoy);
+    if (!$('#filterEndDate').val()) $('#filterEndDate').val(hoy);
+        $.fn.getAttendanceHistory();
+    });
 });
+
+
+// =========================================================================
+// ================= LOGICA DE ASISTENCIA (ATTENDANCE) =====================
+// =========================================================================
+
+// Función para obtener y dibujar los trabajadores en la pestaña de Asistencia
+$.fn.getWorkersForAttendance = function() {
+    $.ajax({
+        url: '/agrosys/workers/get-all', 
+        type: 'GET',
+        success: function(response) {
+            var container = $('#cardsContainerAsistencia');
+            container.html(''); 
+
+            if (response.success && Array.isArray(response.data)) {
+                if (response.data.length === 0) {
+                    container.html('<div class="w-100 text-center p-4 text-muted fst-italic">No hay trabajadores activos.</div>');
+                    return;
+                }
+
+                // Generamos una fila por cada trabajador
+                response.data.forEach(function(worker) {
+                    var workerId = worker.workerId || worker.id;
+                    var nombre = worker.name || worker.nombre || 'Sin nombre';
+                    var photo = worker.photo || null;
+
+                    var photoHtml = photo 
+                        ? '<img src="' + escapeHtml(photo) + '" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">' 
+                        : '<div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;"><i class="ri-user-3-fill text-white"></i></div>';
+
+                    // HTML Limpio del renglón
+                    var rowHtml = $(`
+                        <div class="d-flex align-items-center justify-content-between border-bottom py-2 attendance-row" data-worker-id="${workerId}">
+                            
+                            <div class="d-flex align-items-center gap-3">
+                                ${photoHtml}
+                                <span class="fw-bold text-capitalize" style="font-size: 1.1rem;">${escapeHtml(nombre.toLowerCase())}</span>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-4">
+                                
+                                <div class="form-check mb-0 d-flex align-items-center">
+                                    <input class="form-check-input attendance-checkbox me-2" type="checkbox" checked id="chk_${workerId}" style="width: 1.3rem; height: 1.3rem; cursor:pointer;">
+                                    <label class="form-check-label text-success attendance-label mt-1" for="chk_${workerId}" style="width: 50px;">Asistió</label>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-2">
+                                    <label class="mb-0 small text-muted">Hrs:</label>
+                                    <select class="form-select form-select-sm hours-select" style="width: 70px; cursor:pointer;">
+                                        <option value="8" selected>8</option>
+                                        <option value="7">7</option>
+                                        <option value="6">6</option>
+                                        <option value="5">5</option>
+                                        <option value="4">4</option>
+                                        <option value="3">3</option>
+                                        <option value="2">2</option>
+                                        <option value="1">1</option>
+                                        <option value="0">0</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+
+                    rowHtml.find('.attendance-checkbox').on('change', function() {
+                        var isChecked = $(this).is(':checked');
+                        var row = $(this).closest('.attendance-row');
+                        var label = row.find('.attendance-label');
+                        var select = row.find('.hours-select');
+
+                        if (isChecked) {
+                            label.text('Asistió').removeClass('text-danger').addClass('text-success');
+                            select.prop('disabled', false).val('8');
+                        } else {
+                            label.text('Faltó').removeClass('text-success').addClass('text-danger');
+                            select.prop('disabled', true).val('0');
+                        }
+                    });
+
+                    container.append(rowHtml);
+                });
+            } else {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudieron cargar los trabajadores para asistencia' });
+            }
+        },
+        error: function() {
+            Swal.fire({ icon: 'error', title: 'Error', text: 'Error de red al cargar trabajadores' });
+        }
+    });
+};
+
+// Configurar el botón de guardar Asistencia
+$('#btnSaveAttendance').on('click', function(e) {
+    e.preventDefault();
+    
+    var dateVal = $('#attendanceDate').val();
+    if (!dateVal) {
+        Swal.fire({ icon: 'warning', title: 'Atención', text: 'Debes seleccionar una fecha' });
+        return;
+    }
+
+    var registros = [];
+    var $rows = $('#cardsContainerAsistencia .attendance-row');
+
+    if ($rows.length === 0) {
+        Swal.fire({ icon: 'warning', title: 'Atención', text: 'No hay trabajadores para registrar' });
+        return;
+    }
+
+    $rows.each(function() {
+        var workerId = $(this).data('worker-id');
+        var asistio = $(this).find('.attendance-checkbox').is(':checked');
+        var horas = parseInt($(this).find('.hours-select').val());
+
+        registros.push({
+            workerId: workerId,
+            date: dateVal,
+            attended: asistio,
+            hoursWorked: horas
+        });
+    });
+
+    // Enviamos al backend (A LA URL CORRECTA)
+    $.ajax({
+        url: '/agrosys/workers/attendance/register',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(registros),
+        success: function(response) {
+            if (response.success) {
+                Swal.fire({ icon: 'success', title: '¡Guardado!', text: 'La asistencia se registró correctamente' });
+            } else {
+                Swal.fire({ icon: 'error', title: 'Error', text: response.message || 'No se pudo guardar la asistencia' });
+            }
+        },
+        error: function(xhr) {
+            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Ocurrió un error al guardar';
+            Swal.fire({ icon: 'error', title: 'Error', text: msg });
+        }
+    });
+});
+
+// Función para cargar el historial
+$.fn.getAttendanceHistory = function() {
+    const workerId = $('#filterWorker').val();
+    const startDate = $('#filterStartDate').val();
+    const endDate = $('#filterEndDate').val();
+
+    if (!startDate || !endDate) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Fechas requeridas',
+            text: 'Por favor selecciona un rango de fechas para consultar.'
+        });
+        return;
+    }
+
+    $.ajax({
+        url: '/agrosys/workers/attendance/history', // Ruta de nuestro nuevo puente
+        type: 'GET',
+        data: {
+            workerId: workerId,
+            startDate: startDate,
+            endDate: endDate
+        },
+        success: function(response) {
+            const tbody = $('#tbodyHistorial');
+            tbody.html(''); // Limpiar tabla
+
+            if (response.success && response.data.length > 0) {
+                const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+                response.data.forEach(reg => {
+                    const fechaObj = new Date(reg.date + 'T00:00:00');
+                    const nombreDia = diasSemana[fechaObj.getDay()];
+                    const statusClass = reg.attended ? 'badge bg-success' : 'badge bg-danger';
+                    const statusText = reg.attended ? 'Asistió' : 'Faltó';
+                    
+                    tbody.append(`
+                        <tr>
+                            <td>
+                                <div class="fw-bold">${reg.date}</div>
+                                <small class="text-muted">${nombreDia}</small>
+                            </td>
+                            <td class="text-capitalize align-content-center">${reg.workerName.toLowerCase()}</td>
+                            <td class="align-content-center"><span class="${statusClass}">${statusText}</span></td>
+                            <td class="align-content-center">${reg.hoursWorked} hrs</td>
+                        </tr>
+                    `);
+                });
+            } else {
+                tbody.html('<tr><td colspan="4" class="text-center text-muted">No se encontraron registros.</td></tr>');
+            }
+        },
+        error: function() {
+            Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo cargar el historial' });
+        }
+    });
+};
+
+// Evento para el botón de filtrar
+$('#btnFiltrarHistorial').on('click', function() {
+    $.fn.getAttendanceHistory();
+});
+
+// Función para llenar el select de trabajadores en el historial
+$.fn.fillWorkerFilter = function(workers) {
+    const select = $('#filterWorker');
+    if (select.length) { // Solo si el elemento existe en el HTML
+        select.html('<option value="">Todos los trabajadores</option>');
+        workers.forEach(w => {
+            const id = w.workerId || w.id;
+            const name = w.name || w.nombre;
+            select.append(`<option value="${id}">${name}</option>`);
+        });
+    }
+};
