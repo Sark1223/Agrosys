@@ -8,6 +8,9 @@ const disenioStages = {
 };
 
 $.fn.formatDate = function (dateString) {
+    if (!dateString || dateString === 'Sin fecha' || dateString === 'N/A') {
+        return dateString;
+    }
     const [year, month, day] = dateString.split("-");
     const localDate = new Date(year, month - 1, day);
     const monthName = localDate.toLocaleString('es-ES', { month: 'short' });
@@ -61,7 +64,7 @@ $.fn.getStagesByPlantation = function (plantationId) {
                                                 <i class="ri-more-2-fill" type="button" id="dropdownMenuButton${stage.id}" data-bs-toggle="dropdown" aria-expanded="false">
                                                 </i>
                                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton${stage.id}">
-                                                <li><a class="dropdown-item details-plantation-stage" data-bs-toggle="modal" data-bs-target="#modalDetailsPlantationStage" href="#"><i
+                                                <li><a class="dropdown-item details-plantation-stage" data-bs-toggle="modal" data-bs-target="#modalDetailsPlantationStage" href="#" data-bs-dismiss="modal"><i
                                                                 class="ri-eye-line pe-1"></i>Ver detalles</a></li>
                                                     <li style="display: ${display};"><a class="dropdown-item edit-plantation-stage" data-bs-toggle="modal" data-bs-target="#modalEditPlantationStage" href="#" data-bs-dismiss="modal"><i
                                                                 class="ri-pencil-fill pe-1"></i>Editar</a></li>
@@ -73,6 +76,21 @@ $.fn.getStagesByPlantation = function (plantationId) {
                                     </div>
                                 </div>
                             `);
+
+                        $cardStage.find('.details-plantation-stage').on('click', function () {
+                            $('#stageDetailsPlantationName').text($('#plantationDetailsName').text());
+                            $('#stageNameDetails').text(stage.name);
+                            $('#stageStartDateDetails').text($.fn.formatDate(stage.start_at));
+                            $('#stageEndDateDetails').text($.fn.formatDate(stage.end_at));
+                            $('#stageNotesDetails').text(stage.notes ? stage.notes : 'Sin notas');
+                            
+                            if (stage.id !== 4) {
+                                $('#stageStartDateDetails').parent().show();
+                            }
+                            else {
+                                $('#stageStartDateDetails').parent().hide();
+                            }
+                        });
 
                         $cardStage.find('.edit-plantation-stage').on('click', function () {
                             const stageId = stage.id;

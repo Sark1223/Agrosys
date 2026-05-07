@@ -212,28 +212,35 @@
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Detalles de la Plantación <span id="plantationDetailsCurrentState"></span></h5>
+                        <h5 class="modal-title">Detalles de la Plantación <span
+                                id="plantationDetailsCurrentState"></span></h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p class="text-capitalize"><strong>Plantacion:</strong> <span id="plantationDetailsName"></span></p>
+                        <p class="text-capitalize"><strong>Plantacion:</strong> <span id="plantationDetailsName"></span>
+                        </p>
                         <!-- <p class="text-capitalize"><strong>Etapa Actual:</strong> <span id="plantationDetailsCurrentState"></span></p> -->
-                        <p class="text-capitalize"><strong>Parcela de origen:</strong> <span id="plantationDetailsOriginPlot"></span></p>
+                        <p class="text-capitalize"><strong>Parcela de origen:</strong> <span
+                                id="plantationDetailsOriginPlot"></span></p>
                         <div class="d-flex gap-5 justify-content-between flex-wrap">
-                            <p><strong>Fecha de Inicio:</strong> <span id="plantationDetailsStartAt" class="text-capitalize"></span></p>
-                            <p><strong>Fecha de Finalización:</strong> <span id="plantationDetailsEndAt" class="text-capitalize"></span></p>
+                            <p><strong>Fecha de Inicio:</strong> <span id="plantationDetailsStartAt"
+                                    class="text-capitalize"></span></p>
+                            <p><strong>Fecha de Finalización:</strong> <span id="plantationDetailsEndAt"
+                                    class="text-capitalize"></span></p>
                         </div>
                         <p class="mb-0"><strong>Notas:</strong></p>
-                        <pre id="plantationDetailsNotes" style="font-family: var(--bs-body-font-family);"></pre>
+                        <pre id="plantationDetailsNotes"></pre>
 
                         <div class="mt-4">
                             <div class="d-flex justify-content-end align-items-center mb-2">
-                                <button class="btn btn-sm btn-success" id="btnAddStateToPlantation" data-bs-toggle="modal" data-bs-target="#modalAddPlantationStage" data-bs-dismiss="modal">
+                                <button class="btn btn-sm btn-success" id="btnAddStateToPlantation"
+                                    data-bs-toggle="modal" data-bs-target="#modalAddPlantationStage"
+                                    data-bs-dismiss="modal">
                                     <i class="ri-add-line pe-1"></i>Agregar Etapa
                                 </button>
                             </div>
                             <h6 class="text-center mb-3"><strong>Etapas de la Plantación:</strong></h6>
-                            <div id="containerEstados" > <!-- class="d-flex flex-column gap-3 px-2" -->
+                            <div id="containerEstados"> <!-- class="d-flex flex-column gap-3 px-2" -->
                                 <!-- Se cargan las etapas de la plantación por JavaScript -->
                             </div>
                         </div>
@@ -247,19 +254,47 @@
     </div>
 
     <div th:fragment="plantationStageModals">
-        <div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="modalAddPlantationStage" tabindex="-1" aria-labelledby="modalAddPlantationStage" aria-hidden="true">
+
+        <div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="modalDetailsPlantationStage"
+            tabindex="-1" aria-labelledby="modalDetailsPlantationStage" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Detalles de la Etapa</h5>
+                        <button type="button" class="btn-close" data-bs-target="#modalDetailsPlantation"
+                            data-bs-toggle="modal" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Plantación:</strong> <span id="stageDetailsPlantationName"></span></p>
+                        <p><strong>Etapa:</strong> <span id="stageNameDetails"></span></p>
+                        <p><strong>Fecha de Inicio:</strong> <span id="stageStartDateDetails" class="text-capitalize"></span></p>
+                        <p><strong>Fecha de Finalización:</strong> <span id="stageEndDateDetails" class="text-capitalize"></span></p>
+                        <p class="mb-0"><strong>Notas:</strong> <pre id="stageNotesDetails"></pre><p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-target="#modalDetailsPlantation"
+                            data-bs-toggle="modal" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="modalAddPlantationStage"
+            tabindex="-1" aria-labelledby="modalAddPlantationStage" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Agregar Etapa a Plantación</h5>
-                        <button type="button" class="btn-close" data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"  data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-target="#modalDetailsPlantation"
+                            data-bs-toggle="modal" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <form method="post" th:action="@{/plots/plantation/stage/new}" id="addStateForm"
                             class="needs-validation" novalidate>
                             <input type="number" id="plantationIdInputState" name="plantationId" hidden required>
                             <div>
-                                <label for="nombreStateInput" class="form-label mt-4">Etapa <span class="text-danger">*</span></label>
+                                <label for="nombreStateInput" class="form-label mt-4">Etapa <span
+                                        class="text-danger">*</span></label>
                                 <select class="form-select" id="nombreStateInput" name="stageId" required>
                                     <option value="" disabled selected>Seleccione un etapa</option>
                                     <option value="1">Preparación</option>
@@ -270,21 +305,29 @@
                                 <div class="invalid-feedback">El estado es requerido</div>
                             </div>
                             <div>
-                                <label for="fechaInicioStateInput" class="form-label mt-4">Fecha de Inicio <span class="text-danger">*</span></label></label>
-                                <input type="date" class="form-control" id="fechaInicioStateInput" name="startAt" autocomplete="off" required>
+                                <label for="fechaInicioStateInput" class="form-label mt-4">Fecha de Inicio <span
+                                        class="text-danger">*</span></label></label>
+                                <input type="date" class="form-control" id="fechaInicioStateInput" name="startAt"
+                                    autocomplete="off" required>
                             </div>
                             <div>
-                                <label for="fechaFinalizacionStateInput" class="form-label mt-4">Fecha de Finalización </label>
-                                <input type="date" class="form-control" id="fechaFinalizacionStateInput" name="endAt" autocomplete="off">
+                                <label for="fechaFinalizacionStateInput" class="form-label mt-4">Fecha de Finalización
+                                </label>
+                                <input type="date" class="form-control" id="fechaFinalizacionStateInput" name="endAt"
+                                    autocomplete="off">
                             </div>
                             <div>
                                 <label for="notasStateInput" class="form-label mt-4">Notas </label>
-                                <textarea type="text" class="form-control" id="notasStateInput" name="notes" maxlength="500" placeholder="Notas adicionales sobre la etapa" autocomplete="off"></textarea>
+                                <textarea type="text" class="form-control" id="notasStateInput" name="notes"
+                                    maxlength="500" placeholder="Notas adicionales sobre la etapa"
+                                    autocomplete="off"></textarea>
                             </div>
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" id="btn-close-add-state" data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"  data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-secondary" id="btn-close-add-state"
+                            data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"
+                            data-bs-dismiss="modal">Cancelar</button>
                         <button type="button" class="btn btn-success" id="btn-submit-add-state">
                             Guardar
                         </button>
@@ -293,19 +336,22 @@
             </div>
         </div>
 
-        <div class="modal fade" id="modalEditPlantationStage" tabindex="-1" aria-labelledby="modalEditPlantationStage" aria-hidden="true">
+        <div class="modal fade" id="modalEditPlantationStage" tabindex="-1" aria-labelledby="modalEditPlantationStage"
+            aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Editar Etapa de Plantación</h5>
-                        <button type="button" class="btn-close" data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"  data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-target="#modalDetailsPlantation"
+                            data-bs-toggle="modal" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <form method="post" th:action="@{/plots/plantation/stage/edit}" id="editStateForm"
                             class="needs-validation" novalidate>
                             <input type="number" id="plantationIdInputStateEdit" name="plantationId" hidden required>
                             <div>
-                                <label for="nombreStateInputEdit" class="form-label mt-4">Etapa <span class="text-danger">*</span></label>
+                                <label for="nombreStateInputEdit" class="form-label mt-4">Etapa <span
+                                        class="text-danger">*</span></label>
                                 <select class="form-select" id="nombreStateInputEdit" name="stageId" required disabled>
                                     <option value="" selected>Seleccione un estado</option>
                                     <option value="1">Preparación</option>
@@ -316,21 +362,29 @@
                                 <div class="invalid-feedback">El estado es requerido</div>
                             </div>
                             <div>
-                                <label for="fechaInicioStateInputEdit" class="form-label mt-4">Fecha de Inicio <span class="text-danger">*</span></label></label>
-                                <input type="date" class="form-control" id="fechaInicioStateInputEdit" name="startAt" autocomplete="off" required>
+                                <label for="fechaInicioStateInputEdit" class="form-label mt-4">Fecha de Inicio <span
+                                        class="text-danger">*</span></label></label>
+                                <input type="date" class="form-control" id="fechaInicioStateInputEdit" name="startAt"
+                                    autocomplete="off" required>
                             </div>
                             <div>
-                                <label for="fechaFinalizacionStateInputEdit" class="form-label mt-4">Fecha de Finalización<span class="text-danger">*</span> </label>
-                                <input type="date" class="form-control" id="fechaFinalizacionStateInputEdit" name="endAt" autocomplete="off" required>
+                                <label for="fechaFinalizacionStateInputEdit" class="form-label mt-4">Fecha de
+                                    Finalización<span class="text-danger">*</span> </label>
+                                <input type="date" class="form-control" id="fechaFinalizacionStateInputEdit"
+                                    name="endAt" autocomplete="off" required>
                             </div>
                             <div>
                                 <label for="notasStateInputEdit" class="form-label mt-4">Notas </label>
-                                <textarea type="text" class="form-control" id="notasStateInputEdit" name="notes" maxlength="500" placeholder="Notas adicionales sobre el estado" autocomplete="off"></textarea>
+                                <textarea type="text" class="form-control" id="notasStateInputEdit" name="notes"
+                                    maxlength="500" placeholder="Notas adicionales sobre el estado"
+                                    autocomplete="off"></textarea>
                             </div>
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" id="btn-close-edit-state" data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"  data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-secondary" id="btn-close-edit-state"
+                            data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"
+                            data-bs-dismiss="modal">Cancelar</button>
                         <button type="button" class="btn btn-success" id="btn-submit-edit-state">
                             Guardar
                         </button>
@@ -339,22 +393,28 @@
             </div>
         </div>
 
-        <div class="modal fade" id="modalDeletePlantationStage" tabindex="-1" aria-labelledby="modalDeletePlantationStage" aria-hidden="true">
+        <div class="modal fade" id="modalDeletePlantationStage" tabindex="-1"
+            aria-labelledby="modalDeletePlantationStage" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content border-danger text-white bg-dark">
                     <div class="modal-header border-danger">
                         <h5 class="modal-title">Eliminar Etapa de Plantación</h5>
-                        <button type="button" class="btn-close" data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"  data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-target="#modalDetailsPlantation"
+                            data-bs-toggle="modal" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p id="textDeletePlantationStage">¿Está seguro de que desea eliminar la etapa de la plantación?</p>
-                        <form method="post" th:action="@{/plots/plantation/stage/delete}" id="deleteStateForm" class="needs-validation" novalidate>
+                        <p id="textDeletePlantationStage">¿Está seguro de que desea eliminar la etapa de la plantación?
+                        </p>
+                        <form method="post" th:action="@{/plots/plantation/stage/delete}" id="deleteStateForm"
+                            class="needs-validation" novalidate>
                             <input type="number" id="plantationIdInputStateDelete" name="plantationId" hidden required>
                             <input type="number" id="stageIdInputStateDelete" name="stageId" hidden required>
                         </form>
                     </div>
                     <div class="modal-footer border-danger fw-bolder">
-                        <button type="button" class="btn btn-secondary" id="btn-close-delete-state" data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"  data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-secondary" id="btn-close-delete-state"
+                            data-bs-target="#modalDetailsPlantation" data-bs-toggle="modal"
+                            data-bs-dismiss="modal">Cancelar</button>
                         <button type="button" class="btn btn-danger" id="btn-submit-delete-state">
                             Eliminar
                         </button>
