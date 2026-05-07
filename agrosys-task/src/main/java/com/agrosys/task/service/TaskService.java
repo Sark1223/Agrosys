@@ -33,6 +33,10 @@ public class TaskService {
     public TaskResponse createTask(TaskRequest request) {
         log.info("Creando tarea: {}", request.getName());
 
+        if (request.getPlantationId() == null || request.getPlantationId() <= 0) {
+            throw new IllegalArgumentException("El ID del plantío es inválido");
+        }
+
         Integer inserted = taskRepository.insertTask(
                 request.getName(),
                 request.getDescription(),

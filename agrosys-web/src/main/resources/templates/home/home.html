@@ -4,21 +4,83 @@
 <head th:replace="~{fragments :: html_head}"></head>
 
 <body>
-
     <div class="d-flex vh-100">
         <div th:replace="~{fragments :: sidebar}"></div>
 
         <main class="content-area p-4 w-100 bg-light">
+
             <header class="d-flex justify-content-between">
-                <h1>Bienvenid@!</h1>
+                <div>
+                    <h1>Bienvenid@!</h1>
+                    <p>Aquí tienes el estatus general. (:</p>
+                </div>
+
                 <i class="ri-user-3-fill profile-icon"></i>
             </header>
-            <p>Aquí tienes el estatus general. (:</p>
 
-            <div class="dashboard-cards">
-            </div>
+            <section class="dashboard-actions">
+                <button id="btnRegistrarAsistencia" class="dashboard-btn btn-asistencia">
+                    Registrar asistencia
+                </button>
+
+                <button id="btnRegistrarNuevoLote" class="dashboard-btn btn-lote">
+                    Registrar nuevo lote
+                </button>
+
+                <button id="btnRegistrarNuevaTransaccion" class="dashboard-btn btn-transaccion">
+                    Registrar nueva transaccion
+                </button>
+
+                <button id="btnVerSalarios" class="dashboard-btn btn-salarios">
+                    Ver salarios
+                </button>
+            </section>
+
+            <section class="dashboard-grid">
+
+                <div id="cardFiltros" class="dashboard-card filtros-card">
+                    <h3>FILTROS</h3>
+
+                    <label for="filtroAnio">Seleccione año:</label>
+                    <select id="filtroAnio"></select>
+
+                    <label for="filtroMes">Seleccione mes:</label>
+                    <select id="filtroMes"></select>
+
+                    <label for="filtroDia">Seleccione día:</label>
+                    <select id="filtroDia"></select>
+
+                    <button id="btnAplicarFiltros" class="btn-aplicar">
+                        Aplicar
+                    </button>
+                </div>
+
+                <div id="cardIngresos" class="dashboard-card filtros-card">
+                    <h3>INGRESOS</h3>
+                </div>
+
+                <div id="cardGastos" class="dashboard-card filtros-card">
+                    <h3>GASTOS</h3>
+                </div>
+
+                <div id="cardClima" class="dashboard-card clima-card">
+                    <h3>CLIMA</h3>
+                    <div id="climaContenido" class="clima-contenido">
+                        <p id="climaEstado">Cargando clima...</p>
+                    </div>
+                </div>
+
+                <div id="cardInformeTareas" class="dashboard-card tareas-card">
+                    <h3>INFORME DE TAREAS</h3>
+                </div>
+
+                <div id="cardIngresosVsGastos" class="dashboard-card grafica-card">
+                    <h3>INGRESOS VS GASTOS</h3>
+                </div>
+            </section>
         </main>
-
+    </div>
+    <script th:src="@{/js/home/home.js}"></script>
 </body>
 
 </html>
