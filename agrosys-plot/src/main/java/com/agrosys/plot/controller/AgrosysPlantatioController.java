@@ -98,4 +98,11 @@ public class AgrosysPlantatioController {
         return ResponseEntity.ok(successResponse);  
     }
     
+    @DeleteMapping("delete/plantations/{plantationId}/stage/{id}")
+    @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
+    public ResponseEntity<Object> deleteStageOfPlantatio(@PathVariable Integer plantationId, @PathVariable Integer id) {
+        log.info("[REQUEST] - plantationId: {}, id: {}", plantationId, id);
+        Response response = plantatioService.deleteStageOfPlantatio(plantationId, id);
+        return ResponseEntity.ok(response);
+    }
 }

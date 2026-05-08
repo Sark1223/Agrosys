@@ -390,4 +390,25 @@ public class PlantatioService {
                 .success(true)
                 .build();
     }
+
+    public Response deleteStageOfPlantatio(Integer plantationId, Integer id) {
+        if (id.equals(3) || id.equals(4)) {
+            if (plantatioRespository.countLotsByPlantatio(plantationId) > 0) {
+                throw new IllegalArgumentException(
+                        "No se puede eliminar esta etapa porque existen lotes asociados a esta plantación");
+            }
+        }
+
+        Integer delete = plantatioRespository.deleteStageOfPlantatio(plantationId, id);
+        log.info("Delete stage of plantatio result: {}", delete);
+        if (delete.equals(0)) {
+            throw new RuntimeException("No se pudo eliminar la etapa de la plantacion");
+        }
+
+        return Response.builder()
+                .message("Etapa de plantacion eliminada exitosamente")
+                .success(true)
+                .build();
+    }
+
 }

@@ -290,7 +290,7 @@ public class PlotController {
 
         log.info("Eliminación de plantacion: {}", plantationId);
 
-        Response response = gatewayClient.delete("/api/plantation/delete/" + plantationId, Response.class,
+        Response response = gatewayClient.delete("/api/plantation/delete/plantations/"+plantationId+"/stage/"+stageId, Response.class,
                 session.getAttribute("JWT_TOKEN").toString());
 
         log.info("Respuesta del eliminación: {}", response);

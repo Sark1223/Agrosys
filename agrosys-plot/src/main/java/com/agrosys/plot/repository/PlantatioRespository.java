@@ -212,13 +212,18 @@ public interface PlantatioRespository extends JpaRepository<AgrosysPlantatio, In
                         """, nativeQuery = true)
         Integer updatePlantatioStartDate(Integer plantatioId, String start_at);
 
+        @Query(value = """
+                        SELECT COUNT(*) FROM LOT WHERE plantationId = :plantatioId;
+                        """, nativeQuery = true)
+        Integer countLotsByPlantatio(Integer plantatioId);
+
         @Transactional
         @Modifying
         @Query(value = """
                         DELETE FROM agrosys_db.plantatio_stage_relation
                         WHERE plantatioId = :plantatioId AND stageId = :stageId
                         """, nativeQuery = true)
-        Integer deletePlantatioStage(Integer plantatioId, Integer stageId);
+        Integer deleteStageOfPlantatio(Integer plantatioId, Integer stageId);
 
         interface PlantatioStageProjection {
                 Integer getId();

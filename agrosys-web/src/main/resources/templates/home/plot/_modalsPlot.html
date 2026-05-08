@@ -217,6 +217,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <input type="number" id="plantationIdInputDetails" name="plantationId" hidden required>
                         <p class="text-capitalize"><strong>Plantacion:</strong> <span id="plantationDetailsName"></span>
                         </p>
                         <!-- <p class="text-capitalize"><strong>Etapa Actual:</strong> <span id="plantationDetailsCurrentState"></span></p> -->
@@ -295,7 +296,7 @@
                             <div>
                                 <label for="nombreStateInput" class="form-label mt-4">Etapa <span
                                         class="text-danger">*</span></label>
-                                <select class="form-select" id="nombreStateInput" name="stageId" required>
+                                <select class="form-select" id="nombreStateInput" name="stageId" required disabled>
                                     <option value="" disabled selected>Seleccione un etapa</option>
                                     <option value="1">Preparación</option>
                                     <option value="2">Siembra</option>

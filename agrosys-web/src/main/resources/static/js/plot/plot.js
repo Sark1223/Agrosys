@@ -48,6 +48,8 @@ $(document).ready(function () {
                     if($f.find('#nombreStateInput').val() == 4) {
                         $('#btnAddStateToPlantation').disable().attr('title', 'No se pueden agregar más etapas a esta plantación');
                     }
+
+                    $f[0].reset();
                 }
             });
     });
@@ -58,13 +60,27 @@ $(document).ready(function () {
             .done(function (response) {
                 if (response.success) {
                     //Cerrar modal y recargar información de details
-                    $.fn.getStagesByPlantation($('#plantationIdInputState').val());
+                    $.fn.getStagesByPlantation($('#plantationIdInputDetails').val());
                     $.fn.getAllPlots();
 
                     $('#btn-close-edit-state').trigger('click');
                 }
             });
     });
+
+        $('#btn-submit-delete-state').on('click', function () {
+            const $f = $('#deleteStateForm');
+            $.fn.postFormData($f, $f.attr('action'))
+                .done(function (response) {
+                    if (response.success) {
+                        //Cerrar modal y recargar información de details
+                        $.fn.getStagesByPlantation($('#plantationIdInputDetails').val());
+
+                        $.fn.getAllPlots();
+                        $('#btn-close-delete-state').trigger('click');
+                    }
+                });
+        });
 
     $.fn.getActiveTab = function () {
         const activeTabLink = document.querySelector('.nav-link.active');
@@ -200,6 +216,7 @@ $(document).ready(function () {
 
                                 cardPlantacion.find('.details-plantation').on('click', function () {
                                     if (plantacion) {
+                                        $('#plantationIdInputDetails').val(plantacion.plantatioId);
                                         $('#plantationDetailsName').text(`${plantacion.name}`);
                                         $('#plantationDetailsOriginPlot').text(`${plot.name}`);
                                         $('#plantationDetailsStartAt').text($.fn.formatDate(plantacion.start_at));
