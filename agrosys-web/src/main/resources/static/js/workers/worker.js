@@ -173,9 +173,9 @@ $.fn.getAllWorkers = function() {
                         }
                         var wPhotoHtml;
                         if (w.photo) {
-                            wPhotoHtml = '<img src="' + escapeHtml(w.photo) + '" alt="Foto de ' + escapeHtml(w.name) + '" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">';
+                            wPhotoHtml = '<img src="' + escapeHtml(w.photo) + '" alt="Foto de ' + escapeHtml(w.name) + '" class="rounded-circle" style="width: 130px; height: 130px; object-fit: cover;">';
                         } else {
-                            wPhotoHtml = '<div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width: 120px; height: 120px; margin: auto;"><i class="ri-user-3-fill text-white" style="font-size: 50px;"></i></div>';
+                            wPhotoHtml = '<div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width: 130px; height: 130px; margin: auto;"><i class="ri-user-3-fill text-white" style="font-size: 55px;"></i></div>';
                         }
 
                         $('#viewPhotoContainer').html(wPhotoHtml);
@@ -201,10 +201,11 @@ $.fn.getAllWorkers = function() {
                         $('#notasInputEdit').val(w.notas || '');
                         $('#salaryInputEdit').val(w.salary);
 
+                        var preview = $('#photoPreviewEdit');
                         if (w.photo) {
-                            $('#currentPhotoPreview').html('<img src="' + escapeHtml(w.photo) + '" alt="Foto actual" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">');
+                            preview.html('<img src="' + escapeHtml(w.photo) + '" alt="Foto actual" style="width: 100%; height: 100%; object-fit: cover;">');
                         } else {
-                            $('#currentPhotoPreview').html('');
+                            preview.html('<i class="ri-user-3-fill text-white" style="font-size: 55px;"></i>');
                         }
 
                         $('#modalEditWorker').modal('show');
@@ -236,6 +237,36 @@ $.fn.getAllWorkers = function() {
         }
     });
 };
+
+$('#photoInputAdd').on('change', function() {
+    var file = this.files[0];
+    if (file) {
+        fileToBase64(file).then(function(base64) {
+            var preview = $('#photoPreviewAdd');
+            preview.html('<img src="' + base64 + '" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">');
+        });
+    }
+});
+
+$('#photoInputEdit').on('change', function() {
+    var file = this.files[0];
+    if (file) {
+        fileToBase64(file).then(function(base64) {
+            var preview = $('#photoPreviewEdit');
+            preview.html('<img src="' + base64 + '" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">');
+        });
+    }
+});
+
+$('#modalAddWorker').on('hidden.bs.modal', function() {
+    $('#addWorkerForm')[0].reset();
+    $('#photoPreviewAdd').html('<i class="ri-user-3-fill text-white" style="font-size: 55px;"></i>');
+});
+
+$('#modalEditWorker').on('hidden.bs.modal', function() {
+    $('#editWorkerForm')[0].reset();
+    $('#photoPreviewEdit').html('<i class="ri-user-3-fill text-white" style="font-size: 55px;"></i>');
+});
 
 function escapeHtml(str) {
     if (!str) return '';
