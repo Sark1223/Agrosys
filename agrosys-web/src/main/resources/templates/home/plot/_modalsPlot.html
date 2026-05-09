@@ -18,14 +18,14 @@
                                 <label for="nombrePlotInput" class="form-label mt-4">Nombre <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="nombrePlotInput" name="plotName"
-                                    minlength="2" maxlength="50" placeholder="Ingrese el nombre de la parcela"
+                                    minlength="2" maxlength="100" placeholder="Ingrese el nombre de la parcela"
                                     autocomplete="off" required>
                                 <div class="invalid-feedback">El nombre es requerido</div>
                             </div>
                             <div>
                                 <label for="descripcionPlotInput" class="form-label mt-4">Descripción </label>
                                 <textarea type="text" class="form-control" id="descripcionPlotInput" name="description"
-                                    maxlength="100" placeholder="Ingrese la descripción de la parcela"
+                                    maxlength="255" placeholder="Ingrese la descripción de la parcela"
                                     autocomplete="off"></textarea>
                             </div>
 
@@ -57,14 +57,14 @@
                                 <label for="nombrePlotInputEdit" class="form-label mt-4">Nombre <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="nombrePlotInputEdit" name="plotName"
-                                    minlength="2" maxlength="50" placeholder="Ingrese el nombre de la parcela"
+                                    minlength="2" maxlength="100" placeholder="Ingrese el nombre de la parcela"
                                     autocomplete="off" required>
                                 <div class="invalid-feedback">El nombre es requerido</div>
                             </div>
                             <div>
                                 <label for="descripcionPlotInputEdit" class="form-label mt-4">Descripción </label>
                                 <textarea type="text" class="form-control" id="descripcionPlotInputEdit"
-                                    name="description" maxlength="100"
+                                    name="description" maxlength="255"
                                     placeholder="Ingrese la descripción de la parcela" autocomplete="off"></textarea>
                             </div>
                         </form>
@@ -97,7 +97,7 @@
                                 <label for="nombrePlantationInput" class="form-label mt-4">Nombre <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="nombrePlantationInput" name="plantationName"
-                                    minlength="2" maxlength="50" placeholder="Ingrese el nombre de la plantación"
+                                    minlength="2" maxlength="100" placeholder="Ingrese el nombre de la plantación"
                                     autocomplete="off" required>
                                 <div class="invalid-feedback">El nombre es requerido</div>
                             </div>
@@ -148,7 +148,7 @@
                                 <label for="nombrePlantationInputEdit" class="form-label mt-4">Nombre <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="nombrePlantationInputEdit"
-                                    name="plantationName" minlength="2" maxlength="50"
+                                    name="plantationName" minlength="2" maxlength="100"
                                     placeholder="Ingrese el nombre de la plantación" autocomplete="off" required>
                                 <div class="invalid-feedback">El nombre es requerido</div>
                             </div>
@@ -268,9 +268,13 @@
                     <div class="modal-body">
                         <p><strong>Plantación:</strong> <span id="stageDetailsPlantationName"></span></p>
                         <p><strong>Etapa:</strong> <span id="stageNameDetails"></span></p>
-                        <p><strong>Fecha de Inicio:</strong> <span id="stageStartDateDetails" class="text-capitalize"></span></p>
-                        <p><strong>Fecha de Finalización:</strong> <span id="stageEndDateDetails" class="text-capitalize"></span></p>
-                        <p class="mb-0"><strong>Notas:</strong> <pre id="stageNotesDetails"></pre><p>
+                        <p><strong>Fecha de Inicio:</strong> <span id="stageStartDateDetails"
+                                class="text-capitalize"></span></p>
+                        <p><strong>Fecha de Finalización:</strong> <span id="stageEndDateDetails"
+                                class="text-capitalize"></span></p>
+                        <p class="mb-0"><strong>Notas:</strong>
+                        <pre id="stageNotesDetails"></pre>
+                        <p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-target="#modalDetailsPlantation"
@@ -424,6 +428,273 @@
             </div>
         </div>
 
+    </div>
+
+    <div th:fragment="configuracionesModals">
+        <input type="number" id="qtyLotTrade" hidden/>
+
+        <div class="modal fade" id="modalAddTradeMode" tabindex="-1" aria-labelledby="modalAddTradeMode"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Agregar Modo De Comercio</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/config/trade-mode/new}" id="addTradeModeForm"
+                            class="needs-validation" novalidate>
+                            <div>
+                                <label for="nameTradeModeInput" class="form-label mt-0">Nombre <span
+                                        class="text-danger">*</span></label></label>
+                                <input type="text" minlength="3" maxlength="50" class="form-control" id="nameTradeModeInput" name="name"
+                                    autocomplete="off" required>
+                            </div>
+                            <div class="form-check  mt-4">
+                                <input class="form-check-input" type="checkbox" value="1" id="cBxActiveTradeMode"
+                                    name="active" checked="">
+                                <label class="form-check-label" for="cBxActiveTradeMode">
+                                    Activo
+                                </label>
+                            </div>
+                            <!-- <div>
+                                <label for="notasStateInput" class="form-label mt-4">Notas </label>
+                                <textarea type="text" class="form-control" id="notasStateInput" name="notes"
+                                    maxlength="500" placeholder="Notas adicionales sobre la etapa"
+                                    autocomplete="off"></textarea>
+                            </div> -->
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="btn-close-add-trade-mode"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-add-trade-mode">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalEditTradeMode" tabindex="-1" aria-labelledby="modalEditTradeMode"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Modo De Comercio</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/config/trade-mode/update}" id="editTradeModeForm"
+                            class="needs-validation" novalidate>
+                            <input type="number" name="id" id="idTradeModeEdit" hidden>
+
+                            <div>
+                                <label for="nameTradeModeInputEdit" class="form-label mt-0">Nombre <span
+                                        class="text-danger">*</span></label></label>
+                                <input type="text" minlength="3" maxlength="50" class="form-control" id="nameTradeModeInputEdit" name="name"
+                                    autocomplete="off" required>
+                            </div>
+                            <div class="form-check  mt-4">
+                                <input class="form-check-input" type="checkbox" value="1" id="cBxActiveTradeModeEdit"
+                                    name="active" checked="">
+                                <label class="form-check-label" for="cBxActiveTradeModeEdit">
+                                    Activo
+                                </label>
+                            </div>
+                            <!-- <div>
+                                <label for="notasStateInput" class="form-label mt-4">Notas </label>
+                                <textarea type="text" class="form-control" id="notasStateInput" name="notes"
+                                    maxlength="500" placeholder="Notas adicionales sobre la etapa"
+                                    autocomplete="off"></textarea>
+                            </div> -->
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="btn-close-edit-trade-mode"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-edit-trade-mode">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalAddProductUnit" tabindex="-1" aria-labelledby="modalAddProductUnit"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Agregar Unidad De Producto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/config/product-unit/new}" id="addProductUnitForm"
+                            class="needs-validation" novalidate>
+                            <div>
+                                <label for="nameProductUnitInput" class="form-label mt-0">Nombre <span
+                                        class="text-danger">*</span></label></label>
+                                <input type="text" minlength="3" maxlength="50" class="form-control" id="nameProductUnitInput" name="name"
+                                    autocomplete="off" required>
+                            </div>
+                            <div class="form-check  mt-4">
+                                <input class="form-check-input" type="checkbox" value="1" id="cBxActiveProductUnit"
+                                    name="active" checked="">
+                                <label class="form-check-label" for="cBxActiveProductUnit">
+                                    Activo
+                                </label>
+                            </div>
+                            <!-- <div>
+                                <label for="notasStateInput" class="form-label mt-4">Notas </label>
+                                <textarea type="text" class="form-control" id="notasStateInput" name="notes"
+                                    maxlength="500" placeholder="Notas adicionales sobre la etapa"
+                                    autocomplete="off"></textarea>
+                            </div> -->
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="btn-close-add-product-unit"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-add-product-unit">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalEditProductUnit" tabindex="-1" aria-labelledby="modalEditProductUnit"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Unidad De Producto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/config/product-unit/update}" id="editProductUnitForm"
+                            class="needs-validation" novalidate>
+                            <input type="number" name="id" id="idProductUnitEdit" hidden>
+
+                            <div>
+                                <label for="nameProductUnitInputEdit" class="form-label mt-0">Nombre <span
+                                        class="text-danger">*</span></label></label>
+                                <input type="text" minlength="3" maxlength="50" class="form-control" id="nameProductUnitInputEdit" name="name"
+                                    autocomplete="off" required>
+                            </div>
+                            <div class="form-check  mt-4">
+                                <input class="form-check-input" type="checkbox" value="1" id="cBxActiveProductUnitEdit"
+                                    name="active" checked="">
+                                <label class="form-check-label" for="cBxActiveProductUnitEdit">
+                                    Activo
+                                </label>
+                            </div>
+                            <!-- <div>
+                                <label for="notasStateInput" class="form-label mt-4">Notas </label>
+                                <textarea type="text" class="form-control" id="notasStateInput" name="notes"
+                                    maxlength="500" placeholder="Notas adicionales sobre la etapa"
+                                    autocomplete="off"></textarea>
+                            </div> -->
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="btn-close-edit-product-unit"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-edit-product-unit">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalAddProductType" tabindex="-1" aria-labelledby="modalAddProductType"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Agregar Tipo De Producto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/config/product-type/new}" id="addProductTypeForm"
+                            class="needs-validation" novalidate>
+                            <div>
+                                <label for="nameProductTypeInput" class="form-label mt-0">Nombre <span
+                                        class="text-danger">*</span></label></label>
+                                <input type="text" minlength="3" maxlength="50" class="form-control" id="nameProductTypeInput" name="name"
+                                    autocomplete="off" required>
+                            </div>
+                            <div class="form-check  mt-4">
+                                <input class="form-check-input" type="checkbox" value="1" id="cBxActiveProductType"
+                                    name="active" checked="">
+                                <label class="form-check-label" for="cBxActiveProductType">
+                                    Activo
+                                </label>
+                            </div>
+                            <!-- <div>
+                                <label for="notasStateInput" class="form-label mt-4">Notas </label>
+                                <textarea type="text" class="form-control" id="notasStateInput" name="notes"
+                                    maxlength="500" placeholder="Notas adicionales sobre la etapa"
+                                    autocomplete="off"></textarea>
+                            </div> -->
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="btn-close-add-product-type"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-add-product-type">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalEditProductType" tabindex="-1" aria-labelledby="modalEditProductType"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Tipo De Producto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/config/product-type/update}" id="editProductTypeForm"
+                            class="needs-validation" novalidate>
+                            <input type="number" name="id" id="idProductTypeEdit" hidden>
+                            <div>
+                                <label for="nameProductTypeInputEdit" class="form-label mt-0">Nombre <span
+                                        class="text-danger">*</span></label></label>
+                                <input type="text" minlength="3" maxlength="50" class="form-control" id="nameProductTypeInputEdit" name="name"
+                                    autocomplete="off" required>
+                            </div>
+                            <div class="form-check  mt-4">
+                                <input class="form-check-input" type="checkbox" value="1" id="cBxActiveProductTypeEdit"
+                                    name="active" checked="">
+                                <label class="form-check-label" for="cBxActiveProductTypeEdit">
+                                    Activo
+                                </label>
+                            </div>
+                            <!-- <div>
+                                <label for="notasStateInput" class="form-label mt-4">Notas </label>
+                                <textarea type="text" class="form-control" id="notasStateInput" name="notes"
+                                    maxlength="500" placeholder="Notas adicionales sobre la etapa"
+                                    autocomplete="off"></textarea>
+                            </div> -->
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="btn-close-edit-product-type"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-edit-product-type">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 

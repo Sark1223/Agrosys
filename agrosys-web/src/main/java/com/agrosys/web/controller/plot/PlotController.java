@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.agrosys.web.dto.Response;
 import com.agrosys.web.dto.plot.PlotRegister;
+import com.agrosys.web.dto.plot.lot.ConfigRegister;
 import com.agrosys.web.dto.plot.plantation.PlantatioRegister;
 import com.agrosys.web.dto.plot.plantation.PlantatioStageRegister;
 import com.agrosys.web.utils.GatewayClient;
@@ -290,10 +291,179 @@ public class PlotController {
 
         log.info("Eliminación de plantacion: {}", plantationId);
 
-        Response response = gatewayClient.delete("/api/plantation/delete/plantations/"+plantationId+"/stage/"+stageId, Response.class,
+        Response response = gatewayClient.delete(
+                "/api/plantation/delete/plantations/" + plantationId + "/stage/" + stageId, Response.class,
                 session.getAttribute("JWT_TOKEN").toString());
 
         log.info("Respuesta del eliminación: {}", response);
         return ResponseEntity.ok(response);
     }
+
+    // ================= CONFIGURACIONES =================
+
+    @GetMapping("/config/get-all")
+    public ResponseEntity<Response> getAllConfigs(
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_PARCELAS"))
+            return ResponseEntity.status(403).build();
+
+        log.info("Obteniendo configuraciones");
+
+        Response response = gatewayClient.get("/api/lot/config/get-all", Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta del registro: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/config/trade-mode/new")
+    public ResponseEntity<Response> postTradeMode(
+            @RequestParam String name,
+            @RequestParam(required = false) Integer active,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_PARCELAS"))
+            return ResponseEntity.status(403).build();
+
+        ConfigRegister requestData = new ConfigRegister();
+        requestData.setName(name);
+        requestData.setActive((active != null));
+
+        log.info("Creacion de modo de comercio: {}", requestData);
+
+        Response response = gatewayClient.post("/api/lot/config/trade-mode/post", requestData, Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta del registro: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/config/trade-mode/update")
+    public ResponseEntity<Response> putTradeMode(
+            @RequestParam Integer id,
+            @RequestParam String name,
+            @RequestParam(required = false) Integer active,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_PARCELAS"))
+            return ResponseEntity.status(403).build();
+
+        ConfigRegister requestData = new ConfigRegister();
+        requestData.setName(name);
+        requestData.setActive((active != null));
+
+        log.info("Actualización de modo de comercio: {}", requestData);
+
+        Response response = gatewayClient.put("/api/lot/config/trade-mode/update/" + id, requestData, Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta del actualizacion: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+    
+    @PostMapping("/config/product-unit/new")
+    public ResponseEntity<Response> postProductUnit(
+            @RequestParam String name,
+            @RequestParam(required = false) Integer active,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_PARCELAS"))
+            return ResponseEntity.status(403).build();
+
+        ConfigRegister requestData = new ConfigRegister();
+        requestData.setName(name);
+        requestData.setActive((active != null));
+
+        log.info("Creacion de unidad de producto: {}", requestData);
+
+        Response response = gatewayClient.post("/api/lot/config/product-unit/post", requestData, Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta del registro: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/config/product-unit/update")
+    public ResponseEntity<Response> putProductUnit(
+            @RequestParam Integer id,
+            @RequestParam String name,
+            @RequestParam(required = false) Integer active,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_PARCELAS"))
+            return ResponseEntity.status(403).build();
+
+        ConfigRegister requestData = new ConfigRegister();
+        requestData.setName(name);
+        requestData.setActive((active != null));
+
+        log.info("Actualización de unidad de producto: {}", requestData);
+
+        Response response = gatewayClient.put("/api/lot/config/product-unit/update/" + id, requestData, Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta del actualizacion: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/config/product-type/new")
+    public ResponseEntity<Response> postProductType(
+            @RequestParam String name,
+            @RequestParam(required = false) Integer active,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_PARCELAS"))
+            return ResponseEntity.status(403).build();
+
+        ConfigRegister requestData = new ConfigRegister();
+        requestData.setName(name);
+        requestData.setActive((active != null));
+
+        log.info("Creacion  de tipo de producto: {}", requestData);
+
+        Response response = gatewayClient.post("/api/lot/config/product-type/post", requestData, Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta del registro: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/config/product-type/update")
+    public ResponseEntity<Response> putProductType(
+            @RequestParam Integer id,
+            @RequestParam String name,
+            @RequestParam(required = false) Integer active,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_PARCELAS"))
+            return ResponseEntity.status(403).build();
+
+        ConfigRegister requestData = new ConfigRegister();
+        requestData.setName(name);
+        requestData.setActive((active != null));
+
+        log.info("Actualización de tipo de producto: {}", requestData);
+
+        Response response = gatewayClient.put("/api/lot/config/product-type/update/" + id, requestData, Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta del actualizacion: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
 }

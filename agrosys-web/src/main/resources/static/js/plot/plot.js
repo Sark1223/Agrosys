@@ -45,11 +45,13 @@ $(document).ready(function () {
 
                     $('#btn-close-add-state').trigger('click');
 
-                    if($f.find('#nombreStateInput').val() == 4) {
+                    if ($f.find('#nombreStateInput').val() == 4) {
                         $('#btnAddStateToPlantation').disable().attr('title', 'No se pueden agregar más etapas a esta plantación');
                     }
-
-                    $f[0].reset();
+                    $('#fechaInicioStateInput').val($('#fechaFinalizacionStateInput').val()? $('#fechaFinalizacionStateInput').val() : new Date().toISOString().split('T')[0]);
+                    $('#notasStateInput').val('');
+                    $('#fechaFinalizacionStateInput').val('');
+                    // $f[0].reset();
                 }
             });
     });
@@ -68,28 +70,20 @@ $(document).ready(function () {
             });
     });
 
-        $('#btn-submit-delete-state').on('click', function () {
-            const $f = $('#deleteStateForm');
-            $.fn.postFormData($f, $f.attr('action'))
-                .done(function (response) {
-                    if (response.success) {
-                        //Cerrar modal y recargar información de details
-                        $.fn.getStagesByPlantation($('#plantationIdInputDetails').val());
+    $('#btn-submit-delete-state').on('click', function () {
+        const $f = $('#deleteStateForm');
+        $.fn.postFormData($f, $f.attr('action'))
+            .done(function (response) {
+                if (response.success) {
+                    //Cerrar modal y recargar información de details
+                    $.fn.getStagesByPlantation($('#plantationIdInputDetails').val());
 
-                        $.fn.getAllPlots();
-                        $('#btn-close-delete-state').trigger('click');
-                    }
-                });
-        });
+                    $.fn.getAllPlots();
+                    $('#btn-close-delete-state').trigger('click');
+                }
+            });
+    });
 
-    $.fn.getActiveTab = function () {
-        const activeTabLink = document.querySelector('.nav-link.active');
-        if (activeTabLink) {
-            const href = activeTabLink.getAttribute('href');
-            return href.replace('#', '');
-        }
-        return 'plot';
-    }
 
     $.fn.renderCardPlot = function (plot) {
         return $(`

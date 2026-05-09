@@ -18,6 +18,15 @@ $.fn.formatDate = function (dateString) {
     return `${day}/${monthName}/${year}`;
 }
 
+$.fn.getActiveTab = function () {
+    const activeTabLink = document.querySelector('.nav-link.active');
+    if (activeTabLink) {
+        const href = activeTabLink.getAttribute('href');
+        return href.replace('#', '');
+    }
+    return 'plot';
+}
+
 $.fn.getStagesByPlantation = function (plantationId) {
     $.ajax({
         url: `/agrosys/plots/plantation/${plantationId}/stages`,
@@ -44,9 +53,10 @@ $.fn.getStagesByPlantation = function (plantationId) {
                     if (stagesSize === 4) {
                         $('#btnAddStateToPlantation').attr('disabled', 'disabled').attr('title', 'No se pueden agregar más etapas a esta plantación');
                         // $('#btnAddStateToPlantation').off('click'); Desvincula cualquier evento click previamente asociado al botón
+                        $('#plantationDetailsEndAt').text($.fn.formatDate(stages[stagesSize - 1].end_at));
                     }
                     // else {
-                        
+
 
                     // }
 

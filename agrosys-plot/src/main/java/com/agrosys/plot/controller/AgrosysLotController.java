@@ -1,0 +1,89 @@
+package com.agrosys.plot.controller;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.agrosys.plot.dto.Response;
+import com.agrosys.plot.dto.lot.ConfigRegister;
+import com.agrosys.plot.service.LotService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+
+@RestController
+@RequestMapping("/api/lot")
+@RequiredArgsConstructor
+@Slf4j
+public class AgrosysLotController {
+
+    private final LotService lotService;
+
+    @GetMapping("/config/get-all")
+    @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
+    public ResponseEntity<Response> getAllConfigs() {
+        log.info("[REQUEST] - [Obteniedo las configuraciones de parcelas]");
+        Response response = lotService.getAllConfigs();
+        return ResponseEntity.ok(response);
+    }
+    
+    // ======================== TRADE MODE ========================
+
+    @PostMapping("/config/trade-mode/post")
+    @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
+    public ResponseEntity<Response> postTradeMode(@Valid @RequestBody ConfigRegister request) {
+        log.info("[REQUEST] - request: {}", request);
+        Response response = lotService.postTradeMode(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/config/trade-mode/update/{id}")
+    @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
+    public ResponseEntity<Object> putTradeMode(@PathVariable Integer id, @Valid @RequestBody ConfigRegister request) {
+        log.info("[REQUEST] - request: {}", request);
+        Response response = lotService.putTradeMode(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    // ======================== PRODUCT UNIT ========================
+    @PostMapping("/config/product-unit/post")
+    @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
+    public ResponseEntity<Response> postProductUnit(@Valid @RequestBody ConfigRegister request) {
+        log.info("[REQUEST] - request: {}", request);
+        Response response = lotService.postProductUnit(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/config/product-unit/update/{id}")
+    @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
+    public ResponseEntity<Object> putProductUnit(@PathVariable Integer id, @Valid @RequestBody ConfigRegister request) {
+        log.info("[REQUEST] - request: {}", request);
+        Response response = lotService.putProductUnit(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    // ======================== PRODUCT TYPE ========================
+    @PostMapping("/config/product-type/post")
+    @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
+    public ResponseEntity<Response> postProductType(@Valid @RequestBody ConfigRegister request) {
+        log.info("[REQUEST] - request: {}", request);
+        Response response = lotService.postProductType(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/config/product-type/update/{id}")
+    @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
+    public ResponseEntity<Object> putProductType(@PathVariable Integer id, @Valid @RequestBody ConfigRegister request) {
+        log.info("[REQUEST] - request: {}", request);
+        Response response = lotService.putProductType(id, request);
+        return ResponseEntity.ok(response);
+    }
+}
