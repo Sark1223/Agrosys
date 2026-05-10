@@ -1,5 +1,7 @@
 package com.agrosys.worker.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ public class WorkerService {
     public WorkerResponse crearWorker(WorkerRequest request) {
         log.info("[REQUEST] - request: {}", request);
 
+        BigDecimal hourlyPay = request.getSalary().divide(BigDecimal.valueOf(56),2,RoundingMode.HALF_UP);
         String notas = request.getNotas() != null ? request.getNotas() : null;
 
         Integer worker = workerRepository.insertWorker(
@@ -36,7 +39,9 @@ public class WorkerService {
                 notas,
                 request.getSalary(),
                 null,
-                null);
+                null,
+                hourlyPay
+            );
 
         if (worker == null || worker == 0) {
             log.error("[FAILED] - No se pudo registrar el trabajador");
@@ -61,9 +66,11 @@ public class WorkerService {
                     saved.getNotas(),
                     saved.getSalary(),
                     photo,
-                    photoPublicId);
+                    photoPublicId,
+                    hourlyPay);
             saved = workerRepository.findByName(request.getName());
         }
+
 
         log.info("[SUCCESS] - Trabajador registrado exitosamente: {} con ID: {}",
                 saved.getName(), saved.getWorkerId());
@@ -75,6 +82,7 @@ public class WorkerService {
                 .salary(saved.getSalary())
                 .photo(saved.getPhoto())
                 .photoPublicId(saved.getPhotoPublicId())
+                .hourlyPay(hourlyPay)
                 .message("Trabajador registrado exitosamente")
                 .success(true)
                 .build();
@@ -127,13 +135,17 @@ public class WorkerService {
             photoPublicId = existing.getPhotoPublicId();
         }
 
+        BigDecimal hourlyPay = request.getSalary().divide(BigDecimal.valueOf(56),2,RoundingMode.HALF_UP);
+        
+
         Integer updated = workerRepository.updateWorker(
                 workerId,
                 request.getName(),
                 notas,
                 request.getSalary(),
                 photo,
-                photoPublicId);
+                photoPublicId,
+                hourlyPay);
 
         if (updated == null || updated == 0) {
             log.error("[FAILED] - No se pudo actualizar el trabajador");
