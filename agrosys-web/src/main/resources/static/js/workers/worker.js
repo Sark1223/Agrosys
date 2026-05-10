@@ -1,6 +1,13 @@
 let currentWorkerId = null;
 let workersData = [];
 
+$('#salaryInput, #salaryInputEdit').on('input', function () {
+    var salary = parseFloat($(this).val()) || 0;
+    var hourly = (salary / 56).toFixed(2);
+    var suffix = $(this).is('#salaryInput') ? '' : 'Edit';
+    $('#hourlyPayDisplay' + suffix).text('Pago por hora: $' + hourly);
+});
+
 $('#btn-submit-edit-worker').on('click', function () {
     const $f = $('#editWorkerForm');
     const activeTab = getActiveTab();
@@ -199,7 +206,7 @@ $.fn.getAllWorkers = function() {
                         $('#workerIdInputEdit').val(workerId);
                         $('#nombreInputEdit').val(w.name);
                         $('#notasInputEdit').val(w.notas || '');
-                        $('#salaryInputEdit').val(w.salary);
+                        $('#salaryInputEdit').val(w.salary).trigger('input');
 
                         var preview = $('#photoPreviewEdit');
                         if (w.photo) {
@@ -261,11 +268,13 @@ $('#photoInputEdit').on('change', function() {
 $('#modalAddWorker').on('hidden.bs.modal', function() {
     $('#addWorkerForm')[0].reset();
     $('#photoPreviewAdd').html('<i class="ri-user-3-fill text-white" style="font-size: 55px;"></i>');
+    $('#hourlyPayDisplay').text('Pago por hora: $0.00');
 });
 
 $('#modalEditWorker').on('hidden.bs.modal', function() {
     $('#editWorkerForm')[0].reset();
     $('#photoPreviewEdit').html('<i class="ri-user-3-fill text-white" style="font-size: 55px;"></i>');
+    $('#hourlyPayDisplayEdit').text('Pago por hora: $0.00');
 });
 
 function escapeHtml(str) {
