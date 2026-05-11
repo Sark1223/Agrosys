@@ -1,13 +1,13 @@
 package com.agrosys.task.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,17 +21,26 @@ import lombok.NoArgsConstructor;
 public class SpecialTask {
 
     @Id
-    @Column(name = "task_id")
-    private Integer taskId;
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(name = "special_task_id")
+    private Integer specialTaskId;  
 
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "task_id")
-    private AgrosysTask task;
+    @Column(name = "name", nullable = false, length=100)
+    private String name;
 
-    @Column(name = "worker_id", nullable = false)
-    private Integer workerId;
-
-    @Column(name = "payment_amount", precision = 18, scale = 2)
+    @Column(name = "payment_amount", precision = 18, scale = 2, nullable=false)
     private BigDecimal paymentAmount;
+    
+    @Column(name = "create_at", nullable = false)
+    private LocalDate createAt;
+    
+    @Column(name = "task_stage_id", nullable = false)
+    private Integer taskStageId;
+
+    @Column(name = "end_at")
+    private LocalDate endAt;
+
+    @Column(name = "description", length= 256)
+    private String description;
+
 }
