@@ -1,5 +1,8 @@
 package com.agrosys.task.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,8 +14,10 @@ import com.agrosys.task.dto.SpecialTaskRequest;
 import com.agrosys.task.dto.SpecialTaskResponse;
 import com.agrosys.task.dto.TaskRequest;
 import com.agrosys.task.dto.TaskResponse;
+import com.agrosys.task.entity.SpecialTask;
 import com.agrosys.task.repository.SpecialTaskRepository;
 import com.agrosys.task.repository.TaskRepository;
+import com.agrosys.task.repository.WorkerTaskRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +29,7 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final SpecialTaskRepository specialTaskRepository;
+    private final WorkerTaskRepository workerTaskRepository;
 
     public static final int STAGE_PENDIENTE = 1;
     public static final int STAGE_EN_PROCESO = 2;
@@ -52,7 +58,7 @@ public class TaskService {
 
         Integer newTaskId = taskRepository.getLastInsertId();
         TaskRepository.TaskProjection saved = taskRepository.findTaskById(newTaskId);
-        
+
         log.info("Tarea creada con ID: {}", saved.getTaskId());
         return mapToResponse(saved);
     }
@@ -76,7 +82,7 @@ public class TaskService {
             throw new RuntimeException("Tarea no encontrada con id: " + id);
         }
         taskRepository.updateTask(id, request.getName(), request.getDescription(),
-                request.getCreateAt(), request.getEndAt(), request.getTaskStageId(), 
+                request.getCreateAt(), request.getEndAt(), request.getTaskStageId(),
                 request.getPlantationId());
         return getTaskById(id);
     }
@@ -86,7 +92,6 @@ public class TaskService {
         if (taskRepository.countById(id) == 0) {
             throw new RuntimeException("Tarea no encontrada con id: " + id);
         }
-        specialTaskRepository.deleteSpecialTaskById(id);
         taskRepository.deleteTaskById(id);
         log.info("Tarea eliminada con ID: {}", id);
     }
@@ -105,54 +110,83 @@ public class TaskService {
 
     public List<Response> getStages() {
         return List.of(
-            Response.builder().success(true).message("1").data("Pendiente").build(),
-            Response.builder().success(true).message("2").data("En Proceso").build(),
-            Response.builder().success(true).message("3").data("Finalizada").build()
+                Response.builder().success(true).message("1").data("Pendiente").build(),
+                Response.builder().success(true).message("2").data("En Proceso").build(),
+                Response.builder().success(true).message("3").data("Finalizada").build()
         );
     }
 
     // Special Tasks
-
     @Transactional
     public SpecialTaskResponse createSpecialTask(SpecialTaskRequest request) {
-        log.info("Creando tarea especial para worker: {}", request.getWorkerId());
+        log.info("Creando tarea especial para worker: {}", request.getName());
 
-        if (taskRepository.countById(request.getTaskId()) == 0) {
-            throw new RuntimeException("Tarea no encontrada con id: " + request.getTaskId());
+        if (request.getPaymentAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("EL monto de pago debe ser mayor a cero ");
         }
 
-        Integer inserted = specialTaskRepository.insertSpecialTask(
-                request.getTaskId(),
-                request.getWorkerId(),
-                request.getPaymentAmount()
-        );
-
-        if (inserted == null || inserted == 0) {
-            throw new RuntimeException("No se pudo crear la tarea especial");
+        LocalDate endAt = request.getEndAt();
+        if (request.getTaskStageId() == STAGE_FINALIZADA && endAt == null) {
+            endAt = LocalDate.now();
         }
 
-        specialTaskRepository.updateSpecialTask(request.getTaskId(), request.getWorkerId(), request.getPaymentAmount());
+        SpecialTask specialtask = new SpecialTask();
+        specialtask.setName(request.getName());
+        specialtask.setPaymentAmount(request.getPaymentAmount());
+        specialtask.setCreateAt(request.getCreateAt());
+        specialtask.setTaskStageId(request.getTaskStageId());
+        specialtask.setEndAt(endAt);
+        specialtask.setDescription(request.getDescription());
 
-        return specialTaskToResponse(request.getTaskId());
+        SpecialTask saved = specialTaskRepository.save(specialtask);
+
+        if (request.getWorkerIds() != null) {
+            for (Integer workerId : request.getWorkerIds()) {
+                workerTaskRepository.insertWorkerAssignment(workerId, saved.getSpecialTaskId());
+            }
+        }
+
+        log.info("Tarea especial creada con ID: {}", saved.getSpecialTaskId());
+        return specialTaskToResponse(saved.getSpecialTaskId());
     }
 
     public List<SpecialTaskResponse> getAllSpecialTasks() {
-        List<SpecialTaskRepository.SpecialTaskProjection> tasks = specialTaskRepository.findAllSpecialTasks();
+        List<SpecialTaskRepository.SpecialTaskWithWorkersProjection> tasks = specialTaskRepository.findAllSpecialTasksWithWorkers();
         return tasks.stream().map(this::specialProjectionToResponse).collect(Collectors.toList());
     }
 
     public List<SpecialTaskResponse> getSpecialTasksByWorker(Integer workerId) {
-        List<SpecialTaskRepository.SpecialTaskProjection> tasks = specialTaskRepository.findByWorkerId(workerId);
+        List<SpecialTaskRepository.SpecialTaskWithWorkersProjection> tasks = specialTaskRepository.findSpecialTasksByWorkerId(workerId);
         return tasks.stream().map(this::specialProjectionToResponse).collect(Collectors.toList());
     }
 
     @Transactional
-    public SpecialTaskResponse updateSpecialTask(Integer taskId, SpecialTaskRequest request) {
-        if (specialTaskRepository.countByTaskId(taskId) == 0) {
-            throw new RuntimeException("Tarea especial no encontrada con id: " + taskId);
+    public SpecialTaskResponse updateSpecialTask(Integer specialtaskId, SpecialTaskRequest request) {
+        if (specialTaskRepository.countBySpecialTaskId(specialtaskId)== 0) {
+            throw new RuntimeException("Tarea especial no encontrada con id: " + specialtaskId);
         }
-        specialTaskRepository.updateSpecialTask(taskId, request.getWorkerId(), request.getPaymentAmount());
-        return specialTaskToResponse(taskId);
+
+        LocalDate endAt = request.getEndAt();
+        if(request.getTaskStageId() == STAGE_FINALIZADA && endAt == null){
+            endAt = LocalDate.now();
+        }
+        specialTaskRepository.updateSpecialTask(
+            specialtaskId, 
+            request.getName(), 
+            request.getPaymentAmount(),
+            request.getCreateAt(),
+            request.getTaskStageId(),
+            endAt,
+            request.getDescription()
+        );
+
+        workerTaskRepository.deleteBySpecialTaskId(specialtaskId);
+        if(request.getWorkerIds() != null){
+            for(Integer workerId : request.getWorkerIds()){
+                workerTaskRepository.insertWorkerAssignment(workerId, specialtaskId);
+            }
+        }
+        return specialTaskToResponse(specialtaskId);
     }
 
     private TaskResponse mapToResponse(TaskRepository.TaskProjection proj) {
@@ -167,20 +201,30 @@ public class TaskService {
                 .build();
     }
 
-    private SpecialTaskResponse specialTaskToResponse(Integer taskId) {
-        SpecialTaskRepository.SpecialTaskProjection proj = specialTaskRepository.findByTaskId(taskId);
+    private SpecialTaskResponse specialTaskToResponse(Integer specialTaskId) {
+        SpecialTaskRepository.SpecialTaskWithWorkersProjection proj = specialTaskRepository.findSpecialTaskWithWorkersById(specialTaskId);
         if (proj == null) {
             throw new RuntimeException("Tarea especial no encontrada");
         }
         return specialProjectionToResponse(proj);
     }
 
-    private SpecialTaskResponse specialProjectionToResponse(SpecialTaskRepository.SpecialTaskProjection proj) {
+    private SpecialTaskResponse specialProjectionToResponse(SpecialTaskRepository.SpecialTaskWithWorkersProjection proj) {
+        List<Integer> workerIds = null;
+        if (proj.getWorkerIds() != null && !proj.getWorkerIds().isEmpty()) {
+            workerIds = Arrays.stream(proj.getWorkerIds().split(","))
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList());
+        }
         return SpecialTaskResponse.builder()
-                .taskId(proj.getTaskId())
-                .workerId(proj.getWorkerId())
+                .specialTaskId(proj.getSpecialTaskId())
+                .name(proj.getName())
                 .paymentAmount(proj.getPaymentAmount())
+                .createAt(proj.getCreateAt())
                 .taskStageId(proj.getTaskStageId())
+                .endAt(proj.getEndAt())
+                .description(proj.getDescription())
+                .workerIds(workerIds)
                 .build();
     }
 }

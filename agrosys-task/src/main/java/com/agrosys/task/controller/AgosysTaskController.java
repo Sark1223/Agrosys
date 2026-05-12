@@ -264,10 +264,18 @@ public class AgosysTaskController {
                     .build());
         } catch (IllegalArgumentException e) {
             log.error("[ERROR] - Tarea especial no encontrada: {}", e.getMessage());
-            throw new IllegalArgumentException("Tarea especial no encontrada con id: " + taskId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Tarea especial no encontrada con id: " + taskId)
+                            .build());
         } catch (Exception e) {
-            log.error("[ERROR] - Error al actualizar tarea especial: {}", e.getMessage());
-            throw new RuntimeException("Error al actualizar tarea especial: " + e.getMessage());
+            log.error("[ERROR] - Error al actualizar tarea especial: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Error al actualizar tarea especial: " + e.getMessage())
+                            .build());
         }
     }
 }
