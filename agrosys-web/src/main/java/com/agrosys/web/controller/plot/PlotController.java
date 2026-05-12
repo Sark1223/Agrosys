@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.agrosys.web.dto.Response;
-import com.agrosys.web.dto.plot.PlotRegister;
 import com.agrosys.web.dto.plot.lot.ConfigRegister;
+import com.agrosys.web.dto.plot.lot.LotRegister;
+import com.agrosys.web.dto.plot.parcelas.PlotRegister;
 import com.agrosys.web.dto.plot.plantation.PlantatioRegister;
 import com.agrosys.web.dto.plot.plantation.PlantatioStageRegister;
 import com.agrosys.web.utils.GatewayClient;
@@ -367,7 +368,7 @@ public class PlotController {
 
         return ResponseEntity.ok(response);
     }
-    
+
     @PostMapping("/config/product-unit/new")
     public ResponseEntity<Response> postProductUnit(
             @RequestParam String name,
@@ -462,6 +463,69 @@ public class PlotController {
                 session.getAttribute("JWT_TOKEN").toString());
 
         log.info("Respuesta del actualizacion: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
+    // ================= CONFIGURACIONES =================
+    @GetMapping("/lot/plantations/get-select")
+    public ResponseEntity<Response> getAllPlantations(
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_PARCELAS"))
+            return ResponseEntity.status(403).build();
+
+        log.info("Obteniendo lista de plantaciones");
+
+        Response response = gatewayClient.get("/api/lot/plantations/select", Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta del registro: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/lots/by-plantation/{id}")
+    public ResponseEntity<Response> getAllPlantations(@PathVariable Integer id,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_PARCELAS"))
+            return ResponseEntity.status(403).build();
+
+        log.info("Obteniendo lista de lotes por plantación");
+
+        Response response = gatewayClient.get("/api/lot/by-plantation/" + id, Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta del registro: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/lot/new")
+    public ResponseEntity<Response> postLot(
+            @RequestParam String name,
+            @RequestParam Integer plantatio,
+            @RequestParam(required = false) String description,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_PARCELAS"))
+            return ResponseEntity.status(403).build();
+
+        LotRegister requestData = new LotRegister();
+        requestData.setName(name);
+        requestData.setPlantationId(plantatio);
+        requestData.setDescription(description);
+
+        log.info("Creacion de lote: {}", requestData);
+
+        Response response = gatewayClient.post("/api/lot/post", requestData, Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta del registro: {}", response);
 
         return ResponseEntity.ok(response);
     }

@@ -1,5 +1,7 @@
 $(document).ready(function () {
 
+    // ================ CONFIGURACIONES ================
+
     $('#btn-submit-add-trade-mode').on('click', function () {
         const $f = $('#addTradeModeForm');
         const activeTab = $.fn.getActiveTab();
@@ -129,6 +131,14 @@ $(document).ready(function () {
             });
     });
 
+    // ================ LOTES ================
+    $('#btn-submit-add-lot').on('click', function () {
+        const $f = $('#addLotForm');
+        const activeTab = $.fn.getActiveTab();
+        $.fn.postFormData($f, $f.attr('action'), '/agrosys/plots?tab=' + activeTab);
+    });
+
+
     $.fn.getAllConfigs = function () {
         $.ajax({
             url: '/agrosys/plots/config/get-all',
@@ -142,7 +152,6 @@ $(document).ready(function () {
                 $containerProductTypes.html('');
 
                 if (response.success) {
-                    console.log('Configuraciones obtenidas:', response.data);
 
                     const data = response.data ? response.data : null;
                     const $message = $('<p class="fs-5 text-body-tertiary text-center w-100">Sin informacion registrada...</p>');
@@ -315,5 +324,34 @@ $(document).ready(function () {
         });
     };
 
+    $.fn.getAllPlantations = function () {
+        $.ajax({
+            url: '/agrosys/plots/lot/plantations/get-select',
+            type: 'GET',
+            success: function (response) {                
+                if (response.success) {
+                    const $plantationIdLotInput = $(`#plantationIdLotInput`);
+                    const plantationsSelect = response.data ? response.data : null;
+
+                    plantationsSelect?.forEach(pl => {
+                        const $opt = $(`<option value="${pl.plantatioId}">${pl.name}</option>`);
+                        $plantationIdLotInput.append($opt);
+                    });
+
+                } else {
+                    $.fn.errorAlert(response.message || 'Ocurrió un error inesperado al obtener las plantaciones');
+                }
+            },
+            error: function (xhr, status, error) {
+                $.fn.errorAlert('Ocurrió un error al comunicarse con el servidor');
+            }
+
+        });
+    };
+
+    $.fn.getAllPlantations();
+
     $.fn.getAllConfigs();
+
+
 });

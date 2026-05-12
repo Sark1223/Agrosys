@@ -117,7 +117,7 @@ $(document).ready(function () {
         );
     }
 
-    $.fn.renderCardPlantation = function (plantacion) {
+    $.fn.renderCardPlantation = function (plantacion) { //ri-footprint-line
         return $(`
                     <div class="card mb-2">
                         <div class="card-body d-flex flex-row justify-content-between align-items-center gap-3 overflow-auto">
@@ -135,6 +135,8 @@ $(document).ready(function () {
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton${plot.plotId}">
                                         <li><a class="dropdown-item details-plantation" data-bs-toggle="modal" data-bs-target="#modalDetailsPlantation" href="#"><i
                                                     class="ri-eye-line pe-1"></i>Ver detalles</a></li>
+                                        <li><a class="dropdown-item lots-plantation" data-bs-toggle="modal" data-bs-target="#modalLotsPlantation" href="#"><i
+                                                    class="ri-mist-line pe-1"></i>Ver lotes</a></li>
                                         <li><a class="dropdown-item edit-plantation" data-bs-toggle="modal" data-bs-target="#modalEditPlantation" href="#"><i
                                                     class="ri-pencil-fill pe-1"></i>Editar</a></li>
                                         <li><a class="dropdown-item delete-plantation" data-bs-toggle="modal" data-bs-target="#modalDeletePlantation" href="#"><i
@@ -157,7 +159,6 @@ $(document).ready(function () {
 
                 $("#message-plot").attr("style", "display:none !important;");
                 if (response.success) {
-                    console.log('Parcelas obtenidas:', response.data);
 
                     if (response.data.length === 0) {
                         $("#message-plot").attr("style", "display:block !important;")
@@ -169,7 +170,6 @@ $(document).ready(function () {
                         const accordionItem = $.fn.renderCardPlot(plot);
 
                         const plantaciones = plot.plantatios ? JSON.parse(plot.plantatios) : null;
-                        console.log('Plantaciones:', plantaciones);
 
                         const statusDiv = accordionItem.find(`#status-${plot.plotId}`);
                         if (plantaciones[0] !== null) {
@@ -183,7 +183,6 @@ $(document).ready(function () {
                                 'width': '125px'
                             });
                             plantaciones.forEach(plantacion => {
-                                console.log('Plantación:', plantacion);
                                 const cardPlantacion = $.fn.renderCardPlantation(plantacion);
 
                                 cardPlantacion.find('.edit-plantation').on('click', function (e) {

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.agrosys.plot.dto.Response;
 import com.agrosys.plot.dto.lot.ConfigRegister;
+import com.agrosys.plot.dto.lot.LotRegister;
 import com.agrosys.plot.service.LotService;
 
 import jakarta.validation.Valid;
@@ -84,6 +85,32 @@ public class AgrosysLotController {
     public ResponseEntity<Object> putProductType(@PathVariable Integer id, @Valid @RequestBody ConfigRegister request) {
         log.info("[REQUEST] - request: {}", request);
         Response response = lotService.putProductType(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    // ======================== LOT ========================
+
+    @GetMapping("/plantations/select")
+    @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
+    public ResponseEntity<Response> getAllPlantations() {
+        log.info("[REQUEST] - [Obteniedo plantaciones para select]");
+        Response response = lotService.getAllPlantations();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/by-plantation/{id}")
+    @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
+    public ResponseEntity<Response> getLotsByPlantation(@PathVariable Integer id) {
+        log.info("[REQUEST] - [Obteniedo lotes por plantación]");
+        Response response = lotService.getLotsByPlantation(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/post")
+    @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
+    public ResponseEntity<Response> postLot(@Valid @RequestBody LotRegister request) {
+        log.info("[REQUEST] - request: {}", request);
+        Response response = lotService.postLot(request);
         return ResponseEntity.ok(response);
     }
 }

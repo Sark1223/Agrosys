@@ -6,8 +6,10 @@ import org.springframework.stereotype.Service;
 
 import com.agrosys.plot.dto.Response;
 import com.agrosys.plot.dto.lot.ConfigRegister;
+import com.agrosys.plot.dto.lot.LotRegister;
 import com.agrosys.plot.repository.LotRepository;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -149,5 +151,46 @@ public class LotService {
                 .success(true)
                 .build();
     }
+
+    // ======================== LOTS OF PLANTATION ========================
+
+    public Response getAllPlantations() {
+        List<LotRepository.SelectPlantationsProjection> plantations = lotRepository.findAllPlantations();
+        return Response.builder()
+                .message("Plantaciones obtenidas correctamente")
+                .success(true)
+                .data(plantations)
+                .build();
+    }
+
+    public Response postLot(LotRegister request) {
+        Integer find = lotRepository.findLotByName(request.getName(), request.getPlantationId());
+        if (find != null) {
+            throw new IllegalArgumentException(
+                    "El nombre " + request.getName() + "del lote ya esta en uso dentro de la plantación");
+        }
+
+        Integer insert = lotRepository.insertLot(request.getName(), request.getPlantationId(),
+                request.getDescription());
+        if (insert != 1) {
+            throw new RuntimeException("Error al crear nuevo lote.");
+        }
+
+        return Response.builder()
+                .message("Lote registrado exitosamente!")
+                .success(true)
+                .build();
+    }
+
+    public Response getLotsByPlantation(Integer id) {
+        List<LotRepository.LotsByPlantationsProjection> plantations = lotRepository.findAllLotsByPlantation(id);
+        return Response.builder()
+                .message("Plantaciones obtenidas correctamente")
+                .success(true)
+                .data(plantations)
+                .build();
+    }
+
+
 
 }

@@ -38,16 +38,16 @@ public interface LotRepository extends JpaRepository<AgrosysLot, Integer> {
                 FROM agrosys_db.TRADE_MODE AS tm
                 LEFT JOIN agrosys_db.LOT_TRADE lt ON lt.tradeMode = tm.tradeId
                 GROUP BY tm.tradeId
-                
+
                 UNION ALL
-                
+
                 SELECT pu.unitId AS id, pu.nombre AS name, pu.active, 'pu' AS origin, count(lt.unitType) AS qyt
                 FROM agrosys_db.PRODUCT_UNIT AS pu
                 LEFT JOIN agrosys_db.LOT_TRADE lt ON lt.unitType =  pu.unitId
                 GROUP BY pu.unitId
-                
+
                 UNION ALL
-                
+
                 SELECT pt.typeId AS id, pt.nombre AS name, pt.active, 'pt' AS origin, count(lt.productType) AS qyt
                 FROM agrosys_db.PRODUCT_TYPE AS pt
                 LEFT JOIN agrosys_db.LOT_TRADE lt ON lt.productType =  pt.typeId
@@ -151,4 +151,48 @@ public interface LotRepository extends JpaRepository<AgrosysLot, Integer> {
             WHERE typeId = :id
             """, nativeQuery = true)
     Integer updateProductType(Integer id, String name, Boolean active);
+
+    // ======================== LOTS OF PLANTATION ========================
+
+    interface SelectPlantationsProjection {
+        Integer getPlantatioId();
+
+        String getName();
+    }
+
+    @Query(value = """
+            SELECT DISTINCT
+                s.plantatioId,
+                p.name
+            FROM agrosys_db.plantatio_stage_relation s
+            LEFT JOIN agrosys_db.plantatio p ON p.plantatioId = s.plantatioId
+            WHERE s.stageId = 3 OR s.stageId = 4;
+            """, nativeQuery = true)
+    List<SelectPlantationsProjection> findAllPlantations();
+
+    @Query(value = """
+            SELECT lotId FROM agrosys_db.LOT WHERE name = :name AND plantationId = :plantationId;
+            """, nativeQuery = true)
+    Integer findLotByName(String name, Integer plantationId);
+
+    @Transactional
+    @Modifying
+    @Query(value = """
+            INSERT INTO agrosys_db.LOT (name, plantationId, description)
+            VALUES (:name, :plantationId, :description)
+            """, nativeQuery = true)
+    Integer insertLot(String name, Integer plantationId, String description);
+
+    interface LotsByPlantationsProjection {
+        Integer getLotId();
+
+        String getName();
+
+        String getDescription();
+    }
+
+    @Query(value = """
+            SELECT lotId, name, description FROM agrosys_db.LOT WHERE plantationId = :id;
+            """, nativeQuery = true)
+    List<LotsByPlantationsProjection> findAllLotsByPlantation(Integer id);
 }

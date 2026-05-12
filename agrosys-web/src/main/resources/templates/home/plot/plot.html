@@ -20,6 +20,11 @@
                             href="#plot" aria-selected="true" role="tab">Parcelas</a>
                     </li>
                     <li class="nav-item" role="presentation">
+                        <a class="nav-link" th:classappend="${activeTab == 'plantations'} ? 'active' : ''"
+                            data-bs-toggle="tab" href="#plantations" aria-selected="false" role="tab"
+                            tabindex="-1">Plantaciones</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
                         <a class="nav-link" th:classappend="${activeTab == 'lot'} ? 'active' : ''" data-bs-toggle="tab"
                             href="#lot" aria-selected="false" role="tab" tabindex="-1">Lotes</a>
                     </li>
@@ -41,6 +46,18 @@
                         <!-- <div class="cards d-flex flex-wrap flex-row g-2" id="cardsContainerPlot">
                         </div> -->
                         <div class="accordion p-2" id="accordionContainerPlots">
+
+                            <!-- Se carga por JavaScript -->
+
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="plantations" role="tabpanel"
+                        th:classappend="${activeTab == 'plantations'} ? 'show active' : ''">
+                        <div class="d-flex justify-content-center align-items-center text-body-tertiary fs-5 text"
+                            style="height: 100px;" id="message-plantations">Cargando información...</div>
+
+                        <div class="accordion p-2" id="accordionContainerPlantations">
 
                             <!-- Se carga por JavaScript -->
 
@@ -167,6 +184,7 @@
 
     <!-- CONFIGURACIONES -->
     <div th:replace="~{home/plot/_modalsPlot :: configuracionesModals}"></div>
+    <div th:replace="~{home/plot/_modalsPlot :: lotModals}"></div>
 
 
     <script th:src="@{/js/plot/plot.js}"></script>
