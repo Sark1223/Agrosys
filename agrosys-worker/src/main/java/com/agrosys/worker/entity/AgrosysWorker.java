@@ -38,4 +38,7 @@ public class AgrosysWorker {
 
     @Column(name = "photo_public_id", length = 255)
     private String photoPublicId;
+
+    @Column(name = "hourly_pay", precision=10, scale=2)
+    private BigDecimal  hourlyPay;
 }

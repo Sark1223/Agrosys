@@ -14,6 +14,7 @@ public class WorkerResponse {
     private BigDecimal salary;
     private String photo;
     private String photoPublicId;
+    private BigDecimal hourlyPay;
     private String message;
     private boolean success;
 }
