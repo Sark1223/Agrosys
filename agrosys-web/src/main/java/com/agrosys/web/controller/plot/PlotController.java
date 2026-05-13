@@ -61,7 +61,7 @@ public class PlotController {
         Response response = gatewayClient.get("/api/plot/get-all", Response.class,
                 session.getAttribute("JWT_TOKEN").toString());
 
-        log.info("Respuesta del registro: {}", response);
+        log.info("Lotes obtenidos: {}", response);
 
         return ResponseEntity.ok(response);
     }
@@ -115,6 +115,27 @@ public class PlotController {
     }
 
     // ==================== PLANTACIONES ====================
+    @GetMapping("/plantations/get-all")
+    public ResponseEntity<Response> getAllPlantations(
+            @RequestParam String initDate,
+            @RequestParam String endDate,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_PARCELAS"))
+            return ResponseEntity.status(403).build();
+
+        log.info("Obteniendo lista de plantaciones initDate: {} endDate: {}", initDate, endDate);
+
+        Response response = gatewayClient.get("/api/plantation/get-all?initDate=" + initDate + "&endDate=" + endDate,
+                Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Plantaciones obtenidas: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/plantations/new")
     public ResponseEntity<Response> postPlantation(
             @RequestParam Integer plotId,
@@ -315,7 +336,7 @@ public class PlotController {
         Response response = gatewayClient.get("/api/lot/config/get-all", Response.class,
                 session.getAttribute("JWT_TOKEN").toString());
 
-        log.info("Respuesta del registro: {}", response);
+        log.info("configuracione obtenidas: {}", response);
 
         return ResponseEntity.ok(response);
     }
@@ -481,7 +502,7 @@ public class PlotController {
         Response response = gatewayClient.get("/api/lot/plantations/select", Response.class,
                 session.getAttribute("JWT_TOKEN").toString());
 
-        log.info("Respuesta del registro: {}", response);
+        log.info("Plantaciones obtenidas para select: {}", response);
 
         return ResponseEntity.ok(response);
     }
@@ -499,7 +520,7 @@ public class PlotController {
         Response response = gatewayClient.get("/api/lot/by-plantation/" + id, Response.class,
                 session.getAttribute("JWT_TOKEN").toString());
 
-        log.info("Respuesta del registro: {}", response);
+        log.info("Plantaciones obtenidas: {}", response);
 
         return ResponseEntity.ok(response);
     }

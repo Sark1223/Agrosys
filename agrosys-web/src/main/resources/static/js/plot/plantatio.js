@@ -173,6 +173,7 @@ $.fn.getLotsByPlantation = function (plantationId) {
 
             console.log(response);
             if (response.success) {
+
                 // $('#btnAddStateToPlantation').removeAttr('disabled').removeAttr('title');
                 // const stages = response.data;
                 // const stagesSize = stages.length;
@@ -216,7 +217,7 @@ $.fn.getLotsByPlantation = function (plantationId) {
                 //                 `<p class="card-text p-0 m-0">Fecha de terminación: <span class="text-capitalize">${$.fn.formatDate(stage.start_at)}</span></p>`
                 //             }
                 //                         <div class="d-flex flex-row justify-content-end align-items-center gap-4">
-                                            
+
                 //                             <div class="dropdown position-static">
                 //                                 <i class="ri-more-2-fill" type="button" id="dropdownMenuButton${stage.id}" data-bs-toggle="dropdown" aria-expanded="false">
                 //                                 </i>
@@ -303,3 +304,142 @@ $.fn.getLotsByPlantation = function (plantationId) {
     });
 
 };
+
+let today = new Date();
+let endDate = today.toISOString().split('T')[0];
+$('#filterPlantationStartDate').val(new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0]);
+$('#filterPlantationEndDate').val(endDate);
+
+$.fn.getAllPlantations = function () {
+    $container = $('#containerPlantations');
+    $container.html('').append('<div class="d-flex justify-content-center align-items-center text-body-tertiary fs-5 text" style="height: 100px;">Cargando información...</div>')
+    $.ajax({
+        url: `/agrosys/plots/plantations/get-all?initDate=${$('#filterPlantationStartDate').val()}&endDate=${$('#filterPlantationEndDate').val()}`,
+        type: 'GET',
+        success: function (response) {
+
+            console.log(response);
+            if (response.success) {
+
+                const plantations = response.data;
+                if (!plantations) {
+                    $container.append('<div class="d-flex justify-content-center align-items-center text-body-tertiary fs-5 text" style="height: 100px;">Sin información...</div>')
+                    return;
+                }
+
+                $container.html('');
+
+                plantations.forEach(plantation => {
+                    const $card = $(`
+                                <div class="card mb-2">
+                                    <div class="card-body d-flex flex-row justify-content-between align-items-center gap-3 overflow-auto">
+                                        <p class="card-title text-capitalize p-0 m-0 w-25">${plantation.name.toLowerCase()}</p>
+                                        <p class="card-text p-0 m-0">Fecha de inicio: <span class="text-capitalize">${$.fn.formatDate(plantation.startAt)}</span></p>
+                                        <p class="card-text p-0 m-0">Fecha de finalización: <span class="text-capitalize">${plantation.endAt !== 'N/A' ? $.fn.formatDate(plantation.endAt) : plantation.endAt}</span></p>
+                                        <div class="d-flex flex-row justify-content-end align-items-center gap-4">
+                                            <div class="${plantation.stageId === null ? disenioStages[0].classBorder : disenioStages[plantation.stageId].classBorder} btn px-1 py-0" id="status-plantation-${plantation.plantacioId}"
+                                                style="pointer-events: none; width: 125px;">
+                                                ${plantation.stageId === null ? `<span class="${disenioStages[0].classText}">Sin etapa</span>` : `<span class="${disenioStages[plantation.stageId].classText}">${plantation.stage}</span>`}
+                                            </div>
+                                            <div class="dropdown position-static">
+                                                <i class="ri-more-2-fill" type="button" id="dpBtn-plantation-${plantation.plotId}" data-bs-toggle="dropdown" aria-expanded="false">
+                                                </i>
+                                                <ul class="dropdown-menu" aria-labelledby="dpBtn-plantation-${plantation.plotId}">
+                                                    <li><a class="dropdown-item details-plantation" data-bs-toggle="modal" data-bs-target="#modalDetailsPlantation" href="#"><i
+                                                                class="ri-eye-line pe-1"></i>Ver detalles</a></li>
+                                                    <li><a class="dropdown-item lots-plantation" data-bs-toggle="modal" data-bs-target="#modalLotsPlantation" href="#"><i
+                                                                class="ri-mist-line pe-1"></i>Ver lotes</a></li>
+                                                    <li><a class="dropdown-item edit-plantation" data-bs-toggle="modal" data-bs-target="#modalEditPlantation" href="#"><i
+                                                                class="ri-pencil-fill pe-1"></i>Editar</a></li>
+                                                    <li><a class="dropdown-item delete-plantation" data-bs-toggle="modal" data-bs-target="#modalDeletePlantation" href="#"><i
+                                                                class="ri-delete-bin-fill pe-1"></i>Eliminar</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `);
+
+                    $card.find('.edit-plantation').on('click', function (e) {
+                        if (plot) {
+                            $('#plotIdInputPlantationEdit').val(plantation.plotId);
+                            $('#plantationIdInputEdit').val(plantation.plantatioId);
+                            $('#nombrePlantationInputEdit').val(plantation.name);
+                            // $('#fechaInicioPlantationInputEdit').val(plantacion.start_at);
+                            // $('#fechaFinalizacionPlantationInputEdit').val(plantacion.end_at);
+                            $('#notasPlantationInputEdit').val(plantation.notas);
+                        } else {
+                            $.fn.errorAlert('No se pudo cargar la información de la plantación para editar');
+                        }
+                    });
+
+                    $card.find('.delete-plantation').on('click', function () {
+                        if (plantation) {
+                            $('#textDeletePlantation').text(`¿Está seguro de que desea eliminar la plantacion ${plantation.name} ${plantation.startAt}?`);
+                            $('#plantationIdInputDelete').val(plantation.plantatioId);
+                        } else {
+                            $.fn.errorAlert('No se pudo cargar la información de la plantación para eliminar');
+                        }
+                    });
+
+                    $card.find('.details-plantation').on('click', function () {
+                        if (plantation) {
+                            $('#plantationIdInputDetails').val(plantation.plantatioId);
+                            $('#plantationDetailsName').text(`${plantation.name}`);
+                            // $('#plantationDetailsOriginPlot').text(`${plot.name}`); FALTA NOMBRE DEL PLOT
+                            $('#plantationDetailsStartAt').text($.fn.formatDate(plantation.startAt));
+                            $('#plantationDetailsEndAt').text(plantation.endAt !== 'N/A' ? $.fn.formatDate(plantation.endAt) : plantation.endAt);
+                            $('#plantationDetailsNotes').text(plantation.notas);
+                            $('#plantationIdInputState').val(plantation.plantatioId);
+                            $('#plantationIdInputStateEdit').val(plantation.plantatioId);
+                            $('#plantationIdInputStateDelete').val(plantation.plantatioId);
+                            $.fn.getStagesByPlantation(parseInt(plantation.plantatioId));
+                        } else {
+                            $.fn.errorAlert('No se pudo cargar la información de la plantación para ver detalles');
+                        }
+                    });
+
+                    $card.find('.lots-plantation').on('click', function () {
+                        if (plantation) {
+                            // $('#plantationIdInputDetails').val(plantacion.plantatioId);
+                            $('#plantationLotName').text(`${plantation.name}`);
+                            // $('#plantationLotOriginPlot').text(`${plot.name}`); 
+                            $('#plantationLotsNotes').text(plantation.notas);
+                            $('#plantationIdInputState').val(plantation.plantatioId);
+                            $.fn.getLotsByPlantation(parseInt(plantation.plantatioId));
+                        }
+                    });
+
+                    $container.append($card);
+                });
+
+            } else {
+                $container.append('<div class="d-flex justify-content-center align-items-center text-body-tertiary fs-5 text" style="height: 100px;">Sin información...</div>')
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: response.message || 'Ocurrió un error inesperado al obtener las etapas de la plantación'
+                });
+            }
+        },
+        error: function (xhr, status, error) {
+            $container.append('<div class="d-flex justify-content-center align-items-center text-body-tertiary fs-5 text" style="height: 100px;">Error...</div>')
+
+            console.error('Error en la solicitud AJAX:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Ocurrió un error al comunicarse con el servidor'
+            });
+        }
+    });
+};
+
+$('#tabPlantations').on('click', function (e) {
+    // aquí ya se activó el tab "Plantaciones"
+    $.fn.getAllPlantations();
+});
+
+$('#btnFilterPlantations').on('click', function () {
+    $.fn.getAllPlantations();
+});

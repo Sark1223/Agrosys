@@ -22,7 +22,7 @@
                     <li class="nav-item" role="presentation">
                         <a class="nav-link" th:classappend="${activeTab == 'plantations'} ? 'active' : ''"
                             data-bs-toggle="tab" href="#plantations" aria-selected="false" role="tab"
-                            tabindex="-1">Plantaciones</a>
+                            tabindex="-1" id="tabPlantations">Plantaciones</a>
                     </li>
                     <li class="nav-item" role="presentation">
                         <a class="nav-link" th:classappend="${activeTab == 'lot'} ? 'active' : ''" data-bs-toggle="tab"
@@ -43,8 +43,7 @@
                         </div>
                         <div class="d-flex justify-content-center align-items-center text-body-tertiary fs-5 text"
                             style="height: 100px;" id="message-plot">Cargando información...</div>
-                        <!-- <div class="cards d-flex flex-wrap flex-row g-2" id="cardsContainerPlot">
-                        </div> -->
+                            
                         <div class="accordion p-2" id="accordionContainerPlots">
 
                             <!-- Se carga por JavaScript -->
@@ -54,10 +53,22 @@
 
                     <div class="tab-pane fade" id="plantations" role="tabpanel"
                         th:classappend="${activeTab == 'plantations'} ? 'show active' : ''">
-                        <div class="d-flex justify-content-center align-items-center text-body-tertiary fs-5 text"
-                            style="height: 100px;" id="message-plantations">Cargando información...</div>
-
-                        <div class="accordion p-2" id="accordionContainerPlantations">
+                        <div class="row p-2 justify-content-end align-items-end">
+                            <div class="col-md-3">
+                                <label for="filterPlantationStartDate" class="fw-bold small">Desde:</label>
+                                <input type="date" id="filterPlantationStartDate" class="form-control" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="filterPlantationEndDate" class="fw-bold small">Hasta:</label>
+                                <input type="date" id="filterPlantationEndDate" class="form-control" required>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-primary w-100" id="btnFilterPlantations">
+                                    <i class="ri-search-line"></i> Filtrar
+                                </button>
+                            </div>
+                        </div>
+                        <div class=" p-2" id="containerPlantations">
 
                             <!-- Se carga por JavaScript -->
 

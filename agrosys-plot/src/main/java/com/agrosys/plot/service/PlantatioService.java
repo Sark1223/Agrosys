@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PlantatioService {
     private final PlantatioRespository plantatioRespository;
 
-    public List<PlantatioRespository.PlantatioProjection> getAllPlantatioByPlotId(Integer plotId) {
+    public List<PlantatioRespository.PlantatiosByPlotProjection> getAllPlantatioByPlotId(Integer plotId) {
         log.info("Obteniendo plantaciones por id de parcela: {}", plotId);
         return plantatioRespository.findByPlotId(plotId);
     }
@@ -410,5 +410,14 @@ public class PlantatioService {
                 .success(true)
                 .build();
     }
+
+	public Response getAllPlantations(String initDate, String endDate) {
+		List<PlantatioRespository.PlantatioWithStageProjection> lista = plantatioRespository.findAllPlantations(initDate, endDate);
+        return Response.builder()
+                .success(true)
+                .message("Plantacione obtenidas correctamente")
+                .data(lista)
+                .build();
+	}
 
 }

@@ -324,7 +324,7 @@ $(document).ready(function () {
         });
     };
 
-    $.fn.getAllPlantations = function () {
+    $.fn.getPlantationsSelect = function () {
         $.ajax({
             url: '/agrosys/plots/lot/plantations/get-select',
             type: 'GET',
@@ -349,7 +349,7 @@ $(document).ready(function () {
         });
     };
 
-    $.fn.getAllPlantations();
+    $.fn.getPlantationsSelect();
 
     $.fn.getAllConfigs();
 

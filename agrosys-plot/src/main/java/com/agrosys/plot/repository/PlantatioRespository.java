@@ -14,7 +14,7 @@ import jakarta.transaction.Transactional;
 @Repository
 public interface PlantatioRespository extends JpaRepository<AgrosysPlantatio, Integer> {
 
-        interface PlantatioProjection {
+        interface PlantatiosByPlotProjection {
                 Integer getPlantatioId();
 
                 String getName();
@@ -40,7 +40,61 @@ public interface PlantatioRespository extends JpaRepository<AgrosysPlantatio, In
                         WHERE plotId = :plotId
                         ORDER BY plantatioId DESC
                         """, nativeQuery = true)
-        List<PlantatioProjection> findByPlotId(Integer plotId);
+        List<PlantatiosByPlotProjection> findByPlotId(Integer plotId);
+
+        interface PlantatioWithStageProjection {
+                Integer getPlantatioId();
+
+                String getName();
+
+                String getStartAt();
+
+                String getEndAt();
+
+                String getNotas();
+
+                Integer getPlotId();
+
+                String getStageId();
+
+                String getStage();
+
+        }
+
+        @Query(value = """
+                        /*SELECT
+                                plantatioId,
+                                name,
+                                start_at,
+                                end_at,
+                                notas,
+                                plotId
+                        FROM agrosys_db.plantatio
+                        WHERE (start_at BETWEEN :initDate AND :endDate) OR (end_at BETWEEN :initDate AND :endDate)
+                        ORDER BY plantatioId DESC*/
+                        WITH ranked AS (SELECT
+                                        p.plantatioId,
+                                        p.name,
+                                        p.start_at,
+                                        COALESCE(p.end_at, 'N/A') as 'endAt',
+                                        p.notas,
+                                        p.plotId,
+                                        stage.stageId,
+                                        stage.name AS stage,
+                                        ROW_NUMBER() OVER (
+                                        PARTITION BY p.plantatioId
+                                        ORDER BY relation.stageId DESC
+                                        ) AS rn
+                        FROM agrosys_db.plantatio p
+                        LEFT JOIN agrosys_db.plantatio_stage_relation relation
+                                        ON relation.plantatioId = p.plantatioId
+                        LEFT JOIN agrosys_db.plantatio_stage stage
+                                        ON relation.stageId = stage.stageId)
+                        SELECT * FROM ranked
+                                WHERE rn = 1
+                                        AND ((start_at BETWEEN :initDate AND :endDate) OR (endAt BETWEEN :initDate AND :endDate));
+                        """, nativeQuery = true)
+        List<PlantatioWithStageProjection> findAllPlantations(String initDate, String endDate);
 
         @Query(value = """
                         SELECT plantatioId

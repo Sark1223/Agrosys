@@ -185,7 +185,7 @@ public class LotService {
     public Response getLotsByPlantation(Integer id) {
         List<LotRepository.LotsByPlantationsProjection> plantations = lotRepository.findAllLotsByPlantation(id);
         return Response.builder()
-                .message("Plantaciones obtenidas correctamente")
+                .message("Lotes de plantacion obtenidas correctamente")
                 .success(true)
                 .data(plantations)
                 .build();

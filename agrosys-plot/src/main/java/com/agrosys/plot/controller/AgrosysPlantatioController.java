@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.agrosys.plot.dto.Response;
@@ -24,8 +25,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-
-
 @RestController
 @RequestMapping("/api/plantation")
 @RequiredArgsConstructor
@@ -33,16 +32,25 @@ import lombok.extern.slf4j.Slf4j;
 public class AgrosysPlantatioController {
     private final PlantatioService plantatioService;
 
+    @GetMapping("/get-all")
+    @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
+    public ResponseEntity<Object> getAllPlantations(
+            @RequestParam String initDate,
+            @RequestParam String endDate) {
+        Response response = plantatioService.getAllPlantations(initDate, endDate);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/get-all-by-plot-id/{plotId}")
     @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
     public ResponseEntity<Object> getAllPlantatioByPlotId(@PathVariable Integer plotId) {
-        List<PlantatioRespository.PlantatioProjection> plantatio = plantatioService.getAllPlantatioByPlotId(plotId);
+        List<PlantatioRespository.PlantatiosByPlotProjection> plantatio = plantatioService.getAllPlantatioByPlotId(plotId);
         Response successResponse = Response.builder()
                 .success(true)
                 .message("Plantaciones obtenidas exitosamente")
                 .data(plantatio)
                 .build();
-        return ResponseEntity.ok(successResponse);  
+        return ResponseEntity.ok(successResponse);
     }
 
     @PostMapping("/post")
@@ -55,7 +63,8 @@ public class AgrosysPlantatioController {
 
     @PutMapping("/update/{id}")
     @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
-    public ResponseEntity<Object> putMethodName(@PathVariable Integer id, @Valid @RequestBody PlantatioRegister request) {
+    public ResponseEntity<Object> putMethodName(@PathVariable Integer id,
+            @Valid @RequestBody PlantatioRegister request) {
         log.info("[REQUEST] - request: {}", request);
         Response response = plantatioService.updatePlantatio(id, request);
         return ResponseEntity.ok(response);
@@ -72,7 +81,8 @@ public class AgrosysPlantatioController {
     // ================================= Stages =================================
     @PostMapping("/insert-plantation-stage")
     @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
-    public ResponseEntity<Object> postMethodName(@Valid @RequestBody PlantatioStageRegister request) throws JsonProcessingException {
+    public ResponseEntity<Object> postMethodName(@Valid @RequestBody PlantatioStageRegister request)
+            throws JsonProcessingException {
         log.info("[REQUEST] - request:", request);
         Response response = plantatioService.insertPlantatioStage(request);
         return ResponseEntity.ok(response);
@@ -80,7 +90,8 @@ public class AgrosysPlantatioController {
 
     @PutMapping("/update-plantation-stage")
     @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
-    public ResponseEntity<Object> putMethodName(@Valid @RequestBody PlantatioStageRegister request) throws JsonProcessingException {
+    public ResponseEntity<Object> putMethodName(@Valid @RequestBody PlantatioStageRegister request)
+            throws JsonProcessingException {
         log.info("[REQUEST] - request:", request);
         Response response = plantatioService.updatePlantatioStage(request);
         return ResponseEntity.ok(response);
@@ -89,15 +100,16 @@ public class AgrosysPlantatioController {
     @GetMapping("/stages/by-plantation-id/{plotId}")
     @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
     public ResponseEntity<Object> getStagesByPlantationId(@PathVariable Integer plotId) {
-        List<PlantatioRespository.PlantatioStageProjection> plantatioStages = plantatioService.getStagesByPlantationId(plotId);
+        List<PlantatioRespository.PlantatioStageProjection> plantatioStages = plantatioService
+                .getStagesByPlantationId(plotId);
         Response successResponse = Response.builder()
                 .success(true)
                 .message("Estados de plantacion obtenidos exitosamente")
                 .data(plantatioStages)
                 .build();
-        return ResponseEntity.ok(successResponse);  
+        return ResponseEntity.ok(successResponse);
     }
-    
+
     @DeleteMapping("delete/plantations/{plantationId}/stage/{id}")
     @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
     public ResponseEntity<Object> deleteStageOfPlantatio(@PathVariable Integer plantationId, @PathVariable Integer id) {

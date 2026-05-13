@@ -223,6 +223,16 @@ $(document).ready(function () {
                                         $.fn.errorAlert('No se pudo cargar la información de la plantación para ver detalles');
                                     }
                                 });
+
+                                cardPlantacion.find('.lots-plantation').on('click', function () {
+                                    if (plantacion) {
+                                        // $('#plantationIdInputDetails').val(plantacion.plantatioId);
+                                        $('#plantationLotName').text(`${plantacion.name}`);
+                                        $('#plantationLotOriginPlot').text(`${plot.name}`);$('#plantationLotsNotes').text(plantacion.notas);
+                                        $('#plantationIdInputState').val(plantacion.plantatioId);
+                                        $.fn.getLotsByPlantation(parseInt(plantacion.plantatioId));
+                                    }
+                                });
                                 collapseBody.append(cardPlantacion);
                             });
                         }
