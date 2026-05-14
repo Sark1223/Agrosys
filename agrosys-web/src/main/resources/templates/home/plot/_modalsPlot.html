@@ -724,9 +724,45 @@
                                 </select>
                             </div>
                             <div>
+                                <label for="productTypeLotInput" class="form-label mt-4">Tipo de producto <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="productTypeLotInput" name="productType" required>
+                                    <option value="" disabled selected>Seleccione un tipo</option>
+                                    <div class="invalid-feedback">Seleccionar una plantación es requerido</div>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="unitTypeLotInput" class="form-label mt-4">Unidad del producto <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="unitTypeLotInput" name="unitType" required>
+                                    <option value="" disabled selected>Seleccione una unidad</option>
+                                    <div class="invalid-feedback">Seleccionar una unidad es requerido</div>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="unitCostLotInput" class="form-label ">Costo por unidad <span
+                                        class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="unitCostLotInput" name="unitCost" min="0"
+                                    step="0.00" value="0.00" autocomplete="off" required>
+                                <div class="invalid-feedback">El costo por unidad es requerido</div>
+                            </div>
+                            <div>
+                                <label for="tradeModeLotInput" class="form-label mt-4">Modo de comercio <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="tradeModeLotInput" name="tradeMode" required>
+                                    <option value="" disabled selected>Seleccione un modo de comercio</option>
+                                    <div class="invalid-feedback">Seleccionar un modo de comercio es requerido</div>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="freightCostLotInput" class="form-label ">Costo de transporte </label>
+                                <input type="number" class="form-control" id="freightCostLotInput" name="freightCost" min="0"
+                                    step="0.00" value="0.00" autocomplete="off">
+                            </div>
+                            <div>
                                 <label for="descripcionLotInput" class="form-label mt-4">Descripción </label>
                                 <textarea type="text" class="form-control" id="descripcionLotInput" name="description"
-                                    maxlength="256" placeholder="Ingrese la descripción de la parcela"
+                                    maxlength="256" placeholder="Ingrese algunas notas sobre el lote"
                                     autocomplete="off"></textarea>
                             </div>
 
@@ -771,7 +807,7 @@
                                 </button>
                             </div>
                             <h6 class="text-center mb-3"><strong>Lotes:</strong></h6>
-                            <div id="containerEstados"> <!-- class="d-flex flex-column gap-3 px-2" -->
+                            <div id="containerPlantationLots"> <!-- class="d-flex flex-column gap-3 px-2" -->
                                 <!-- Se cargan las etapas de la plantación por JavaScript -->
                             </div>
                         </div>

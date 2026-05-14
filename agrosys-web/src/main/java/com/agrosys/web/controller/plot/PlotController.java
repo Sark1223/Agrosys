@@ -1,5 +1,6 @@
 package com.agrosys.web.controller.plot;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -529,6 +530,11 @@ public class PlotController {
     public ResponseEntity<Response> postLot(
             @RequestParam String name,
             @RequestParam Integer plantatio,
+            @RequestParam Integer productType,
+            @RequestParam Integer unitType,
+            @RequestParam BigDecimal unitCost,
+            @RequestParam Integer tradeMode,
+            @RequestParam(required = false) BigDecimal freightCost,
             @RequestParam(required = false) String description,
             HttpSession session) {
 
@@ -539,6 +545,11 @@ public class PlotController {
         LotRegister requestData = new LotRegister();
         requestData.setName(name);
         requestData.setPlantationId(plantatio);
+        requestData.setProductType(productType);
+        requestData.setUnitType(unitType);
+        requestData.setUnitCost(unitCost);
+        requestData.setTradeMode(tradeMode);
+        requestData.setFreightCost(freightCost);
         requestData.setDescription(description);
 
         log.info("Creacion de lote: {}", requestData);

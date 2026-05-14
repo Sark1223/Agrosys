@@ -47,6 +47,8 @@ public interface PlantatioRespository extends JpaRepository<AgrosysPlantatio, In
 
                 String getName();
 
+                String getPlotName();
+
                 String getStartAt();
 
                 String getEndAt();
@@ -75,6 +77,7 @@ public interface PlantatioRespository extends JpaRepository<AgrosysPlantatio, In
                         WITH ranked AS (SELECT
                                         p.plantatioId,
                                         p.name,
+                                        plot.name as plotName,
                                         p.start_at,
                                         COALESCE(p.end_at, 'N/A') as 'endAt',
                                         p.notas,
@@ -87,9 +90,11 @@ public interface PlantatioRespository extends JpaRepository<AgrosysPlantatio, In
                                         ) AS rn
                         FROM agrosys_db.plantatio p
                         LEFT JOIN agrosys_db.plantatio_stage_relation relation
-                                        ON relation.plantatioId = p.plantatioId
+                                ON relation.plantatioId = p.plantatioId
                         LEFT JOIN agrosys_db.plantatio_stage stage
-                                        ON relation.stageId = stage.stageId)
+                                ON relation.stageId = stage.stageId
+                        LEFT JOIN agrosys_db.plot plot
+                                ON plot.plotId = p.plotId)
                         SELECT * FROM ranked
                                 WHERE rn = 1
                                         AND ((start_at BETWEEN :initDate AND :endDate) OR (endAt BETWEEN :initDate AND :endDate));

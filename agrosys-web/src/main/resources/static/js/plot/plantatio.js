@@ -166,6 +166,9 @@ $.fn.getStagesByPlantation = function (plantationId) {
 };
 
 $.fn.getLotsByPlantation = function (plantationId) {
+    const $containerPlots = $('#containerPlantationLots');
+    $containerPlots.html('').append('<div class="d-flex justify-content-center align-items-center text-body-tertiary fs-5 text" style="height: 100px;">Cargando información...</div>');
+
     $.ajax({
         url: `/agrosys/plots/lots/by-plantation/${plantationId}`,
         type: 'GET',
@@ -173,6 +176,17 @@ $.fn.getLotsByPlantation = function (plantationId) {
 
             console.log(response);
             if (response.success) {
+
+                const lots = response.data ? response.data : null;
+                if(!lots){
+                    $containerPlots.html('').append('<div class="d-flex justify-content-center align-items-center text-body-tertiary fs-5 text" style="height: 100px;">Sin información...</div>');
+                    return;
+                }
+
+                lots.forEach(lot => {
+                    
+                });
+
 
                 // $('#btnAddStateToPlantation').removeAttr('disabled').removeAttr('title');
                 // const stages = response.data;
@@ -386,7 +400,7 @@ $.fn.getAllPlantations = function () {
                         if (plantation) {
                             $('#plantationIdInputDetails').val(plantation.plantatioId);
                             $('#plantationDetailsName').text(`${plantation.name}`);
-                            // $('#plantationDetailsOriginPlot').text(`${plot.name}`); FALTA NOMBRE DEL PLOT
+                            $('#plantationDetailsOriginPlot').text(`${plantation.plotName}`);
                             $('#plantationDetailsStartAt').text($.fn.formatDate(plantation.startAt));
                             $('#plantationDetailsEndAt').text(plantation.endAt !== 'N/A' ? $.fn.formatDate(plantation.endAt) : plantation.endAt);
                             $('#plantationDetailsNotes').text(plantation.notas);
@@ -401,12 +415,18 @@ $.fn.getAllPlantations = function () {
 
                     $card.find('.lots-plantation').on('click', function () {
                         if (plantation) {
-                            // $('#plantationIdInputDetails').val(plantacion.plantatioId);
+                            $('#plantationIdLotInput').val(plantation.plantatioId);
                             $('#plantationLotName').text(`${plantation.name}`);
-                            // $('#plantationLotOriginPlot').text(`${plot.name}`); 
+                            $('#plantationLotOriginPlot').text(`${plantation.plotName}`);
                             $('#plantationLotsNotes').text(plantation.notas);
                             $('#plantationIdInputState').val(plantation.plantatioId);
-                            $.fn.getLotsByPlantation(parseInt(plantation.plantatioId));
+                            if (plantation.stageId < 3) {
+                                $('#btnAddPlantationLot').attr('disabled', 'disabled').attr('title', 'No se pueden agregar lotes esta plantación');
+                                $('#containerPlantationLots').html('').append('<div class="alert border-primary text-body-tertiary text-center" role="alert" style="background: #e9e9e9a6;">Para tener lotes la plantación se debe encontrar en la etapa "COCECHA" ó "FINALIZADO".</div>')
+                            } else {
+                                $('#btnAddPlantationLot').removeAttr('disabled').removeAttr('title');
+                                $.fn.getLotsByPlantation(parseInt(plantation.plantatioId));
+                            }
                         }
                     });
 

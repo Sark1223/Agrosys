@@ -175,8 +175,18 @@ $(document).ready(function () {
                     $('#countProductUnit').text(productUnits.length);
                     $('#countProductType').text(productTypes.length);
 
+                    const $selectProductType = $('#productTypeLotInput');
+                    const $selectUnitType = $('#unitTypeLotInput');
+                    const $selectTradeMode = $('#tradeModeLotInput');
+
+                    $selectProductType.empty().append('<option value="" disabled selected>Seleccione un tipo</option>');
+                    $selectUnitType.empty().append('<option value="" disabled selected>Seleccione una unidad</option>');
+                    $selectTradeMode.empty().append('<option value="" disabled selected>Seleccione un modo de comercio</option>');
+
                     tradeModes.forEach(tm => {
                         const active = tm.active === 1 ? true : false;
+                        if (active)
+                            $selectTradeMode.append(`<option value="${tm.id}">${tm.name}</option>`)
                         const $card = $(`                                    
                                 <div id="${tm.origin}-${tm.id}"
                                     class="bg-light card col-12 col-lg-3 col-md-4 col-sm-5 col-xxl-2 d-flex flex-row justify-content-between justify-content-md-center p-2 shadow-none">
@@ -220,6 +230,9 @@ $(document).ready(function () {
 
                     productUnits.forEach(pu => {
                         const active = pu.active === 1 ? true : false;
+                        if (active)
+                            $selectUnitType.append(`<option value="${pu.id}">${pu.name}</option>`)
+
                         const $card = $(`                                    
                                 <div id="${pu.origin}-${pu.id}"
                                     class="bg-light card col-12 col-lg-3 col-md-4 col-sm-5 col-xxl-2 d-flex flex-row justify-content-between justify-content-md-center p-2 shadow-none">
@@ -263,6 +276,8 @@ $(document).ready(function () {
 
                     productTypes.forEach(pt => {
                         const active = pt.active === 1 ? true : false;
+                        if (active)
+                            $selectProductType.append(`<option value="${pt.id}">${pt.name}</option>`)
                         const $card = $(`                                    
                                 <div id="${pt.origin}-${pt.id}"
                                     class="bg-light card col-12 col-lg-3 col-md-4 col-sm-5 col-xxl-2 d-flex flex-row justify-content-between justify-content-md-center p-2 shadow-none">
@@ -328,7 +343,7 @@ $(document).ready(function () {
         $.ajax({
             url: '/agrosys/plots/lot/plantations/get-select',
             type: 'GET',
-            success: function (response) {                
+            success: function (response) {
                 if (response.success) {
                     const $plantationIdLotInput = $(`#plantationIdLotInput`);
                     const plantationsSelect = response.data ? response.data : null;

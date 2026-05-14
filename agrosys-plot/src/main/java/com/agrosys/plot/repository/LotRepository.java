@@ -14,185 +14,185 @@ import jakarta.transaction.Transactional;
 @Repository
 public interface LotRepository extends JpaRepository<AgrosysLot, Integer> {
 
-    interface ConfigsProjection {
-        Integer getId();
+        interface ConfigsProjection {
+                Integer getId();
 
-        String getName();
+                String getName();
 
-        byte getActive();
+                byte getActive();
 
-        String getOrigin();
+                String getOrigin();
 
-        Integer getQty();
-    }
+                Integer getQty();
+        }
 
-    @Query(value = """
-            SELECT
-                id,
-                name,
-                active,
-                origin,
-                qyt
-            FROM (
-                SELECT tm.tradeId AS id, tm.nombre AS name, tm.active, 'tm' AS origin, count(lt.tradeMode) AS qyt
-                FROM agrosys_db.TRADE_MODE AS tm
-                LEFT JOIN agrosys_db.LOT_TRADE lt ON lt.tradeMode = tm.tradeId
-                GROUP BY tm.tradeId
+        @Query(value = """
+                        SELECT
+                                id,
+                                name,
+                                active,
+                                origin,
+                                qyt
+                        FROM (
+                                SELECT tm.tradeId AS id, tm.nombre AS name, tm.active, 'tm' AS origin, count(lt.tradeMode) AS qyt
+                                FROM agrosys_db.TRADE_MODE AS tm
+                                LEFT JOIN agrosys_db.LOT_TRADE lt ON lt.tradeMode = tm.tradeId
+                                GROUP BY tm.tradeId
 
-                UNION ALL
+                                UNION ALL
 
-                SELECT pu.unitId AS id, pu.nombre AS name, pu.active, 'pu' AS origin, count(lt.unitType) AS qyt
-                FROM agrosys_db.PRODUCT_UNIT AS pu
-                LEFT JOIN agrosys_db.LOT_TRADE lt ON lt.unitType =  pu.unitId
-                GROUP BY pu.unitId
+                                SELECT pu.unitId AS id, pu.nombre AS name, pu.active, 'pu' AS origin, count(lt.unitType) AS qyt
+                                FROM agrosys_db.PRODUCT_UNIT AS pu
+                                LEFT JOIN agrosys_db.LOT_TRADE lt ON lt.unitType =  pu.unitId
+                                GROUP BY pu.unitId
 
-                UNION ALL
+                                UNION ALL
 
-                SELECT pt.typeId AS id, pt.nombre AS name, pt.active, 'pt' AS origin, count(lt.productType) AS qyt
-                FROM agrosys_db.PRODUCT_TYPE AS pt
-                LEFT JOIN agrosys_db.LOT_TRADE lt ON lt.productType =  pt.typeId
-                GROUP BY pt.typeId
-            ) AS configs;
+                                SELECT pt.typeId AS id, pt.nombre AS name, pt.active, 'pt' AS origin, count(lt.productType) AS qyt
+                                FROM agrosys_db.PRODUCT_TYPE AS pt
+                                LEFT JOIN agrosys_db.LOT_TRADE lt ON lt.productType =  pt.typeId
+                                GROUP BY pt.typeId
+                        ) AS configs;
+                                """, nativeQuery = true)
+        List<ConfigsProjection> findAllConfigs();
+
+        // ======================== TRADE MODE ========================
+        @Query(value = """
+                        SELECT tradeId FROM agrosys_db.TRADE_MODE
+                        WHERE nombre = :name
                         """, nativeQuery = true)
-    List<ConfigsProjection> findAllConfigs();
+        Integer findTradeModeByName(String name);
 
-    // ======================== TRADE MODE ========================
-    @Query(value = """
-            SELECT tradeId FROM agrosys_db.TRADE_MODE
-            WHERE nombre = :name
-            """, nativeQuery = true)
-    Integer findTradeModeByName(String name);
+        @Query(value = """
+                        SELECT tradeId FROM agrosys_db.TRADE_MODE
+                        WHERE nombre = :name AND tradeId != :id
+                        """, nativeQuery = true)
+        Integer findTradeModeByName(Integer id, String name);
 
-    @Query(value = """
-            SELECT tradeId FROM agrosys_db.TRADE_MODE
-            WHERE nombre = :name AND tradeId != :id
-            """, nativeQuery = true)
-    Integer findTradeModeByName(Integer id, String name);
+        @Transactional
+        @Modifying
+        @Query(value = """
+                        INSERT INTO agrosys_db.TRADE_MODE (nombre, active)
+                        VALUES (:name, :active)
+                        """, nativeQuery = true)
+        Integer insertTradeMode(String name, Boolean active);
 
-    @Transactional
-    @Modifying
-    @Query(value = """
-            INSERT INTO agrosys_db.TRADE_MODE (nombre, active)
-            VALUES (:name, :active)
-            """, nativeQuery = true)
-    Integer insertTradeMode(String name, Boolean active);
+        @Transactional
+        @Modifying
+        @Query(value = """
+                        UPDATE agrosys_db.TRADE_MODE
+                        SET nombre = :name, active = :active
+                        WHERE tradeId = :id
+                        """, nativeQuery = true)
+        Integer updateTradeMode(Integer id, String name, Boolean active);
 
-    @Transactional
-    @Modifying
-    @Query(value = """
-            UPDATE agrosys_db.TRADE_MODE
-            SET nombre = :name, active = :active
-            WHERE tradeId = :id
-            """, nativeQuery = true)
-    Integer updateTradeMode(Integer id, String name, Boolean active);
+        // ======================== PRODUCT UNIT ========================
 
-    // ======================== PRODUCT UNIT ========================
+        @Query(value = """
+                        SELECT unitId FROM agrosys_db.PRODUCT_UNIT
+                        WHERE nombre = :name
+                        """, nativeQuery = true)
+        Integer findProductUnitByName(String name);
 
-    @Query(value = """
-            SELECT unitId FROM agrosys_db.PRODUCT_UNIT
-            WHERE nombre = :name
-            """, nativeQuery = true)
-    Integer findProductUnitByName(String name);
+        @Query(value = """
+                        SELECT unitId FROM agrosys_db.PRODUCT_UNIT
+                        WHERE nombre = :name AND unitId != :id
+                        """, nativeQuery = true)
+        Integer findProductUnitByName(Integer id, String name);
 
-    @Query(value = """
-            SELECT unitId FROM agrosys_db.PRODUCT_UNIT
-            WHERE nombre = :name AND unitId != :id
-            """, nativeQuery = true)
-    Integer findProductUnitByName(Integer id, String name);
+        @Transactional
+        @Modifying
+        @Query(value = """
+                        INSERT INTO agrosys_db.PRODUCT_UNIT (nombre, active)
+                        VALUES (:name, :active)
+                        """, nativeQuery = true)
+        Integer insertProductUnit(String name, Boolean active);
 
-    @Transactional
-    @Modifying
-    @Query(value = """
-            INSERT INTO agrosys_db.PRODUCT_UNIT (nombre, active)
-            VALUES (:name, :active)
-            """, nativeQuery = true)
-    Integer insertProductUnit(String name, Boolean active);
+        @Transactional
+        @Modifying
+        @Query(value = """
+                        UPDATE agrosys_db.PRODUCT_UNIT
+                        SET nombre = :name, active = :active
+                        WHERE unitId = :id
+                        """, nativeQuery = true)
+        Integer updateProductUnit(Integer id, String name, Boolean active);
 
-    @Transactional
-    @Modifying
-    @Query(value = """
-            UPDATE agrosys_db.PRODUCT_UNIT
-            SET nombre = :name, active = :active
-            WHERE unitId = :id
-            """, nativeQuery = true)
-    Integer updateProductUnit(Integer id, String name, Boolean active);
+        // ======================== PRODUCT TYPE ========================
+        @Query(value = """
+                        SELECT typeId FROM agrosys_db.PRODUCT_TYPE
+                        WHERE nombre = :name
+                        """, nativeQuery = true)
+        Integer findProductTypeByName(String name);
 
-    // ======================== PRODUCT TYPE ========================
-    @Query(value = """
-            SELECT typeId FROM agrosys_db.PRODUCT_TYPE
-            WHERE nombre = :name
-            """, nativeQuery = true)
-    Integer findProductTypeByName(String name);
+        @Query(value = """
+                        SELECT typeId FROM agrosys_db.PRODUCT_TYPE
+                        WHERE nombre = :name AND typeId != :id
+                        """, nativeQuery = true)
+        Integer findProductTypeByName(Integer id, String name);
 
-    @Query(value = """
-            SELECT typeId FROM agrosys_db.PRODUCT_TYPE
-            WHERE nombre = :name AND typeId != :id
-            """, nativeQuery = true)
-    Integer findProductTypeByName(Integer id, String name);
+        @Transactional
+        @Modifying
+        @Query(value = """
+                        INSERT INTO agrosys_db.PRODUCT_TYPE (nombre, active)
+                        VALUES (:name, :active)
+                        """, nativeQuery = true)
+        Integer insertProductType(String name, Boolean active);
 
-    @Transactional
-    @Modifying
-    @Query(value = """
-            INSERT INTO agrosys_db.PRODUCT_TYPE (nombre, active)
-            VALUES (:name, :active)
-            """, nativeQuery = true)
-    Integer insertProductType(String name, Boolean active);
+        @Query(value = """
+                        SELECT COUNT(*) FROM agrosys_db.LOT_TRADE WHERE productType = :id;
+                        """, nativeQuery = true)
+        Integer findTradeWithProductType(Integer id);
 
-    @Query(value = """
-            SELECT COUNT(*) FROM agrosys_db.LOT_TRADE WHERE productType = :id;
-            """, nativeQuery = true)
-    Integer findTradeWithProductType(Integer id);
+        @Transactional
+        @Modifying
+        @Query(value = """
+                        UPDATE agrosys_db.PRODUCT_TYPE
+                        SET nombre = :name, active = :active
+                        WHERE typeId = :id
+                        """, nativeQuery = true)
+        Integer updateProductType(Integer id, String name, Boolean active);
 
-    @Transactional
-    @Modifying
-    @Query(value = """
-            UPDATE agrosys_db.PRODUCT_TYPE
-            SET nombre = :name, active = :active
-            WHERE typeId = :id
-            """, nativeQuery = true)
-    Integer updateProductType(Integer id, String name, Boolean active);
+        // ======================== LOTS OF PLANTATION ========================
 
-    // ======================== LOTS OF PLANTATION ========================
+        interface SelectPlantationsProjection {
+                Integer getPlantatioId();
 
-    interface SelectPlantationsProjection {
-        Integer getPlantatioId();
+                String getName();
+        }
 
-        String getName();
-    }
+        @Query(value = """
+                        SELECT DISTINCT
+                            s.plantatioId,
+                            p.name
+                        FROM agrosys_db.plantatio_stage_relation s
+                        LEFT JOIN agrosys_db.plantatio p ON p.plantatioId = s.plantatioId
+                        WHERE s.stageId = 3 OR s.stageId = 4;
+                        """, nativeQuery = true)
+        List<SelectPlantationsProjection> findAllPlantations();
 
-    @Query(value = """
-            SELECT DISTINCT
-                s.plantatioId,
-                p.name
-            FROM agrosys_db.plantatio_stage_relation s
-            LEFT JOIN agrosys_db.plantatio p ON p.plantatioId = s.plantatioId
-            WHERE s.stageId = 3 OR s.stageId = 4;
-            """, nativeQuery = true)
-    List<SelectPlantationsProjection> findAllPlantations();
+        @Query(value = """
+                        SELECT lotId FROM agrosys_db.LOT WHERE name = :name AND plantationId = :plantationId;
+                        """, nativeQuery = true)
+        Integer findLotByName(String name, Integer plantationId);
 
-    @Query(value = """
-            SELECT lotId FROM agrosys_db.LOT WHERE name = :name AND plantationId = :plantationId;
-            """, nativeQuery = true)
-    Integer findLotByName(String name, Integer plantationId);
+        @Transactional
+        @Modifying
+        @Query(value = """
+                        INSERT INTO agrosys_db.LOT (name, plantationId, description)
+                        VALUES (:name, :plantationId, :description)
+                        """, nativeQuery = true)
+        Integer insertLot(String name, Integer plantationId, String description);
 
-    @Transactional
-    @Modifying
-    @Query(value = """
-            INSERT INTO agrosys_db.LOT (name, plantationId, description)
-            VALUES (:name, :plantationId, :description)
-            """, nativeQuery = true)
-    Integer insertLot(String name, Integer plantationId, String description);
+        interface LotsByPlantationsProjection {
+                Integer getLotId();
 
-    interface LotsByPlantationsProjection {
-        Integer getLotId();
+                String getName();
 
-        String getName();
+                String getDescription();
+        }
 
-        String getDescription();
-    }
-
-    @Query(value = """
-            SELECT lotId, name, description FROM agrosys_db.LOT WHERE plantationId = :id;
-            """, nativeQuery = true)
-    List<LotsByPlantationsProjection> findAllLotsByPlantation(Integer id);
+        @Query(value = """
+                        SELECT lotId, name, description FROM agrosys_db.LOT WHERE plantationId = :id;
+                        """, nativeQuery = true)
+        List<LotsByPlantationsProjection> findAllLotsByPlantation(Integer id);
 }
