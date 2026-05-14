@@ -161,6 +161,16 @@ public class TaskService {
     }
 
     @Transactional
+    public void deleteSpecialTask(Integer specialTaskId) {
+        if (specialTaskRepository.countBySpecialTaskId(specialTaskId) == 0) {
+            throw new RuntimeException("Tarea especial no encontrada con id: " + specialTaskId);
+        }
+        workerTaskRepository.deleteBySpecialTaskId(specialTaskId);
+        specialTaskRepository.deleteSpecialTaskById(specialTaskId);
+        log.info("Tarea especial eliminada con ID: {}", specialTaskId);
+    }
+
+    @Transactional
     public SpecialTaskResponse updateSpecialTask(Integer specialtaskId, SpecialTaskRequest request) {
         if (specialTaskRepository.countBySpecialTaskId(specialtaskId)== 0) {
             throw new RuntimeException("Tarea especial no encontrada con id: " + specialtaskId);
