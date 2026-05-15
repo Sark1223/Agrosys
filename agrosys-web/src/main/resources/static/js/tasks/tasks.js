@@ -1,11 +1,13 @@
 let currentTaskId = null;
+let currentSpecialTaskId = null;
 let tasksData = [];
 let specialTasksData = [];
 let stages = [];
 let plotsData = [];
 let plantationsData = {};
 let allPlantationsData = [];
-let plantationInfoMap = {}; // Mapa de plantationId -> {plotId, plotName, plantationName}
+let plantationInfoMap = {};
+let workersData = [];
 
 function buildPlantationInfoMap(callback) {
     $.ajax({
@@ -172,9 +174,127 @@ $('#btn-submit-edit-task').on('click', function () {
 });
 
 $('#btn-submit-add-special-task').on('click', function () {
-    const $f = $('#addSpecialTaskForm');
-    const activeTab = getActiveTab();
-    $.fn.postFormData($f, $f.attr('action'), '/agrosys/tasks?tab=' + activeTab);
+    var $f = $('#addSpecialTaskForm');
+    var activeTab = getActiveTab();
+
+    if (!$f[0].checkValidity()) {
+        $f.addClass('was-validated');
+        $f.find(':invalid').first().focus();
+        return;
+    }
+
+    var workerIds = workerAddAutocomplete ? workerAddAutocomplete.getSelected() : [];
+    var origAction = $f.attr('action');
+    var formData = new FormData($f[0]);
+    formData.set('workerIds', workerIds.join(','));
+
+    $.ajax({
+        url: origAction,
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            if (response.success || response.status === "OK") {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: response.message || 'Tarea especial creada exitosamente',
+                    showConfirmButton: true
+                }).then(function() {
+                    window.location.href = '/agrosys/tasks?tab=' + activeTab;
+                });
+            } else {
+                Swal.fire({ icon: 'error', title: 'Error', text: response.message || 'Ocurrió un error inesperado' });
+            }
+        },
+        error: function(xhr) {
+            var errorMsg = "Error en el servidor";
+            if (xhr.status === 403) errorMsg = "No tienes permisos para esta acción";
+            else if (xhr.responseJSON && xhr.responseJSON.message) errorMsg = xhr.responseJSON.message;
+            Swal.fire({ icon: 'error', title: 'Error', text: errorMsg });
+        }
+    });
+});
+
+$('#btn-submit-edit-special-task').on('click', function() {
+    var taskId = $('#specialTaskIdInputEdit').val();
+    if (!taskId) {
+        Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo obtener el ID de la tarea' });
+        return;
+    }
+
+    var $f = $('#editSpecialTaskForm');
+    if (!$f[0].checkValidity()) {
+        $f.addClass('was-validated');
+        $f.find(':invalid').first().focus();
+        return;
+    }
+
+    var formData = new FormData($f[0]);
+    var workerIds = workerEditAutocomplete ? workerEditAutocomplete.getSelected() : [];
+    formData.set('workerIds', workerIds.join(','));
+
+    $.ajax({
+        url: '/agrosys/tasks/special/edit/' + taskId,
+        type: 'PUT',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: response.message || 'Tarea especial actualizada correctamente'
+                }).then(function() {
+                    $('#modalEditSpecialTask').modal('hide');
+                    $.fn.getAllSpecialTasks();
+                });
+            } else {
+                Swal.fire({ icon: 'error', title: 'Error', text: response.message || 'Ocurrió un error inesperado' });
+            }
+        },
+        error: function(xhr) {
+            var errorMsg = "Error en el servidor";
+            if (xhr.status === 403) errorMsg = "No tienes permisos para esta acción";
+            else if (xhr.responseJSON && xhr.responseJSON.message) errorMsg = xhr.responseJSON.message;
+            Swal.fire({ icon: 'error', title: 'Error', text: errorMsg });
+        }
+    });
+});
+
+$('#btn-submit-delete-special-task').on('click', function() {
+    var id = currentSpecialTaskId;
+    if (!id) {
+        Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo obtener el ID de la tarea' });
+        return;
+    }
+
+    $.ajax({
+        url: '/agrosys/tasks/special/delete/' + id,
+        type: 'DELETE',
+        contentType: 'application/json',
+        success: function(response) {
+            if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: 'Tarea especial eliminada exitosamente'
+                }).then(function() {
+                    $('#modalDeleteSpecialTask').modal('hide');
+                    currentSpecialTaskId = null;
+                    $.fn.getAllSpecialTasks();
+                });
+            } else {
+                Swal.fire({ icon: 'error', title: 'Error', text: response.message });
+            }
+        },
+        error: function(xhr) {
+            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Error al eliminar la tarea especial';
+            Swal.fire({ icon: 'error', title: 'Error', text: msg });
+        }
+    });
 });
 
 $('#btn-submit-delete-task').on('click', function() {
@@ -331,44 +451,244 @@ $.fn.getAllTasks = function() {
     });
 };
 
+function getWorkerName(workerId) {
+    var worker = workersData.find(function(w) { return w.workerId === workerId; });
+    return worker ? worker.name : 'ID ' + workerId;
+}
+
+function getWorkerNames(workerIds) {
+    if (!workerIds || !Array.isArray(workerIds) || workerIds.length === 0) return 'N/A';
+    return workerIds.map(getWorkerName).join(', ');
+}
+
+$.fn.loadWorkers = function(callback) {
+    $.ajax({
+        url: '/agrosys/tasks/workers/get-all',
+        type: 'GET',
+        success: function(response) {
+            if (response.success && Array.isArray(response.data)) {
+                workersData = response.data;
+            }
+            if (callback) callback();
+        },
+        error: function() {
+            if (callback) callback();
+        }
+    });
+};
+
+var workerAddAutocomplete, workerEditAutocomplete;
+var workerAutocompleteInitDone = false;
+
+function initWorkerAutocomplete(searchId, dropdownId, containerId, autocompleteRef) {
+    var $search = $('#' + searchId);
+    var $dropdown = $('#' + dropdownId);
+    var $container = $('#' + containerId);
+    var selectedWorkers = [];
+
+    if (!$search.length || !$dropdown.length || !$container.length) return;
+
+    function renderTags() {
+        $container.html('');
+        selectedWorkers.forEach(function(w) {
+            var tag = $(
+                '<span class="badge bg-primary d-inline-flex align-items-center gap-1 me-1" style="font-size: 0.85rem;">' +
+                    escapeHtml(w.name) +
+                    '<i class="ri-close-line" style="cursor:pointer;" data-id="' + w.workerId + '"></i>' +
+                '</span>'
+            );
+            tag.find('.ri-close-line').on('click', function() {
+                var id = parseInt($(this).data('id'));
+                selectedWorkers = selectedWorkers.filter(function(s) { return s.workerId !== id; });
+                renderTags();
+            });
+            $container.append(tag);
+        });
+    }
+
+    function renderDropdown(query) {
+        $dropdown.html('');
+        if (!query) {
+            $dropdown.addClass('d-none');
+            return;
+        }
+        var matching = workersData.filter(function(w) {
+            return w.name.toLowerCase().indexOf(query.toLowerCase()) !== -1;
+        });
+        if (matching.length === 0) {
+            $dropdown.html('<small class="p-2 text-muted d-block">Sin resultados</small>').removeClass('d-none');
+            return;
+        }
+        matching.forEach(function(w) {
+            var alreadySelected = selectedWorkers.some(function(s) { return s.workerId === w.workerId; });
+            var item = $(
+                '<div class="dropdown-item py-1 px-2" style="cursor:pointer;" data-id="' + w.workerId + '">' +
+                    escapeHtml(w.name) +
+                    (alreadySelected ? ' <i class="ri-check-line text-success"></i>' : '') +
+                '</div>'
+            );
+            item.on('click', function() {
+                if (!alreadySelected) {
+                    selectedWorkers.push({ workerId: w.workerId, name: w.name });
+                    renderTags();
+                }
+                $search.val('').focus();
+                $dropdown.addClass('d-none');
+            });
+            $dropdown.append(item);
+        });
+        $dropdown.removeClass('d-none');
+    }
+
+    $search.on('input', function() {
+        renderDropdown($(this).val());
+    });
+
+    $search.on('focus', function() {
+        if ($(this).val()) {
+            renderDropdown($(this).val());
+        }
+    });
+
+    autocompleteRef.setSelected = function(ids) {
+        selectedWorkers = [];
+        if (ids && Array.isArray(ids)) {
+            workersData.forEach(function(w) {
+                if (ids.indexOf(w.workerId) !== -1) {
+                    selectedWorkers.push({ workerId: w.workerId, name: w.name });
+                }
+            });
+        }
+        renderTags();
+    };
+
+    autocompleteRef.getSelected = function() {
+        return selectedWorkers.map(function(w) { return w.workerId; });
+    };
+}
+
+$.fn.initWorkerComponents = function() {
+    if (workerAutocompleteInitDone) return;
+    workerAutocompleteInitDone = true;
+
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.worker-selector').length) {
+            $('.worker-dropdown').addClass('d-none');
+        }
+    });
+
+    workerAddAutocomplete = {};
+    workerEditAutocomplete = {};
+    initWorkerAutocomplete('workerSearchAdd', 'workerDropdownAdd', 'selectedWorkersAdd', workerAddAutocomplete);
+    initWorkerAutocomplete('workerSearchEdit', 'workerDropdownEdit', 'selectedWorkersEdit', workerEditAutocomplete);
+};
+
+function renderSpecialTaskAccordion(tasks) {
+    var accordion = $('#accordionContainerSpecialTasks');
+    accordion.html('');
+
+    if (!tasks || tasks.length === 0) {
+        $('#message-special-tasks').html('No hay tareas especiales registradas.').show();
+        return;
+    }
+    $('#message-special-tasks').hide();
+
+    tasks.forEach(function(task) {
+        var specialTaskId = task.specialTaskId;
+        var name = task.name || 'Sin nombre';
+        var paymentAmount = task.paymentAmount || 0;
+        var workersStr = getWorkerNames(task.workerIds);
+        var stageStyle = stageStyles[task.taskStageId] || stageStyles[1];
+
+        var accordionItem = $(
+            '<div class="accordion-item">' +
+                '<h2 class="accordion-header" id="special-heading-' + specialTaskId + '">' +
+                    '<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" ' +
+                        'data-bs-target="#special-collapse-' + specialTaskId + '" aria-expanded="true" aria-controls="special-collapse-' + specialTaskId + '">' +
+                        '<div class="d-flex flex-row justify-content-between align-items-center w-100">' +
+                            '<div class="d-flex flex-row align-items-center gap-2">' +
+                                '<i class="ri-task-fill fs-5 btn btn-link p-0 text-decoration-none" ' +
+                                    'style="filter: brightness(0.85);"></i>' +
+                                '<span>' + escapeHtml(name) + '</span>' +
+                            '</div>' +
+                            '<div class="" id="special-status-' + specialTaskId + '"></div>' +
+                        '</div>' +
+                    '</button>' +
+                '</h2>' +
+                '<div id="special-collapse-' + specialTaskId + '" class="accordion-collapse collapse" ' +
+                    'aria-labelledby="special-heading-' + specialTaskId + '" data-bs-parent="#accordionContainerSpecialTasks">' +
+                    '<div class="accordion-body">' +
+                        '<p class="mb-1"><strong>Pago:</strong> <span class="text-success">$' + parseFloat(paymentAmount).toFixed(2) + '</span></p>' +
+                        '<p class="mb-1"><strong>Workers:</strong> ' + workersStr + '</p>' +
+                        '<div class="d-flex flex-row justify-content-between align-items-center gap-4 mt-2 mb-3">' +
+                            '<p class="card-text p-0 m-0">Inicio: <span class="text-capitalize">' + (task.createAt ? $.fn.formatDate(task.createAt) : 'N/A') + '</span></p>' +
+                            '<p class="card-text p-0 m-0">Fin: <span class="text-capitalize">' + (task.endAt ? $.fn.formatDate(task.endAt) : 'Sin fecha') + '</span></p>' +
+                            '<div class="d-flex flex-row justify-content-end align-items-center gap-2">' +
+                                '<button class="edit-special-task btn btn-outline-info btn-sm py-0 px-3"><i class="ri-edit-2-fill pe-1"></i>Editar</button>' +
+                                '<button class="btn btn-outline-primary btn-sm py-0 px-3 view-special-task"><i class="ri-eye-fill pe-1"></i>Ver</button>' +
+                                '<button class="btn btn-outline-danger btn-sm py-0 px-3 delete-special-task"><i class="ri-delete-bin-fill pe-1"></i>Eliminar</button>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>'
+        );
+
+        var statusDiv = accordionItem.find('#special-status-' + specialTaskId);
+        statusDiv.html('<span class="' + stageStyle.textClass + '">' + getStageName(task.taskStageId || 1) + '</span>');
+        statusDiv.addClass(stageStyle.borderClass + ' btn px-1 py-0 me-5');
+        statusDiv.css({ 'pointer-events': 'none', 'width': '125px' });
+
+        accordionItem.find('.edit-special-task').on('click', function() {
+            $('#specialTaskIdInputEdit').val(specialTaskId);
+            $('#nameInputSpecialEdit').val(name);
+            $('#paymentAmountInputSpecialEdit').val(paymentAmount);
+            $('#createAtInputSpecialEdit').val(task.createAt || '');
+            $('#taskStageIdInputSpecialEdit').val(task.taskStageId || 1);
+            $('#endAtInputSpecialEdit').val(task.endAt || '');
+            $('#descriptionInputSpecialEdit').val(task.description || '');
+            if (workerEditAutocomplete) {
+                workerEditAutocomplete.setSelected(task.workerIds || []);
+            }
+            $('#modalEditSpecialTask').modal('show');
+        });
+
+        accordionItem.find('.view-special-task').on('click', function() {
+            $('#viewSpecialTaskName').text(name);
+            $('#viewSpecialTaskId').text(specialTaskId);
+            $('#viewSpecialTaskDescription').text(task.description || 'Sin descripción');
+            $('#viewSpecialTaskCreateAt').text(task.createAt ? $.fn.formatDate(task.createAt) : 'N/A');
+            $('#viewSpecialTaskEndAt').text(task.endAt ? $.fn.formatDate(task.endAt) : 'Sin fecha');
+            $('#viewSpecialTaskPayment').text(parseFloat(paymentAmount).toFixed(2));
+            $('#viewSpecialTaskStage').text(getStageName(task.taskStageId || 1));
+            $('#viewSpecialTaskWorkers').text(workersStr);
+            $('#modalViewSpecialTask').modal('show');
+        });
+
+        accordionItem.find('.delete-special-task').on('click', function() {
+            currentSpecialTaskId = specialTaskId;
+            $('#textDeleteSpecialTask').text('¿Está seguro de que desea eliminar la tarea especial "' + escapeHtml(name) + '"?');
+            $('#modalDeleteSpecialTask').modal('show');
+        });
+
+        accordion.append(accordionItem);
+    });
+}
+
 $.fn.getAllSpecialTasks = function() {
     $.ajax({
         url: '/agrosys/tasks/special/get-all',
         type: 'GET',
         success: function(response) {
-            var cardsContainer = $('#cardsContainerSpecialTasks');
-            cardsContainer.html('');
-
             if (response.success && Array.isArray(response.data)) {
                 specialTasksData = response.data;
-
-                if (response.data.length === 0) {
-                    $('#message-special-tasks').show();
-                    return;
-                } else {
-                    $('#message-special-tasks').hide();
-                }
-
-                response.data.forEach(function(task) {
-                    var taskId = task.taskId;
-                    var workerId = task.workerId;
-                    var paymentAmount = task.paymentAmount || 0;
-
-                    var taskCard = $(
-                        '<div class="card mb-2">' +
-                            '<div class="card-body d-flex flex-row justify-content-between align-items-center gap-3 overflow-auto">' +
-                                '<p class="card-title p-0 m-0 w-25">Worker #' + workerId + '</p>' +
-                                '<p class="card-text p-0 m-0">Pago: <span class="text-success fw-bold">$' + parseFloat(paymentAmount).toFixed(2) + '</span></p>' +
-                                '<p class="card-text p-0 m-0">Tarea ID: ' + taskId + '</p>' +
-                            '</div>' +
-                        '</div>'
-                    );
-
-                    cardsContainer.append(taskCard);
-                });
+                renderSpecialTaskAccordion(specialTasksData);
+            } else {
+                $('#message-special-tasks').html('No hay tareas especiales registradas.').show();
             }
         },
         error: function(xhr) {
+            $('#message-special-tasks').hide();
             var msg = 'Error al cargar las tareas especiales';
             if (xhr.responseJSON && xhr.responseJSON.message) {
                 msg = xhr.responseJSON.message;
@@ -526,7 +846,18 @@ $(document).on('change', '#plotIdInputEdit', function() {
 });
 
 $(document).ready(function() {
-    $.fn.getAllSpecialTasks();
+    var workersLoaded = false;
+
+    function onWorkersDone() {
+        if (workersLoaded) return;
+        workersLoaded = true;
+        $.fn.getAllSpecialTasks();
+        $.fn.initWorkerComponents();
+    }
+
+    $.fn.loadWorkers(onWorkersDone);
+    setTimeout(onWorkersDone, 3000);
+
     $.fn.loadPlots();
     buildPlantationInfoMap(function() {
         $.fn.getAllTasks();
