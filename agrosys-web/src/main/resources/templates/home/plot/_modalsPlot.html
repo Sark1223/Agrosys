@@ -192,13 +192,13 @@
                     </div>
                     <div class="modal-body">
                         <p id="textDeletePlantation">¿Está seguro de que desea eliminar la plantación?</p>
-                        <form method="post" th:action="@{/plots/plantations/delete}" id="deletePlantationForm"
+                        <form method="post" th:action="@{/plots/plantation/delete}" id="deletePlantationForm"
                             class="needs-validation" novalidate>
                             <input type="number" id="plantationIdInputDelete" name="plantationId" hidden required>
                         </form>
                     </div>
                     <div class="modal-footer border-danger fw-bolder">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btn-close-delete-plantation">Cancelar</button>
                         <button type="button" class="btn btn-danger" id="btn-submit-delete-plantation">
                             Eliminar
                         </button>

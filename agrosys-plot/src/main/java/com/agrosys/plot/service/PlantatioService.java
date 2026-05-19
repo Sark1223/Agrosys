@@ -74,6 +74,13 @@ public class PlantatioService {
 
     @Transactional
     public Response deletePlantatio(Integer plantatioId) {
+
+        Integer lotes = plantatioRespository.countLotsByPlantatio(plantatioId);
+        if (lotes > 0) {
+            throw new IllegalArgumentException(
+                    "No se puede eliminar la plantación porque existen lotes asociados");
+        }
+
         Integer delete = plantatioRespository.deletePlantatio(plantatioId);
 
         if (delete.equals(0)) {
