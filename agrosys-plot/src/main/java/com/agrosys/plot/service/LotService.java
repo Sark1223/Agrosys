@@ -9,7 +9,6 @@ import com.agrosys.plot.dto.lot.ConfigRegister;
 import com.agrosys.plot.dto.lot.LotRegister;
 import com.agrosys.plot.repository.LotRepository;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -165,15 +164,24 @@ public class LotService {
 
     public Response postLot(LotRegister request) {
         Integer find = lotRepository.findLotByName(request.getName(), request.getPlantationId());
+        log.info("request: {}", request);
         if (find != null) {
             throw new IllegalArgumentException(
                     "El nombre " + request.getName() + "del lote ya esta en uso dentro de la plantación");
         }
 
-        Integer insert = lotRepository.insertLot(request.getName(), request.getPlantationId(),
-                request.getDescription());
+        Integer insert = lotRepository.insertLot(request.getName(), request.getPlantationId(), request.getDescription());
         if (insert != 1) {
             throw new RuntimeException("Error al crear nuevo lote.");
+        }
+
+        Integer newLotId = lotRepository.findLotByName(request.getName(), request.getPlantationId());
+
+        Integer lotTrade = lotRepository.insertLotTrade(newLotId, request.getProductType(), request.getUnitType(),
+                request.getUnitCost(), request.getTradeMode(), request.getFreightCost());
+
+        if (lotTrade != 1) {
+            throw new RuntimeException("Error al crear tipo de trato del nuevo lote.");
         }
 
         return Response.builder()
@@ -191,6 +199,47 @@ public class LotService {
                 .build();
     }
 
+    public Response updateLot(Integer id, Integer lotTradeId, LotRegister request) {
+        Integer find = lotRepository.findLotByName(request.getName(), request.getPlantationId(), id);
+        if (find != null) {
+            throw new IllegalArgumentException(
+                    "El nombre " + request.getName() + "del lote ya esta en uso dentro de la plantación");
+        }
 
+        Integer update = lotRepository.updateLot(id, request.getName(), request.getDescription());
+        if (update != 1) {
+            throw new RuntimeException("Error al actualizar el lote.");
+        }
+
+        Integer updateLotTrade = lotRepository.updateLotTrade(lotTradeId, request.getProductType(), request.getUnitType(),
+                request.getUnitCost(), request.getTradeMode(), request.getFreightCost());
+
+        if (updateLotTrade != 1) {
+            throw new RuntimeException("Error al actualizar el tipo de trato del lote.");
+        }
+
+        return Response.builder()
+                .message("Lote actualizado exitosamente!")
+                .success(true)
+                .build();
+    }
+
+    public Response deleteLot(Integer id, Integer lotTradeId) {
+        Integer delete = lotRepository.deleteLot(id);
+        if (delete != 1) {
+            throw new RuntimeException("Error al eliminar el lote.");
+        }
+
+        // Integer deleteLotTrade = lotRepository.deleteLotTrade(lotTradeId);
+
+        // if (deleteLotTrade != 1) {
+        //     throw new RuntimeException("Error al eliminar el tipo de trato del lote.");
+        // }
+
+        return Response.builder()
+                .message("Lote eliminado exitosamente!")
+                .success(true)
+                .build();
+    }
 
 }

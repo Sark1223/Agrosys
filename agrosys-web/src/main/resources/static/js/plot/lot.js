@@ -135,7 +135,38 @@ $(document).ready(function () {
     $('#btn-submit-add-lot').on('click', function () {
         const $f = $('#addLotForm');
         const activeTab = $.fn.getActiveTab();
-        $.fn.postFormData($f, $f.attr('action'), '/agrosys/plots?tab=' + activeTab);
+        $.fn.postFormData($f, $f.attr('action')) //, '/agrosys/plots?tab=' + activeTab
+            .done(function (response) {
+                if (response.success) {
+                    $.fn.getLotsByPlantation(parseInt($('#plantationIdInputLots').val()));
+                    $('#btn-close-add-lot').trigger('click');
+                }
+            });
+    });
+
+    $('#btn-submit-edit-lot').on('click', function () {
+        const $f = $('#editLotForm');
+        const activeTab = $.fn.getActiveTab();
+        $.fn.postFormData($f, $f.attr('action')) //, '/agrosys/plots?tab=' + activeTab
+            .done(function (response) {
+                if (response.success) {
+                    $.fn.getLotsByPlantation(parseInt($('#plantationIdInputLots').val()));
+                    $('#btn-close-edit-lot').trigger('click');
+                }
+            });
+    });
+
+    $('#btn-submit-delete-lot').on('click', function () {
+        const $f = $('#deleteLotForm');
+        const activeTab = $.fn.getActiveTab();
+        $.fn.postFormData($f, $f.attr('action')) //, '/agrosys/plots?tab=' + activeTab
+            .done(function (response) {
+                if (response.success) {
+                    console.log("$('#plantationIdInputLots').val(): ", $('#plantationIdInputLots').val());
+                    $.fn.getLotsByPlantation(parseInt($('#plantationIdInputLots').val()));
+                    $('#btn-close-delete-lot').trigger('click');
+                }
+            });
     });
 
 
@@ -175,9 +206,9 @@ $(document).ready(function () {
                     $('#countProductUnit').text(productUnits.length);
                     $('#countProductType').text(productTypes.length);
 
-                    const $selectProductType = $('#productTypeLotInput');
-                    const $selectUnitType = $('#unitTypeLotInput');
-                    const $selectTradeMode = $('#tradeModeLotInput');
+                    const $selectProductType = $('#productTypeLotInput, #productTypeLotInputEdit');
+                    const $selectUnitType = $('#unitTypeLotInput, #unitTypeLotInputEdit');
+                    const $selectTradeMode = $('#tradeModeLotInput, #tradeModeLotInputEdit');
 
                     $selectProductType.empty().append('<option value="" disabled selected>Seleccione un tipo</option>');
                     $selectUnitType.empty().append('<option value="" disabled selected>Seleccione una unidad</option>');
@@ -339,30 +370,10 @@ $(document).ready(function () {
         });
     };
 
-    $.fn.getPlantationsSelect = function () {
-        $.ajax({
-            url: '/agrosys/plots/lot/plantations/get-select',
-            type: 'GET',
-            success: function (response) {
-                if (response.success) {
-                    const $plantationIdLotInput = $(`#plantationIdLotInput`);
-                    const plantationsSelect = response.data ? response.data : null;
 
-                    plantationsSelect?.forEach(pl => {
-                        const $opt = $(`<option value="${pl.plantatioId}">${pl.name}</option>`);
-                        $plantationIdLotInput.append($opt);
-                    });
 
-                } else {
-                    $.fn.errorAlert(response.message || 'Ocurrió un error inesperado al obtener las plantaciones');
-                }
-            },
-            error: function (xhr, status, error) {
-                $.fn.errorAlert('Ocurrió un error al comunicarse con el servidor');
-            }
-
-        });
-    };
+    // $('#btnAddPlantationLot').on('click', function () {
+    // });
 
     $.fn.getPlantationsSelect();
 

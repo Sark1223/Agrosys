@@ -2,6 +2,7 @@ package com.agrosys.plot.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -111,6 +112,22 @@ public class AgrosysLotController {
     public ResponseEntity<Response> postLot(@Valid @RequestBody LotRegister request) {
         log.info("[REQUEST] - request: {}", request);
         Response response = lotService.postLot(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/update/{id}/{lotTradeId}")
+    @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
+    public ResponseEntity<Response> updateLot(@PathVariable Integer id, @PathVariable Integer lotTradeId, @Valid @RequestBody LotRegister request) {
+        log.info("[REQUEST] - request: {}", request);
+        Response response = lotService.updateLot(id, lotTradeId, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/delete/{id}/{lotTradeId}")
+    @PreAuthorize("hasAuthority('MODULE_PARCELAS')")
+    public ResponseEntity<Response> deleteLot(@PathVariable Integer id, @PathVariable Integer lotTradeId) {
+        log.info("[REQUEST] - [Eliminando lote]");
+        Response response = lotService.deleteLot(id, lotTradeId);
         return ResponseEntity.ok(response);
     }
 }

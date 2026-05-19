@@ -562,4 +562,62 @@ public class PlotController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/lot/edit")
+    public ResponseEntity<Response> updateLot(
+            @RequestParam Integer id,
+            @RequestParam Integer lotTradeId,
+            @RequestParam String name,
+            @RequestParam Integer plantatio,
+            @RequestParam Integer productType,
+            @RequestParam Integer unitType,
+            @RequestParam BigDecimal unitCost,
+            @RequestParam Integer tradeMode,
+            @RequestParam(required = false) BigDecimal freightCost,
+            @RequestParam(required = false) String description,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_PARCELAS"))
+            return ResponseEntity.status(403).build();
+
+        LotRegister requestData = new LotRegister();
+        requestData.setName(name);
+        requestData.setPlantationId(plantatio);
+        requestData.setProductType(productType);
+        requestData.setUnitType(unitType);
+        requestData.setUnitCost(unitCost);
+        requestData.setTradeMode(tradeMode);
+        requestData.setFreightCost(freightCost);
+        requestData.setDescription(description);
+
+        log.info("Actualizacion de lote: {}", requestData);
+
+        Response response = gatewayClient.put("/api/lot/update/" + id + "/" + lotTradeId, requestData,
+                Response.class, session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta del actualizacion: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/lot/delete")
+    public ResponseEntity<Response> deleteLot(
+            @RequestParam Integer lotId,
+            @RequestParam Integer lotTradeId,
+            HttpSession session) {
+
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_PARCELAS"))
+            return ResponseEntity.status(403).build();
+
+        log.info("Eliminación de lote: {}", lotId);
+
+        Response response = gatewayClient.delete(
+                "/api/lot/delete/" + lotId + "/" + lotTradeId, Response.class,
+                session.getAttribute("JWT_TOKEN").toString());
+
+        log.info("Respuesta del eliminación: {}", response);
+        return ResponseEntity.ok(response);
+    }
+
 }

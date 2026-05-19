@@ -1,5 +1,6 @@
 package com.agrosys.plot.repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -175,6 +176,11 @@ public interface LotRepository extends JpaRepository<AgrosysLot, Integer> {
                         """, nativeQuery = true)
         Integer findLotByName(String name, Integer plantationId);
 
+        @Query(value = """
+                        SELECT lotId FROM agrosys_db.LOT WHERE name = :name AND plantationId = :plantationId AND lotId != :lotId;
+                        """, nativeQuery = true)
+        Integer findLotByName(String name, Integer plantationId, Integer lotId);
+
         @Transactional
         @Modifying
         @Query(value = """
@@ -183,16 +189,100 @@ public interface LotRepository extends JpaRepository<AgrosysLot, Integer> {
                         """, nativeQuery = true)
         Integer insertLot(String name, Integer plantationId, String description);
 
+        @Transactional
+        @Modifying
+        @Query(value = """
+                        UPDATE agrosys_db.LOT
+                        SET name = :name, description = :description
+                        WHERE lotId = :id
+                        """, nativeQuery = true)
+        Integer updateLot(Integer id, String name, String description);
+
+        @Transactional
+        @Modifying
+        @Query(value = """
+                        INSERT INTO agrosys_db.LOT_TRADE (loteId, productType, unitType, unitCost, tradeMode, freightCost)
+                        VALUES (:lotId, :productType, :unitType, :unitCost, :tradeMode, :freightCost)
+                        """, nativeQuery = true)
+        Integer insertLotTrade(Integer lotId, Integer productType, Integer unitType, BigDecimal unitCost,
+                        Integer tradeMode, BigDecimal freightCost);
+
+        @Transactional
+        @Modifying
+        @Query(value = """
+                        UPDATE agrosys_db.LOT_TRADE
+                        SET productType = :productType, unitType = :unitType, unitCost = :unitCost, tradeMode = :tradeMode, freightCost = :freightCost
+                        WHERE lotTradeId = :lotTradeId
+                        """, nativeQuery = true)
+        Integer updateLotTrade(Integer lotTradeId, Integer productType, Integer unitType, BigDecimal unitCost,
+                        Integer tradeMode, BigDecimal freightCost);
+
         interface LotsByPlantationsProjection {
                 Integer getLotId();
 
                 String getName();
 
+                String getFechaCreacion();
+
                 String getDescription();
+
+                Integer getProductType();
+
+                String getNameTypeProduct();
+
+                Integer getUnitType();
+
+                String getNameUnitType();
+
+                BigDecimal getUnitCost();
+
+                Integer getTradeMode();
+
+                String getNameTradeMode();
+
+                BigDecimal getFreightCost();
+
+                Integer getPlantationId();
+
+                Integer getLotTradeId();
         }
 
         @Query(value = """
-                        SELECT lotId, name, description FROM agrosys_db.LOT WHERE plantationId = :id;
+                        SELECT
+                                l.lotId,
+                                l.name,
+                                l.fechaCreacion,
+                                lt.productType,
+                                pt.nombre AS nameTypeProduct,
+                                lt.unitType,
+                                ut.nombre AS nameUnitType,
+                                lt.unitCost,
+                                lt.tradeMode,
+                                tm.nombre AS nameTradeMode,
+                                lt.freightCost,
+                                l.plantationId,
+                                l.description,
+                                lt.lotTradeId
+                        FROM agrosys_db.LOT l
+                        LEFT JOIN agrosys_db.LOT_TRADE lt ON lt.loteId = l.lotId
+                        LEFT JOIN agrosys_db.PRODUCT_TYPE pt ON pt.typeId = lt.productType
+                        LEFT JOIN agrosys_db.PRODUCT_UNIT ut ON ut.unitId = lt.unitType
+                        LEFT JOIN agrosys_db.TRADE_MODE tm ON tm.tradeId = lt.tradeMode
+                        WHERE plantationId = :id;
                         """, nativeQuery = true)
         List<LotsByPlantationsProjection> findAllLotsByPlantation(Integer id);
+
+        @Transactional
+        @Modifying
+        @Query(value = """
+                        DELETE FROM agrosys_db.LOT WHERE lotId = :id
+                        """, nativeQuery = true)
+        Integer deleteLot(Integer id);
+
+        @Transactional
+        @Modifying
+        @Query(value = """
+                        DELETE FROM agrosys_db.LOT_TRADE WHERE lotTradeId = :lotTradeId
+                        """, nativeQuery = true)
+        Integer deleteLotTrade(Integer lotTradeId);
 }

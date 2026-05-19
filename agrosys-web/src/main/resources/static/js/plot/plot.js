@@ -117,17 +117,17 @@ $(document).ready(function () {
         );
     }
 
-    $.fn.renderCardPlantation = function (plantacion) { //ri-footprint-line
+    $.fn.renderCardPlantation = function (plantation) { //ri-footprint-line
         return $(`
                     <div class="card mb-2">
                         <div class="card-body d-flex flex-row justify-content-between align-items-center gap-3 overflow-auto">
-                            <p class="card-title text-capitalize p-0 m-0 w-25">${plantacion.name.toLowerCase()}</p>
-                            <p class="card-text p-0 m-0">Fecha de inicio: <span class="text-capitalize">${$.fn.formatDate(plantacion.start_at)}</span></p>
-                            <p class="card-text p-0 m-0">Fecha de finalización: <span class="text-capitalize">${plantacion.end_at !== 'N/A' ? $.fn.formatDate(plantacion.end_at) : plantacion.end_at}</span></p>
+                            <p class="card-title text-capitalize p-0 m-0 w-25">${plantation.name.toLowerCase()}</p>
+                            <p class="card-text p-0 m-0">Fecha de inicio: <span class="text-capitalize">${$.fn.formatDate(plantation.start_at)}</span></p>
+                            <p class="card-text p-0 m-0">Fecha de finalización: <span class="text-capitalize">${plantation.end_at !== 'N/A' ? $.fn.formatDate(plantation.end_at) : plantation.end_at}</span></p>
                             <div class="d-flex flex-row justify-content-end align-items-center gap-4">
-                                <div class="${plantacion.stageId === null ? disenioStages[0].classBorder : disenioStages[plantacion.stageId].classBorder} btn px-1 py-0" id="status-plantacion-${plantacion.plantacioId}"
+                                <div class="${plantation.stageId === null ? disenioStages[0].classBorder : disenioStages[plantation.stageId].classBorder} btn px-1 py-0" id="status-plantacion-${plantation.plantacioId}"
                                     style="pointer-events: none; width: 125px;">
-                                    ${plantacion.stageId === null ? `<span class="${disenioStages[0].classText}">Sin etapa</span>` : `<span class="${disenioStages[plantacion.stageId].classText}">${plantacion.stage}</span>`}
+                                    ${plantation.stageId === null ? `<span class="${disenioStages[0].classText}">Sin etapa</span>` : `<span class="${disenioStages[plantation.stageId].classText}">${plantation.stage}</span>`}
                                 </div>
                                 <div class="dropdown position-static">
                                     <i class="ri-more-2-fill" type="button" id="dropdownMenuButton${plot.plotId}" data-bs-toggle="dropdown" aria-expanded="false">
@@ -135,8 +135,13 @@ $(document).ready(function () {
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton${plot.plotId}">
                                         <li><a class="dropdown-item details-plantation" data-bs-toggle="modal" data-bs-target="#modalDetailsPlantation" href="#"><i
                                                     class="ri-eye-line pe-1"></i>Ver detalles</a></li>
-                                        <li><a class="dropdown-item lots-plantation" data-bs-toggle="modal" data-bs-target="#modalLotsPlantation" href="#"><i
-                                                    class="ri-mist-line pe-1"></i>Ver lotes</a></li>
+                                        ${plantation.stageId !== null && plantation.stageId >= 3
+                                            ?
+                                            `<li><a class="dropdown-item lots-plantation" data-bs-toggle="modal" data-bs-target="#modalLotsPlantation" href="#"><i
+                                                    class="ri-mist-line pe-1"></i>Ver lotes</a></li>`
+                                            :
+                                            ``
+                                        }
                                         <li><a class="dropdown-item edit-plantation" data-bs-toggle="modal" data-bs-target="#modalEditPlantation" href="#"><i
                                                     class="ri-pencil-fill pe-1"></i>Editar</a></li>
                                         <li><a class="dropdown-item delete-plantation" data-bs-toggle="modal" data-bs-target="#modalDeletePlantation" href="#"><i
