@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Controller
+
 @RequestMapping("/tasks")
 @RequiredArgsConstructor
 @Validated
@@ -256,9 +257,13 @@ public class TaskController {
     @PostMapping(value = "/special/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
     public ResponseEntity<Response> registerSpecialTask(
-            @RequestParam Integer taskId,
-            @RequestParam Integer workerId,
+            @RequestParam String name,
             @RequestParam java.math.BigDecimal paymentAmount,
+            @RequestParam String createAt,
+            @RequestParam Integer taskStageId,
+            @RequestParam(required = false) String endAt,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String workerIds,
             HttpSession session) {
         try {
             List<String> modules = jwtHelper.getUserModules(session);
@@ -267,9 +272,23 @@ public class TaskController {
             }
 
             SpecialTaskRequest request = new SpecialTaskRequest();
-            request.setTaskId(taskId);
-            request.setWorkerId(workerId);
+            request.setName(name);
             request.setPaymentAmount(paymentAmount);
+            request.setCreateAt(java.time.LocalDate.parse(createAt));
+            request.setTaskStageId(taskStageId);
+
+            if (endAt != null && !endAt.isEmpty()) {
+                request.setEndAt(java.time.LocalDate.parse(endAt));
+            }
+            request.setDescription(description);
+
+            if (workerIds != null && !workerIds.isEmpty()) {
+                request.setWorkerIds(
+                        java.util.Arrays.stream(workerIds.split(","))
+                                .map(Integer::parseInt)
+                                .collect(java.util.stream.Collectors.toList())
+                );
+            }
 
             String token = (String) session.getAttribute("JWT_TOKEN");
             Response response = gatewayClient.post(
@@ -279,6 +298,7 @@ public class TaskController {
                     token);
 
             return ResponseEntity.ok(response);
+
         } catch (Exception e) {
             log.error("[FAILED] - Error al registrar tarea especial: {}", e.getMessage(), e);
             return ResponseEntity.badRequest()
@@ -344,8 +364,13 @@ public class TaskController {
     @PutMapping(value = "/special/edit/{taskId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
     public ResponseEntity<Response> updateSpecialTask(@PathVariable Integer taskId,
-            @RequestParam Integer workerId,
+            @RequestParam String name,
             @RequestParam java.math.BigDecimal paymentAmount,
+            @RequestParam String createAt,
+            @RequestParam Integer taskStageId,
+            @RequestParam(required = false) String endAt,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String workerIds,
             HttpSession session) {
         try {
             List<String> modules = jwtHelper.getUserModules(session);
@@ -354,9 +379,23 @@ public class TaskController {
             }
 
             SpecialTaskRequest request = new SpecialTaskRequest();
-            request.setTaskId(taskId);
-            request.setWorkerId(workerId);
+            request.setName(name);
             request.setPaymentAmount(paymentAmount);
+            request.setCreateAt(java.time.LocalDate.parse(createAt));
+            request.setTaskStageId(taskStageId);
+
+            if (endAt != null && !endAt.isEmpty()) {
+                request.setEndAt(java.time.LocalDate.parse(endAt));
+            }
+            request.setDescription(description);
+
+            if (workerIds != null && !workerIds.isEmpty()) {
+                request.setWorkerIds(
+                        java.util.Arrays.stream(workerIds.split(","))
+                                .map(Integer::parseInt)
+                                .collect(java.util.stream.Collectors.toList())
+                );
+            }
 
             String token = (String) session.getAttribute("JWT_TOKEN");
             Response response = gatewayClient.put(
@@ -366,6 +405,7 @@ public class TaskController {
                     token);
 
             return ResponseEntity.ok(response);
+
         } catch (Exception e) {
             log.error("[FAILED] - Error al actualizar tarea especial: {}", e.getMessage(), e);
             return ResponseEntity.badRequest()
@@ -377,6 +417,62 @@ public class TaskController {
     }
 
     // Plots and Plantations endpoints for dropdowns
+    // Workers endpoint for autocomplete
+    @GetMapping("/workers/get-all")
+    @ResponseBody
+    public ResponseEntity<Response> getAllWorkers(HttpSession session) {
+        try {
+            List<String> modules = jwtHelper.getUserModules(session);
+            if (!modules.contains("MODULE_TAREAS")) {
+                return ResponseEntity.status(403).build();
+            }
+
+            String token = (String) session.getAttribute("JWT_TOKEN");
+            Response response = gatewayClient.get(
+                    "/api/workers/get-all",
+                    Response.class,
+                    token);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("[FAILED] - Error al obtener workers: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Error al obtener workers: " + e.getMessage())
+                            .build());
+        }
+    }
+
+    @DeleteMapping("/special/delete/{taskId}")
+    @ResponseBody
+    public ResponseEntity<Response> deleteSpecialTask(@PathVariable Integer taskId, HttpSession session) {
+        try {
+            List<String> modules = jwtHelper.getUserModules(session);
+            if (!modules.contains("MODULE_TAREAS")) {
+                return ResponseEntity.status(403).build();
+            }
+
+            String token = (String) session.getAttribute("JWT_TOKEN");
+            log.info("[REQUEST DELETE SPECIAL] - Eliminando tarea especial con ID: {}", taskId);
+
+            Response response = gatewayClient.delete(
+                    "/api/tasks/special/delete/" + taskId,
+                    Response.class,
+                    token);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("[FAILED] - Error al eliminar tarea especial: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Error al eliminar tarea especial: " + e.getMessage())
+                            .build());
+        }
+    }
+
     @GetMapping("/plots/get-all")
     @ResponseBody
     public ResponseEntity<Response> getAllPlots(HttpSession session) {

@@ -1,26 +1,36 @@
 package com.agrosys.task.controller;
 
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.agrosys.task.dto.Response;
 import com.agrosys.task.dto.SpecialTaskRequest;
 import com.agrosys.task.dto.SpecialTaskResponse;
 import com.agrosys.task.dto.TaskRequest;
 import com.agrosys.task.dto.TaskResponse;
 import com.agrosys.task.service.TaskService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/tasks")
 @RequiredArgsConstructor
 @Slf4j
-public class AgosysTaskController {
+public class AgrosysTaskController {
 
     private final TaskService taskService;
 
@@ -264,10 +274,38 @@ public class AgosysTaskController {
                     .build());
         } catch (IllegalArgumentException e) {
             log.error("[ERROR] - Tarea especial no encontrada: {}", e.getMessage());
-            throw new IllegalArgumentException("Tarea especial no encontrada con id: " + taskId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Tarea especial no encontrada con id: " + taskId)
+                            .build());
         } catch (Exception e) {
-            log.error("[ERROR] - Error al actualizar tarea especial: {}", e.getMessage());
-            throw new RuntimeException("Error al actualizar tarea especial: " + e.getMessage());
+            log.error("[ERROR] - Error al actualizar tarea especial: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Error al actualizar tarea especial: " + e.getMessage())
+                            .build());
+        }
+    }
+
+    @DeleteMapping("/special/delete/{taskId}")
+    @PreAuthorize("hasAuthority('MODULE_TAREAS')")
+    public ResponseEntity<Response> deleteSpecialTask(@PathVariable Integer taskId) {
+        log.info("[REQUEST SPECIAL DELETE] - taskId: {}", taskId);
+        try {
+            taskService.deleteSpecialTask(taskId);
+            return ResponseEntity.ok(Response.builder()
+                    .success(true)
+                    .message("Tarea especial eliminada exitosamente")
+                    .build());
+        } catch (Exception e) {
+            log.error("[ERROR] - Error al eliminar tarea especial: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Error al eliminar tarea especial: " + e.getMessage())
+                            .build());
         }
     }
 }

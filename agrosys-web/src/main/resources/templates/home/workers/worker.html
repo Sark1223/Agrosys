@@ -112,8 +112,18 @@
                     <div class="modal-body">
                         <form method="post" th:action="@{/workers/register}" id="addWorkerForm" class="needs-validation"
                             novalidate>
+                            <div class="text-center mb-4">
+                                <div id="photoPreviewAdd"
+                                    class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto"
+                                    style="width: 130px; height: 130px; cursor: pointer; overflow: hidden;"
+                                    onclick="document.getElementById('photoInputAdd').click()">
+                                    <i class="ri-user-3-fill text-white" style="font-size: 55px;"></i>
+                                </div>
+                                <small class="text-muted d-block mt-2">Click para cambiar foto</small>
+                                <input type="file" id="photoInputAdd" name="photo" accept="image/*" style="display: none;">
+                            </div>
                             <div>
-                                <label for="nombreInput" class="form-label mt-4">Nombre <span
+                                <label for="nombreInput" class="form-label mt-2">Nombre <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="nombreInput" name="nombre" minlength="3"
                                     maxlength="100" placeholder="Ingrese el nombre del usuario" autocomplete="off"
@@ -128,17 +138,11 @@
                                     required>
                                 <div class="invalid-feedback">El salario es requerido</div>
                             </div>
+                            <small id="hourlyPayDisplay" class="text-muted mt-1 d-block ms-1">Pago por hora: $0.00</small>
                             <div>
                                 <label for="notasInput" class="form-label mt-4">Notas</label>
                                 <input type="text" class="form-control" id="notasInput" name="notas"
                                     maxlength="100" placeholder="Ingrese notas del trabajador (opcional)" autocomplete="off">
-                            </div>
-                            
-                            <div>
-                                <label for="photoInput" class="form-label mt-4">Foto de Perfil</label>
-                                <input type="file" class="form-control" id="photoInput" name="photo" 
-                                    accept="image/*">
-                                <div class="form-text">Seleccione una imagen (opcional)</div>
                             </div>
                         </form>
                     </div>
@@ -163,8 +167,18 @@
                         <form method="post" th:action="@{/workers/update}" id="editWorkerForm" class="needs-validation"
                             novalidate>
                             <input type="number" id="workerIdInputEdit" name="workerId" hidden>
+                            <div class="text-center mb-4">
+                                <div id="photoPreviewEdit"
+                                    class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto"
+                                    style="width: 130px; height: 130px; cursor: pointer; overflow: hidden;"
+                                    onclick="document.getElementById('photoInputEdit').click()">
+                                    <i class="ri-user-3-fill text-white" style="font-size: 55px;"></i>
+                                </div>
+                                <small class="text-muted d-block mt-2">Click para cambiar foto</small>
+                                <input type="file" id="photoInputEdit" name="photo" accept="image/*" style="display: none;">
+                            </div>
                             <div>
-                                <label for="nombreInputEdit" class="form-label mt-4">Nombre <span
+                                <label for="nombreInputEdit" class="form-label mt-2">Nombre <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="nombreInputEdit" name="nombre" minlength="3"
                                     maxlength="100" placeholder="Ingrese el nombre del usuario" autocomplete="off"
@@ -180,17 +194,11 @@
                                     required>
                                 <div class="invalid-feedback">El salario es requerido</div>
                             </div>
+                            <small id="hourlyPayDisplayEdit" class="text-muted mt-1 d-block ms-1">Pago por hora: $0.00</small>
                             <div>
                                 <label for="notasInputEdit" class="form-label mt-4">Notas</label>
                                 <input type="text" class="form-control" id="notasInputEdit" name="notas" 
                                     maxlength="255" placeholder="Ingrese notas del trabajador (opcional)" autocomplete="off">
-                            </div>
-                            <div>
-                                <label for="photoInputEdit" class="form-label mt-4">Foto de Perfil</label>
-                                <input type="file" class="form-control" id="photoInputEdit" name="photo" 
-                                    accept="image/*">
-                                <div class="form-text">Seleccione una nueva imagen para reemplazar la actual</div>
-                                <div id="currentPhotoPreview" class="mt-2"></div>
                             </div>
                         </form>
                     </div>
