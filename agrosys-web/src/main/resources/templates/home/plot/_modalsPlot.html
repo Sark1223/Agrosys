@@ -4,7 +4,7 @@
 <body>
 
     <div th:fragment="plotModals">
-        <div class="modal fade" id="modalAddPlot" tabindex="-1" aria-labelledby="modalAddPlot" aria-hidden="true">
+        <div class="modal fade" id="modalAddPlot" tabindex="-1" aria-labelledby="modalAddPlotLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -18,14 +18,14 @@
                                 <label for="nombrePlotInput" class="form-label mt-4">Nombre <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="nombrePlotInput" name="plotName"
-                                    minlength="2" maxlength="50" placeholder="Ingrese el nombre de la parcela"
+                                    minlength="2" maxlength="100" placeholder="Ingrese el nombre de la parcela"
                                     autocomplete="off" required>
                                 <div class="invalid-feedback">El nombre es requerido</div>
                             </div>
                             <div>
                                 <label for="descripcionPlotInput" class="form-label mt-4">Descripción </label>
                                 <textarea type="text" class="form-control" id="descripcionPlotInput" name="description"
-                                    maxlength="100" placeholder="Ingrese la descripción de la parcela"
+                                    maxlength="255" placeholder="Ingrese la descripción de la parcela"
                                     autocomplete="off"></textarea>
                             </div>
 
@@ -54,17 +54,17 @@
                             novalidate>
                             <input type="number" id="plotIdInputEdit" name="plotId" hidden required>
                             <div>
-                                <label for="nombrePlotInputEdit" class="form-label mt-4">Nombre <span
+                                <label for="nombrePlotInputEdit" class="form-label">Nombre <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="nombrePlotInputEdit" name="plotName"
-                                    minlength="2" maxlength="50" placeholder="Ingrese el nombre de la parcela"
+                                    minlength="2" maxlength="100" placeholder="Ingrese el nombre de la parcela"
                                     autocomplete="off" required>
                                 <div class="invalid-feedback">El nombre es requerido</div>
                             </div>
                             <div>
                                 <label for="descripcionPlotInputEdit" class="form-label mt-4">Descripción </label>
                                 <textarea type="text" class="form-control" id="descripcionPlotInputEdit"
-                                    name="description" maxlength="100"
+                                    name="description" maxlength="255"
                                     placeholder="Ingrese la descripción de la parcela" autocomplete="off"></textarea>
                             </div>
                         </form>
@@ -81,7 +81,7 @@
     </div>
 
     <div th:fragment="plantationModals">
-        <div class="modal fade" id="modalAddPlantation" tabindex="-1" aria-labelledby="modalAddPlantation"
+        <div class="modal fade" id="modalAddPlantation" tabindex="-1" aria-labelledby="modalAddPlantationLabel"
             aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
@@ -94,10 +94,10 @@
                             class="needs-validation" novalidate>
                             <input type="number" id="plotIdInputPlantation" name="plotId" hidden required>
                             <div>
-                                <label for="nombrePlantationInput" class="form-label mt-4">Nombre <span
+                                <label for="nombrePlantationInput" class="form-label">Nombre <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="nombrePlantationInput" name="plantationName"
-                                    minlength="2" maxlength="50" placeholder="Ingrese el nombre de la plantación"
+                                    minlength="2" maxlength="100" placeholder="Ingrese el nombre de la plantación"
                                     autocomplete="off" required>
                                 <div class="invalid-feedback">El nombre es requerido</div>
                             </div>
@@ -131,7 +131,7 @@
             </div>
         </div>
 
-        <div class="modal fade" id="modalEditPlantation" tabindex="-1" aria-labelledby="modalEditPlotLabel"
+        <div class="modal fade" id="modalEditPlantation" tabindex="-1" aria-labelledby="modalEditPlantationLabel"
             aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
@@ -145,10 +145,10 @@
                             <input type="number" id="plotIdInputPlantationEdit" name="plotId" hidden required>
                             <input type="number" id="plantationIdInputEdit" name="plantationId" hidden required>
                             <div>
-                                <label for="nombrePlantationInputEdit" class="form-label mt-4">Nombre <span
+                                <label for="nombrePlantationInputEdit" class="form-label">Nombre <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="nombrePlantationInputEdit"
-                                    name="plantationName" minlength="2" maxlength="50"
+                                    name="plantationName" minlength="2" maxlength="100"
                                     placeholder="Ingrese el nombre de la plantación" autocomplete="off" required>
                                 <div class="invalid-feedback">El nombre es requerido</div>
                             </div>
@@ -182,7 +182,7 @@
             </div>
         </div>
 
-        <div class="modal fade" id="modalDeletePlantation" tabindex="-1" aria-labelledby="modalDeleteUser"
+        <div class="modal fade" id="modalDeletePlantation" tabindex="-1" aria-labelledby="modalDeletePlantationLabel"
             aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content border-danger text-white bg-dark">
@@ -207,7 +207,7 @@
             </div>
         </div>
 
-        <div class="modal fade" id="modalDetailsPlantation" tabindex="-1" aria-labelledby="modalDetailsPlantation"
+        <div class="modal fade" id="modalDetailsPlantation" tabindex="-1" aria-labelledby="modalDetailsPlantationLabel"
             aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
                 <div class="modal-content">
@@ -217,6 +217,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <input type="number" id="plantationIdInputDetails" name="plantationId" hidden required>
                         <p class="text-capitalize"><strong>Plantacion:</strong> <span id="plantationDetailsName"></span>
                         </p>
                         <!-- <p class="text-capitalize"><strong>Etapa Actual:</strong> <span id="plantationDetailsCurrentState"></span></p> -->
@@ -267,9 +268,13 @@
                     <div class="modal-body">
                         <p><strong>Plantación:</strong> <span id="stageDetailsPlantationName"></span></p>
                         <p><strong>Etapa:</strong> <span id="stageNameDetails"></span></p>
-                        <p><strong>Fecha de Inicio:</strong> <span id="stageStartDateDetails" class="text-capitalize"></span></p>
-                        <p><strong>Fecha de Finalización:</strong> <span id="stageEndDateDetails" class="text-capitalize"></span></p>
-                        <p class="mb-0"><strong>Notas:</strong> <pre id="stageNotesDetails"></pre><p>
+                        <p><strong>Fecha de Inicio:</strong> <span id="stageStartDateDetails"
+                                class="text-capitalize"></span></p>
+                        <p><strong>Fecha de Finalización:</strong> <span id="stageEndDateDetails"
+                                class="text-capitalize"></span></p>
+                        <p class="mb-0"><strong>Notas:</strong>
+                        <pre id="stageNotesDetails"></pre>
+                        <p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-target="#modalDetailsPlantation"
@@ -295,7 +300,7 @@
                             <div>
                                 <label for="nombreStateInput" class="form-label mt-4">Etapa <span
                                         class="text-danger">*</span></label>
-                                <select class="form-select" id="nombreStateInput" name="stageId" required>
+                                <select class="form-select" id="nombreStateInput" name="stageId" required disabled>
                                     <option value="" disabled selected>Seleccione un etapa</option>
                                     <option value="1">Preparación</option>
                                     <option value="2">Siembra</option>
@@ -424,6 +429,577 @@
         </div>
 
     </div>
+
+    <div th:fragment="configuracionesModals">
+        <input type="number" id="qtyLotTrade" hidden />
+
+        <div class="modal fade" id="modalAddTradeMode" tabindex="-1" aria-labelledby="modalAddTradeMode"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Agregar Modo De Comercio</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/config/trade-mode/new}" id="addTradeModeForm"
+                            class="needs-validation" novalidate>
+                            <div>
+                                <label for="nameTradeModeInput" class="form-label">Nombre <span
+                                        class="text-danger">*</span></label></label>
+                                <input type="text" minlength="3" maxlength="50" class="form-control"
+                                    id="nameTradeModeInput" name="name" autocomplete="off" required>
+                            </div>
+                            <div class="form-check  mt-4">
+                                <input class="form-check-input" type="checkbox" value="1" id="cBxActiveTradeMode"
+                                    name="active" checked="">
+                                <label class="form-check-label" for="cBxActiveTradeMode">
+                                    Activo
+                                </label>
+                            </div>
+                            <!-- <div>
+                                <label for="notasStateInput" class="form-label mt-4">Notas </label>
+                                <textarea type="text" class="form-control" id="notasStateInput" name="notes"
+                                    maxlength="500" placeholder="Notas adicionales sobre la etapa"
+                                    autocomplete="off"></textarea>
+                            </div> -->
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="btn-close-add-trade-mode"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-add-trade-mode">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalEditTradeMode" tabindex="-1" aria-labelledby="modalEditTradeMode"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Modo De Comercio</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/config/trade-mode/update}" id="editTradeModeForm"
+                            class="needs-validation" novalidate>
+                            <input type="number" name="id" id="idTradeModeEdit" hidden>
+
+                            <div>
+                                <label for="nameTradeModeInputEdit" class="form-label">Nombre <span
+                                        class="text-danger">*</span></label></label>
+                                <input type="text" minlength="3" maxlength="50" class="form-control"
+                                    id="nameTradeModeInputEdit" name="name" autocomplete="off" required>
+                            </div>
+                            <div class="form-check  mt-4">
+                                <input class="form-check-input" type="checkbox" value="1" id="cBxActiveTradeModeEdit"
+                                    name="active" checked="">
+                                <label class="form-check-label" for="cBxActiveTradeModeEdit">
+                                    Activo
+                                </label>
+                            </div>
+                            <!-- <div>
+                                <label for="notasStateInput" class="form-label mt-4">Notas </label>
+                                <textarea type="text" class="form-control" id="notasStateInput" name="notes"
+                                    maxlength="500" placeholder="Notas adicionales sobre la etapa"
+                                    autocomplete="off"></textarea>
+                            </div> -->
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="btn-close-edit-trade-mode"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-edit-trade-mode">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalAddProductUnit" tabindex="-1" aria-labelledby="modalAddProductUnit"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Agregar Unidad De Producto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/config/product-unit/new}" id="addProductUnitForm"
+                            class="needs-validation" novalidate>
+                            <div>
+                                <label for="nameProductUnitInput" class="form-label">Nombre <span
+                                        class="text-danger">*</span></label></label>
+                                <input type="text" minlength="3" maxlength="50" class="form-control"
+                                    id="nameProductUnitInput" name="name" autocomplete="off" required>
+                            </div>
+                            <div class="form-check  mt-4">
+                                <input class="form-check-input" type="checkbox" value="1" id="cBxActiveProductUnit"
+                                    name="active" checked="">
+                                <label class="form-check-label" for="cBxActiveProductUnit">
+                                    Activo
+                                </label>
+                            </div>
+                            <!-- <div>
+                                <label for="notasStateInput" class="form-label mt-4">Notas </label>
+                                <textarea type="text" class="form-control" id="notasStateInput" name="notes"
+                                    maxlength="500" placeholder="Notas adicionales sobre la etapa"
+                                    autocomplete="off"></textarea>
+                            </div> -->
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="btn-close-add-product-unit"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-add-product-unit">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalEditProductUnit" tabindex="-1" aria-labelledby="modalEditProductUnit"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Unidad De Producto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/config/product-unit/update}" id="editProductUnitForm"
+                            class="needs-validation" novalidate>
+                            <input type="number" name="id" id="idProductUnitEdit" hidden>
+
+                            <div>
+                                <label for="nameProductUnitInputEdit" class="form-label">Nombre <span
+                                        class="text-danger">*</span></label></label>
+                                <input type="text" minlength="3" maxlength="50" class="form-control"
+                                    id="nameProductUnitInputEdit" name="name" autocomplete="off" required>
+                            </div>
+                            <div class="form-check  mt-4">
+                                <input class="form-check-input" type="checkbox" value="1" id="cBxActiveProductUnitEdit"
+                                    name="active" checked="">
+                                <label class="form-check-label" for="cBxActiveProductUnitEdit">
+                                    Activo
+                                </label>
+                            </div>
+                            <!-- <div>
+                                <label for="notasStateInput" class="form-label mt-4">Notas </label>
+                                <textarea type="text" class="form-control" id="notasStateInput" name="notes"
+                                    maxlength="500" placeholder="Notas adicionales sobre la etapa"
+                                    autocomplete="off"></textarea>
+                            </div> -->
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="btn-close-edit-product-unit"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-edit-product-unit">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalAddProductType" tabindex="-1" aria-labelledby="modalAddProductType"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Agregar Tipo De Producto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/config/product-type/new}" id="addProductTypeForm"
+                            class="needs-validation" novalidate>
+                            <div>
+                                <label for="nameProductTypeInput" class="form-label">Nombre <span
+                                        class="text-danger">*</span></label></label>
+                                <input type="text" minlength="3" maxlength="50" class="form-control"
+                                    id="nameProductTypeInput" name="name" autocomplete="off" required>
+                            </div>
+                            <div class="form-check  mt-4">
+                                <input class="form-check-input" type="checkbox" value="1" id="cBxActiveProductType"
+                                    name="active" checked="">
+                                <label class="form-check-label" for="cBxActiveProductType">
+                                    Activo
+                                </label>
+                            </div>
+                            <!-- <div>
+                                <label for="notasStateInput" class="form-label mt-4">Notas </label>
+                                <textarea type="text" class="form-control" id="notasStateInput" name="notes"
+                                    maxlength="500" placeholder="Notas adicionales sobre la etapa"
+                                    autocomplete="off"></textarea>
+                            </div> -->
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="btn-close-add-product-type"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-add-product-type">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalEditProductType" tabindex="-1" aria-labelledby="modalEditProductType"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Tipo De Producto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/config/product-type/update}" id="editProductTypeForm"
+                            class="needs-validation" novalidate>
+                            <input type="number" name="id" id="idProductTypeEdit" hidden>
+                            <div>
+                                <label for="nameProductTypeInputEdit" class="form-label">Nombre <span
+                                        class="text-danger">*</span></label></label>
+                                <input type="text" minlength="3" maxlength="50" class="form-control"
+                                    id="nameProductTypeInputEdit" name="name" autocomplete="off" required>
+                            </div>
+                            <div class="form-check  mt-4">
+                                <input class="form-check-input" type="checkbox" value="1" id="cBxActiveProductTypeEdit"
+                                    name="active" checked="">
+                                <label class="form-check-label" for="cBxActiveProductTypeEdit">
+                                    Activo
+                                </label>
+                            </div>
+                            <!-- <div>
+                                <label for="notasStateInput" class="form-label mt-4">Notas </label>
+                                <textarea type="text" class="form-control" id="notasStateInput" name="notes"
+                                    maxlength="500" placeholder="Notas adicionales sobre la etapa"
+                                    autocomplete="off"></textarea>
+                            </div> -->
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="btn-close-edit-product-type"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-edit-product-type">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:fragment="lotModals">
+
+        <div class="modal fade" id="modalLotsPlantation" tabindex="-1" aria-labelledby="modalLotsPlantationLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Lotes de Plantación
+                            <!-- <span id="plantationDetailsCurrentState"></span> -->
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="number" id="plantationIdInputLots" name="plantationId" hidden required>
+
+                        <p class="text-capitalize"><strong>Plantacion:</strong> <span id="plantationLotName"></span>
+                        </p>
+                        <p class="text-capitalize"><strong>Parcela de origen:</strong> <span
+                                id="plantationLotOriginPlot"></span></p>
+
+                        <p class="mb-0"><strong>Notas:</strong></p>
+                        <pre id="plantationLotsNotes"></pre>
+
+                        <div class="mt-4">
+                            <div class="d-flex justify-content-end align-items-center mb-2">
+                                <button class="btn btn-sm btn-success" id="btnAddPlantationLot" data-bs-toggle="modal"
+                                    data-bs-target="#modalAddLot" data-bs-dismiss="modal">
+                                    <i class="ri-add-line pe-1"></i>Agregar Lote
+                                </button>
+                            </div>
+                            <h6 class="text-center mb-3"><strong>Lotes:</strong></h6>
+                            <div id="containerPlantationLots"> <!-- class="d-flex flex-column gap-3 px-2" -->
+                                <!-- Se cargan las etapas de la plantación por JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalAddLot" tabindex="-1" aria-labelledby="modalAddLot" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Agregar Lote</h5>
+                        <button type="button" class="btn-close" data-bs-target="#modalLotsPlantation"
+                            data-bs-toggle="modal" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/lot/new}" id="addLotForm" class="needs-validation"
+                            novalidate>
+                            <div>
+                                <label for="nombreLotInput" class="form-label ">Nombre <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nombreLotInput" name="name" minlength="2"
+                                    maxlength="100" placeholder="Asigne un nombre al lote" autocomplete="off" required>
+                                <div class="invalid-feedback">El nombre es requerido</div>
+                            </div>
+                            <div>
+                                <label for="plantationIdLotInput" class="form-label mt-4">Plantación <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="plantationIdLotInput" name="plantatio" required
+                                    disabled>
+                                    <option value="" disabled selected>Seleccione una plantación</option>
+                                    <div class="invalid-feedback">Seleccionar una plantación es requerido</div>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="productTypeLotInput" class="form-label mt-4">Tipo de producto <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="productTypeLotInput" name="productType" required>
+                                    <option value="" disabled selected>Seleccione un tipo</option>
+                                    <div class="invalid-feedback">Seleccionar una plantación es requerido</div>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="unitTypeLotInput" class="form-label mt-4">Unidad del producto <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="unitTypeLotInput" name="unitType" required>
+                                    <option value="" disabled selected>Seleccione una unidad</option>
+                                    <div class="invalid-feedback">Seleccionar una unidad es requerido</div>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="unitCostLotInput" class="form-label ">Costo por unidad <span
+                                        class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="unitCostLotInput" name="unitCost" min="0"
+                                    step="0.00" value="0.00" autocomplete="off" required>
+                                <div class="invalid-feedback">El costo por unidad es requerido</div>
+                            </div>
+                            <div>
+                                <label for="tradeModeLotInput" class="form-label mt-4">Modo de comercio <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="tradeModeLotInput" name="tradeMode" required>
+                                    <option value="" disabled selected>Seleccione un modo de comercio</option>
+                                    <div class="invalid-feedback">Seleccionar un modo de comercio es requerido</div>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="freightCostLotInput" class="form-label ">Costo de transporte </label>
+                                <input type="number" class="form-control" id="freightCostLotInput" name="freightCost"
+                                    min="0" step="0.00" value="0.00" autocomplete="off">
+                            </div>
+                            <div>
+                                <label for="descripcionLotInput" class="form-label mt-4">Descripción </label>
+                                <textarea type="text" class="form-control" id="descripcionLotInput" name="description"
+                                    maxlength="256" placeholder="Ingrese algunas notas sobre el lote"
+                                    autocomplete="off"></textarea>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-target="#modalLotsPlantation"
+                            data-bs-toggle="modal" data-bs-dismiss="modal" id="btn-close-add-lot">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-add-lot">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalEditLot" tabindex="-1" aria-labelledby="modalEditLot" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Lote</h5>
+                        <button type="button" class="btn-close" data-bs-target="#modalLotsPlantation"
+                            data-bs-toggle="modal" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:action="@{/plots/lot/edit}" id="editLotForm" class="needs-validation"
+                            novalidate>
+                            <input type="hidden" name="id" id="idLotEdit" required>
+                            <input type="hidden" name="lotTradeId" id="lotTradeIdEdit" required>
+                            <div>
+                                <label for="nombreLotInputEdit" class="form-label ">Nombre <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nombreLotInputEdit" name="name"
+                                    minlength="2" maxlength="100" placeholder="Asigne un nombre al lote"
+                                    autocomplete="off" required>
+                                <div class="invalid-feedback">El nombre es requerido</div>
+                            </div>
+                            <div>
+                                <label for="plantationIdLotInputEdit" class="form-label mt-4">Plantación <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="plantationIdLotInputEdit" name="plantatio" required
+                                    disabled>
+                                    <option value="" disabled selected>Seleccione una plantación</option>
+                                    <div class="invalid-feedback">Seleccionar una plantación es requerido</div>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="productTypeLotInputEdit" class="form-label mt-4">Tipo de producto <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="productTypeLotInputEdit" name="productType" required>
+                                    <option value="" disabled selected>Seleccione un tipo</option>
+                                    <div class="invalid-feedback">Seleccionar una plantación es requerido</div>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="unitTypeLotInputEdit" class="form-label mt-4">Unidad del producto <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="unitTypeLotInputEdit" name="unitType" required>
+                                    <option value="" disabled selected>Seleccione una unidad</option>
+                                    <div class="invalid-feedback">Seleccionar una unidad es requerido</div>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="unitCostLotInputEdit" class="form-label ">Costo por unidad <span
+                                        class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="unitCostLotInputEdit" name="unitCost"
+                                    min="0" step="0.00" value="0.00" autocomplete="off" required>
+                                <div class="invalid-feedback">El costo por unidad es requerido</div>
+                            </div>
+                            <div>
+                                <label for="tradeModeLotInputEdit" class="form-label mt-4">Modo de comercio <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="tradeModeLotInputEdit" name="tradeMode" required>
+                                    <option value="" disabled selected>Seleccione un modo de comercio</option>
+                                    <div class="invalid-feedback">Seleccionar un modo de comercio es requerido</div>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="freightCostLotInputEdit" class="form-label ">Costo de transporte </label>
+                                <input type="number" class="form-control" id="freightCostLotInputEdit"
+                                    name="freightCost" min="0" step="0.00" value="0.00" autocomplete="off">
+                            </div>
+                            <div>
+                                <label for="descripcionLotInputEdit" class="form-label mt-4">Descripción </label>
+                                <textarea type="text" class="form-control" id="descripcionLotInputEdit"
+                                    name="description" maxlength="256" placeholder="Ingrese algunas notas sobre el lote"
+                                    autocomplete="off"></textarea>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-target="#modalLotsPlantation"
+                            data-bs-toggle="modal" data-bs-dismiss="modal" id="btn-close-edit-lot">
+                            Cancelar
+                        </button>
+                        <button type="button" class="btn btn-success" id="btn-submit-edit-lot">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalDetailsLot" tabindex="-1" aria-labelledby="modalDetailsLotLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Información del Lote</h5>
+                        <button type="button" class="btn-close" data-bs-target="#modalLotsPlantation"
+                            data-bs-toggle="modal" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="fst-italic fst-lighter mb-1 text-capitalize text-end" style="font-size: 13px;">
+                            <span id="plantationLotCreationDate"></span>
+                        </p>
+                        <p class="text-capitalize"><strong>Nombre:</strong>
+                            <span id="lotNameDetails">lote 1 - 2026</span>
+                        </p>
+                        <p class="text-capitalize"><strong>Plantación de origen:</strong>
+                            <span id="lotOriginPlantatioDetails">Cebollas</span>
+                        </p>
+
+                        <p class="mb-0"><strong>Notas de lote:</strong></p>
+                        <pre id="lotNotesDetails">Sin notas</pre>
+
+                        <div class="d-flex gap-2 justify-content-between col-12">
+                            <p class="text-capitalize col-6"><strong>Tipo de producto:</strong>
+                                <br><span id="lotProductTypeDetails">Calidad 1</span>
+                            </p>
+                            <p class="text-capitalize col-6"><strong>Unidad de producto:</strong>
+                                <br><span id="lotUnitTypeDetails">Caja</span>
+                            </p>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-between col-12">
+                            <p class="text-capitalize col-6"><strong>Modo de comercialización:</strong>
+                                <br><span id="lotTradeModeDetails">Venta directa</span>
+                            </p>
+                            <p class="text-capitalize col-6"><strong>Costo unitario:</strong>
+                                <br><span id="lotUnitCostDetails">$1.00</span>
+                            </p>
+
+
+                        </div>
+                        <p class="text-capitalize"><strong>Costo de transporte:</strong>
+                            <br><span id="lotFreightCostDetails">$0.00</span>
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-target="#modalLotsPlantation"
+                            data-bs-toggle="modal" data-bs-dismiss="modal" id="btn-close-details-lot">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalDeleteLot" tabindex="-1" aria-labelledby="modalDeleteLotLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content border-danger text-white bg-dark">
+                    <div class="modal-header border-danger">
+                        <h5 class="modal-title">Eliminar lote</h5>
+                        <button type="button" class="btn-close" data-bs-target="#modalLotsPlantation"
+                            data-bs-toggle="modal" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="textDeleteLot">¿Está seguro de que desea eliminar el Lote?</p>
+                        <form method="post" th:action="@{/plots/lot/delete}" id="deleteLotForm" class="needs-validation"
+                            novalidate>
+                            <input type="number" id="lotIdInputDelete" name="lotId" hidden required>
+                            <input type="number" id="lotTradeIdInputDelete" name="lotTradeId" hidden required>
+                        </form>
+                    </div>
+                    <div class="modal-footer border-danger fw-bolder">
+                        <button type="button" class="btn btn-secondary" data-bs-target="#modalLotsPlantation"
+                            data-bs-toggle="modal" data-bs-dismiss="modal" id="btn-close-delete-lot">
+                            Cancelar
+                        </button>
+                        <button type="button" class="btn btn-danger" id="btn-submit-delete-lot">
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
 </body>
 
 </html>

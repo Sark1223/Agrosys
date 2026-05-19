@@ -20,51 +20,187 @@
                             href="#plot" aria-selected="true" role="tab">Parcelas</a>
                     </li>
                     <li class="nav-item" role="presentation">
+                        <a class="nav-link" th:classappend="${activeTab == 'plantations'} ? 'active' : ''"
+                            data-bs-toggle="tab" href="#plantations" aria-selected="false" role="tab"
+                            tabindex="-1" id="tabPlantations">Plantaciones</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
                         <a class="nav-link" th:classappend="${activeTab == 'lot'} ? 'active' : ''" data-bs-toggle="tab"
                             href="#lot" aria-selected="false" role="tab" tabindex="-1">Lotes</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" th:classappend="${activeTab == 'config_lot'} ? 'active' : ''"
+                            data-bs-toggle="tab" href="#config_lot" aria-selected="false" role="tab"
+                            tabindex="-1">Configuraciones</a>
                     </li>
                 </ul>
                 <div id="myTabContent" class="tab-content">
                     <div class="tab-pane fade" id="plot" role="tabpanel"
                         th:classappend="${activeTab == 'plot'} ? 'show active' : ''">
                         <div class="options p-2 d-flex justify-content-end flex-nowrap">
-                            <button class="btn btn-primary" data-bs-toggle="modal"
+                            <button class="btn btn-primary btn-sm py-1 px-3" data-bs-toggle="modal"
                                 data-bs-target="#modalAddPlot"><i class="ri-add-line pe-1"></i>Agregar Parcela</button>
                         </div>
-                        <div class="d-flex justify-content-center align-items-center text-body-tertiary fs-4 text"
+                        <div class="d-flex justify-content-center align-items-center text-body-tertiary fs-5 text"
                             style="height: 100px;" id="message-plot">Cargando información...</div>
-                        <!-- <div class="cards d-flex flex-wrap flex-row g-2" id="cardsContainerPlot">
-                        </div> -->
+                            
                         <div class="accordion p-2" id="accordionContainerPlots">
-                            
+
                             <!-- Se carga por JavaScript -->
-                            
+
                         </div>
                     </div>
+
+                    <div class="tab-pane fade" id="plantations" role="tabpanel"
+                        th:classappend="${activeTab == 'plantations'} ? 'show active' : ''">
+                        <div class="row p-2 justify-content-end align-items-end">
+                            <div class="col-md-3">
+                                <label for="filterPlantationStartDate" class="fw-bold small">Desde:</label>
+                                <input type="date" id="filterPlantationStartDate" class="form-control" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="filterPlantationEndDate" class="fw-bold small">Hasta:</label>
+                                <input type="date" id="filterPlantationEndDate" class="form-control" required>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-primary w-100" id="btnFilterPlantations">
+                                    <i class="ri-search-line"></i> Filtrar
+                                </button>
+                            </div>
+                        </div>
+                        <div class=" p-2" id="containerPlantations">
+
+                            <!-- Se carga por JavaScript -->
+
+                        </div>
+                    </div>
+
                     <div class="tab-pane fade" id="lot" role="tabpanel"
                         th:classappend="${activeTab == 'lot'} ? 'show active' : ''">
                         <div class="options p-2 d-flex justify-content-end flex-nowrap">
-                            <button class="btn btn-primary" data-bs-toggle="modal"
-                                data-bs-target="#modalAddRole"><i class="ri-add-line pe-1"></i>Agregar Lote</button>
+                            <button class="btn btn-primary btn-sm py-1 px-3" data-bs-toggle="modal"
+                                data-bs-target="#modalAddLot"><i class="ri-add-line pe-1"></i>Agregar Lote</button>
                         </div>
                         <div class="cards d-flex flex-wrap flex-row g-2" id="cardsContainerLot">
                             <!-- Se carga por JavaScript -->
                         </div>
                     </div>
 
+                    <div class="tab-pane fade" id="config_lot" role="tabpanel"
+                        th:classappend="${activeTab == 'config_lot'} ? 'show active' : ''">
+
+                        <div class="cards d-flex flex-wrap flex-column gap-3">
+
+                            <div class="w-100 border-bottom px-2 pb-4 pt-2 mt-2">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <h5 class="d-flex flex-row align-items-center">
+                                        <i class="ri-coins-line text-primary me-2"></i> Modos de Comercio
+                                        <span id="countTradeMode" class="badge bg-primary rounded-pill ms-2"
+                                            style="font-size: 11px !important;">0</span>
+                                    </h5>
+                                    <button class="btn btn-primary btn-sm py-1 px-3" data-bs-toggle="modal"
+                                        data-bs-target="#modalAddTradeMode">
+                                        <i class="ri-add-line pe-1"></i> Agregar Modo de comercio
+                                    </button>
+                                </div>
+
+                                <div id="containerTradeModes"
+                                    class="col-12 d-flex flex-md-wrap flex-row flex-wrap gap-2 my-2">
+                                    <!-- <div
+                                        class="bg-light card col-12 col-lg-3 col-md-4 col-sm-6 col-xxl-2 d-flex flex-row justify-content-between justify-content-md-center p-2 shadow-none">
+                                        <div class="col-9">
+                                            <p class="m-0">Venta directa</p>
+                                            <p class="m-0" style="font-size: 11px;">#1</p>
+
+                                        </div>
+                                        <div class="align-items-start d-flex flex-row">
+                                            <div class="badge bg-success rounded-pill fw-light"
+                                                style="font-size: 12px;">activo</div>
+                                            <div class="dropdown">
+                                                <i class="ri-more-2-fill" type="button" id="dropdownMenuButton"
+                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                </i>
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <li><a class="dropdown-item details-plantation-stage"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#modalDetailsTradeMode" href="#"
+                                                            data-bs-dismiss="modal"><i class="ri-eye-line pe-1"></i>Ver
+                                                            detalles</a></li>
+                                                    <li><a class="dropdown-item edit-plantation-stage"
+                                                            data-bs-toggle="modal" data-bs-target="#modalEditTradeMode"
+                                                            href="#" data-bs-dismiss="modal"><i
+                                                                class="ri-pencil-fill pe-1"></i>Editar</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                </div>
+
+                            </div>
+
+                            <div class="w-100 border-bottom px-2 pb-4 pt-2 mt-2">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <h5 class="d-flex flex-row align-items-center">
+                                        <i class="ri-ruler-line text-info  me-2"></i> Unidades de Producto
+                                        <span id="countProductUnit" class="badge bg-info rounded-pill ms-2"
+                                            style="font-size: 11px !important;">0</span>
+                                    </h5>
+                                    <button class="btn btn-info btn-sm py-1 px-3" data-bs-toggle="modal"
+                                        data-bs-target="#modalAddProductUnit">
+                                        <i class="ri-add-line pe-1"></i> Agregar Unidad de producto
+                                    </button>
+                                </div>
+
+                                <div id="containerProductUnits"
+                                    class="col-12 d-flex flex-md-wrap flex-row  flex-wrap gap-2 my-2">
+                                </div>
+                            </div>
+
+
+                            <div class="w-100 border-bottom px-2 pb-4 pt-2 mt-2">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <h5 class="d-flex flex-row align-items-center">
+                                        <i class="ri-shopping-basket-2-line text-warning me-2"></i>
+                                        Tipos de Producto
+                                        <span id="countProductType" class="badge bg-warning rounded-pill ms-2"
+                                            style="font-size: 11px !important;">0</span>
+                                    </h5>
+                                    <button class="btn btn-warning btn-sm py-1 px-3" data-bs-toggle="modal"
+                                        data-bs-target="#modalAddProductType">
+                                        <i class="ri-add-line pe-1"></i>Agregar Tipo de producto
+                                    </button>
+                                </div>
+
+                                <div id="containerProductTypes"
+                                    class="col-12 d-flex flex-md-wrap flex-row flex-wrap gap-2 my-2">
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
                 </div>
+
             </div>
-        </main>
+    </div>
+    </main>
 
-        <!-- PARCELAS -->
-        <div th:replace="~{home/plot/_modalsPlot :: plotModals}"></div>
+    <!-- PARCELAS -->
+    <div th:replace="~{home/plot/_modalsPlot :: plotModals}"></div>
 
-        <!-- PLANTACIONES -->
-        <div th:replace="~{home/plot/_modalsPlot :: plantationModals}"></div>
-        <div th:replace="~{home/plot/_modalsPlot :: plantationStageModals}"></div>
+    <!-- PLANTACIONES -->
+    <div th:replace="~{home/plot/_modalsPlot :: plantationModals}"></div>
+    <div th:replace="~{home/plot/_modalsPlot :: plantationStageModals}"></div>
 
-        <script th:src="@{/js/plot/plot.js}"></script>
-        <script th:src="@{/js/plot/plantatio.js}"></script>
+    <!-- CONFIGURACIONES -->
+    <div th:replace="~{home/plot/_modalsPlot :: configuracionesModals}"></div>
+    <div th:replace="~{home/plot/_modalsPlot :: lotModals}"></div>
+
+
+    <script th:src="@{/js/plot/plot.js}"></script>
+    <script th:src="@{/js/plot/plantatio.js}"></script>
+    <script th:src="@{/js/plot/lot.js}"></script>
 </body>
 
 </html>
