@@ -17,15 +17,15 @@ import jakarta.transaction.Transactional;
 @Repository
 public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> {
 
-    interface WorkerProjection {
+        interface WorkerProjection {
 
-        Integer getWorkerId();
+                Integer getWorkerId();
 
-        String getName();
+                String getName();
 
-        String getNotas();
+                String getNotas();
 
-        java.math.BigDecimal getSalary();
+                java.math.BigDecimal getSalary();
 
                 String getPhoto();
 
@@ -36,13 +36,13 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
 
         @Query(value = """
                         SELECT
-                            w.workerId,
-                            w.name,
-                            w.notas,
-                            w.salary,
-                            w.photo,
-                            w.photo_public_id,
-                            w.hourly_pay
+                                w.workerId,
+                                w.name,
+                                w.notas,
+                                w.salary,
+                                w.photo,
+                                w.photo_public_id,
+                                w.hourly_pay
                         FROM agrosys_worker.WORKER w
                         WHERE w.name = :name
                         """, nativeQuery = true)
@@ -50,23 +50,23 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
 
         @Query(value = """
                         SELECT
-                            w.workerId,
-                            w.name,
-                            w.notas,
-                            w.salary,
-                            w.photo,
-                            w.photo_public_id,
-                            w.hourly_pay
+                                w.workerId,
+                                w.name,
+                                w.notas,
+                                w.salary,
+                                w.photo,
+                                w.photo_public_id,
+                                w.hourly_pay
                         FROM agrosys_worker.WORKER w
                         """, nativeQuery = true)
         List<WorkerProjection> findAllWorkers();
 
-    @Query(value = """
+        @Query(value = """
                         SELECT workerId
                         FROM agrosys_worker.WORKER
                         WHERE name = :name
                         """, nativeQuery = true)
-    Integer existsByName(String name);
+        Integer existsByName(String name);
 
         @Modifying
         @Transactional
@@ -77,30 +77,30 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
         Integer insertWorker(String name, String notas, java.math.BigDecimal salary, String photo, String photoPublicId,
                         BigDecimal hourlyPay);
 
-    @Modifying
-    @Transactional
-    @Query(value = "DELETE FROM agrosys_worker.WORKER WHERE workerId = :id", nativeQuery = true)
-    void deleteWorkerById(@Param("id") Integer id);
+        @Modifying
+        @Transactional
+        @Query(value = "DELETE FROM agrosys_worker.WORKER WHERE workerId = :id", nativeQuery = true)
+        void deleteWorkerById(@Param("id") Integer id);
 
-    @Query(value = "SELECT COUNT(*) FROM agrosys_worker.WORKER WHERE workerId = :id", nativeQuery = true)
-    int countById(@Param("id") Integer id);
+        @Query(value = "SELECT COUNT(*) FROM agrosys_worker.WORKER WHERE workerId = :id", nativeQuery = true)
+        int countById(@Param("id") Integer id);
 
         @Query(value = """
                         SELECT
-                            w.workerId,
-                            w.name,
-                            w.notas,
-                            w.salary,
-                            w.photo,
-                            w.photo_public_id,
-                            w.hourly_pay
+                                w.workerId,
+                                w.name,
+                                w.notas,
+                                w.salary,
+                                w.photo,
+                                w.photo_public_id,
+                                w.hourly_pay
                         FROM agrosys_worker.WORKER w
                         WHERE w.workerId = :id
                         """, nativeQuery = true)
         WorkerProjection findByIdWorker(Integer id);
 
-    @Query(value = "SELECT workerId FROM agrosys_worker.WORKER WHERE name = :name AND workerId != :excludeId", nativeQuery = true)
-    Integer existsByNameExcludingId(@Param("name") String name, @Param("excludeId") Integer excludeId);
+        @Query(value = "SELECT workerId FROM agrosys_worker.WORKER WHERE name = :name AND workerId != :excludeId", nativeQuery = true)
+        Integer existsByNameExcludingId(@Param("name") String name, @Param("excludeId") Integer excludeId);
 
         @Modifying
         @Transactional
@@ -114,38 +114,36 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
                         @Param("photo") String photo, @Param("photoPublicId") String photoPublicId,
                         @Param("hourlyPay") BigDecimal hourlyPay);
 
-    
-    @Query(value = "SELECT COUNT(*) FROM agrosys_worker.ATTENDANCE WHERE workerId = :workerId AND date = :date", nativeQuery = true)
-    int existsAttendanceByWorkerAndDate(@Param("workerId") Integer workerId,
-            @Param("date") LocalDate date);
+        @Query(value = "SELECT COUNT(*) FROM agrosys_worker.ATTENDANCE WHERE workerId = :workerId AND date = :date", nativeQuery = true)
+        int existsAttendanceByWorkerAndDate(@Param("workerId") Integer workerId,
+                        @Param("date") LocalDate date);
 
-    @Modifying
-    @Transactional
-    @Query(value = """
+        @Modifying
+        @Transactional
+        @Query(value = """
                         INSERT INTO agrosys_worker.ATTENDANCE (workerId, date, attended, hoursWorked)
                         VALUES (:workerId, :date, :attended, :hoursWorked)
                         """, nativeQuery = true)
-    Integer insertAttendance(@Param("workerId") Integer workerId, @Param("date") LocalDate date,
-            @Param("attended") Boolean attended, @Param("hoursWorked") Integer hoursWorked);
+        Integer insertAttendance(@Param("workerId") Integer workerId, @Param("date") LocalDate date,
+                        @Param("attended") Boolean attended, @Param("hoursWorked") Integer hoursWorked);
 
-    
-    interface AttendanceHistoryProjection {
+        interface AttendanceHistoryProjection {
 
-        Integer getAttendanceId();
+                Integer getAttendanceId();
 
-        Integer getWorkerId();
+                Integer getWorkerId();
 
-        String getWorkerName();
+                String getWorkerName();
 
-        LocalDate getDate();
+                LocalDate getDate();
 
-        Boolean getAttended();
+                Boolean getAttended();
 
-        Integer getHoursWorked();
-    }
+                Integer getHoursWorked();
+        }
 
-    // La consulta con filtros, paginación y el JOIN para traer el nombre
-    @Query(value = """
+        // La consulta con filtros, paginación y el JOIN para traer el nombre
+        @Query(value = """
                         SELECT
                                 a.attendanceId,
                                 a.workerId,
@@ -172,6 +170,6 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
                         SELECT COUNT(*) > 0 AS asistencia
                         FROM agrosys_worker.ATTENDANCE
                         WHERE DATE(`date`) = CURDATE()
-                                    """, nativeQuery = true)
+                                """, nativeQuery = true)
         int asistencia();
 }
