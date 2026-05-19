@@ -20,6 +20,32 @@
     color: #1f2937;
 }
 
+.dashboard-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.dashboard-card h3 {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #111111;
+}
+
+.clima-error {
+    font-size: 13px;
+    color: #d32f2f;
+    margin-top: 20px;
+}
+
+
+/* ================================================
+   ADMIN
+   ================================================ */
+
 .dashboard-actions {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -62,30 +88,15 @@
     gap: 28px;
 }
 
-.dashboard-card {
-    background-color: #ffffff;
-    border-radius: 10px;
-    padding: 18px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-}
-
-.dashboard-card h3 {
-    text-align: center;
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 16px;
-    color: #111111;
+.filtros-card {
+    display: flex;
+    flex-direction: column;
+    height: 190px;
 }
 
 .filtros-card h3 {
     font-size: 13px;
     margin-bottom: 12px;
-}
-
-.filtros-card {
-    display: flex;
-    flex-direction: column;
-    height: 190px;
 }
 
 .filtros-card label {
@@ -132,25 +143,6 @@
     grid-column: 3 / 4;
 }
 
-@media (max-width: 992px) {
-    .dashboard-actions {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
-
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto;
-    }
-
-    .clima-card,
-    .tareas-card,
-    .grafica-card {
-        grid-column: auto;
-        grid-row: auto;
-    }
-}
-
 .clima-contenido {
     text-align: center;
     margin-top: 18px;
@@ -192,72 +184,116 @@
     margin: 2px 0;
 }
 
-.clima-error {
-    font-size: 13px;
-    color: #d32f2f;
-    margin-top: 20px;
+@media (max-width: 992px) {
+    .dashboard-actions {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+
+    .clima-card,
+    .tareas-card,
+    .grafica-card {
+        grid-column: auto;
+        grid-row: auto;
+    }
 }
-/* =============================================== */
+
+
 /* ================================================
-   ESTILOS EXCLUSIVOS VISTA USUARIO
-   Agregar al final de tu CSS, no reemplaza nada.
+   USER
    ================================================ */
 
-/* Grid de usuario: reloj pequeño a la izquierda, clima ocupa el resto */
+/* Reloj */
+.reloj-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+}
+
+.reloj-contenido {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.reloj-horizontal {
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+}
+
+.reloj-numero-grande {
+    font-size: 3.2rem;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1;
+    letter-spacing: -1px;
+}
+
+.reloj-separador {
+    font-size: 3.2rem;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1;
+    margin: 0 2px;
+}
+
+.reloj-separador-chico {
+    font-size: 1.4rem;
+    margin: 0 1px;
+}
+
+.reloj-numero-chico {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #6b7280;
+    line-height: 1;
+}
+
+.reloj-ampm {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #6b7280;
+    margin-left: 6px;
+    align-self: flex-end;
+    padding-bottom: 6px;
+}
+
 .usuario-grid {
     display: grid;
     grid-template-columns: 340px 1fr;
-    grid-template-rows: auto;
     gap: 28px;
     align-items: start;
 }
 
-/* Reloj: columna 1 */
 .usuario-grid .reloj-card {
     grid-column: 1;
     grid-row: 1;
 }
 
-/* Clima: columna 2, se extiende verticalmente según contenido */
 .usuario-grid .clima-card {
     grid-column: 2;
     grid-row: 1;
     height: auto !important;
-    min-height: 0;
     overflow: visible;
     align-self: start;
 }
 
-/* Resetear overflow que viene del CSS compartido */
-.usuario-grid #cardClima {
-    overflow: visible;
-}
-
-@media (max-width: 992px) {
-    .usuario-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .usuario-grid .reloj-card,
-    .usuario-grid .clima-card {
-        grid-column: 1;
-        grid-row: auto;
-    }
-}
-
-/* ================================================
-   CLIMA CARD EXTENDIDA — homeuser styles
-   Pegar en tu archivo CSS principal o en un
-   <style> dentro del fragmento de clima.
-   ================================================ */
-
-/* Contenedor principal de la card */
 #cardClima {
     display: flex;
     flex-direction: column;
     gap: 0;
     padding: 1.2rem 1.4rem;
-    overflow: hidden;
+    overflow: visible;
+    height: auto !important;
+    align-self: start;
 }
 
 #cardClima h3 {
@@ -265,6 +301,7 @@
     letter-spacing: 0.12em;
     color: #888;
     margin-bottom: 0.75rem;
+    text-align: center;
 }
 
 #climaContenido {
@@ -272,9 +309,10 @@
     flex-direction: column;
     gap: 0;
     width: 100%;
+    overflow: visible;
 }
 
-/* ── Sección superior: temp actual ── */
+/* Temp actual */
 .clima-top {
     display: flex;
     flex-direction: column;
@@ -286,6 +324,7 @@
     font-size: 1rem;
     font-weight: 600;
     color: #222;
+    text-align: center;
 }
 
 .clima-actual-row {
@@ -328,27 +367,35 @@
     flex-wrap: wrap;
 }
 
-/* ── Divider ── */
 .clima-divider {
     width: 100%;
     height: 1px;
-    background: rgba(0,0,0,0.08);
+    background: rgba(0, 0, 0, 0.08);
     margin: 0.6rem 0;
 }
 
-/* ── Próximas horas: scroll horizontal ── */
+.clima-cuerpo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: start;
+}
+
 .clima-horas-scroll {
     display: flex;
-    gap: 0.5rem;
-    overflow-x: auto;
-    padding-bottom: 0.4rem;
+    flex-direction: column;
+    gap: 0.4rem;
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: 0.3rem;
     scrollbar-width: thin;
     scrollbar-color: #ddd transparent;
 }
 
 .clima-horas-scroll::-webkit-scrollbar {
-    height: 4px;
+    width: 4px;
 }
+
 .clima-horas-scroll::-webkit-scrollbar-thumb {
     background: #ddd;
     border-radius: 4px;
@@ -356,20 +403,19 @@
 
 .clima-hora-item {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 0.25rem;
-    min-width: 54px;
-    background: rgba(0,0,0,0.04);
+    gap: 0.6rem;
+    background: rgba(0, 0, 0, 0.03);
     border-radius: 10px;
-    padding: 0.5rem 0.3rem;
-    flex-shrink: 0;
+    padding: 0.4rem 0.7rem;
 }
 
 .clima-hora-lbl {
-    font-size: 0.65rem;
+    font-size: 0.72rem;
     color: #777;
     white-space: nowrap;
+    width: 4.5rem;
+    flex-shrink: 0;
 }
 
 .clima-hora-emoji {
@@ -377,12 +423,12 @@
 }
 
 .clima-hora-temp {
-    font-size: 0.82rem;
+    font-size: 0.85rem;
     font-weight: 600;
     color: #222;
+    margin-left: auto;
 }
 
-/* ── Pronóstico semanal ── */
 .clima-semana {
     display: flex;
     flex-direction: column;
@@ -393,13 +439,13 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.3rem 0.2rem;
+    padding: 0.4rem 0.5rem;
     border-radius: 8px;
     transition: background 0.15s;
 }
 
 .clima-dia-item:hover {
-    background: rgba(0,0,0,0.04);
+    background: rgba(0, 0, 0, 0.04);
 }
 
 .clima-dia-nombre {
@@ -423,18 +469,41 @@
     font-weight: 600;
 }
 
-.clima-dia-max {
-    color: #222;
+.clima-dia-max { color: #222; }
+.clima-dia-min { color: #aaa; }
+
+@media (max-width: 992px) {
+    .usuario-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .usuario-grid .reloj-card,
+    .usuario-grid .clima-card {
+        grid-column: 1;
+        grid-row: auto;
+    }
 }
 
-.clima-dia-min {
-    color: #aaa;
-}
+@media (max-width: 700px) {
+    .clima-cuerpo {
+        grid-template-columns: 1fr;
+    }
 
-/* Error */
-.clima-error {
-    font-size: 0.8rem;
-    color: #e55;
-    text-align: center;
-    padding: 1rem 0;
+    .clima-horas-scroll {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: visible;
+        max-height: none;
+    }
+
+    .clima-hora-item {
+        flex-direction: column;
+        min-width: 54px;
+        gap: 0.25rem;
+        padding: 0.5rem 0.3rem;
+    }
+
+    .clima-hora-lbl { width: auto; }
+    .clima-hora-temp { margin-left: 0; }
 }

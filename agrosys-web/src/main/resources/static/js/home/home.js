@@ -175,29 +175,31 @@ $(document).ready(function () {
 
                     <div class="clima-divider"></div>
 
-                    <div class="clima-horas-scroll">
-                        ${horasProximas.map(h => `
-                            <div class="clima-hora-item">
-                                <span class="clima-hora-lbl">${formatHoraClima(h.hora)}</span>
-                                <span class="clima-hora-emoji">${h.icono}</span>
-                                <span class="clima-hora-temp">${h.temp}°</span>
-                            </div>
-                        `).join('')}
-                    </div>
+                    <div class="clima-cuerpo">
 
-                    <div class="clima-divider"></div>
+                        <div class="clima-horas-scroll">
+                            ${horasProximas.map(h => `
+                                <div class="clima-hora-item">
+                                    <span class="clima-hora-lbl">${formatHoraClima(h.hora)}</span>
+                                    <span class="clima-hora-emoji">${h.icono}</span>
+                                    <span class="clima-hora-temp">${h.temp}°</span>
+                                </div>
+                            `).join('')}
+                        </div>
 
-                    <div class="clima-semana">
-                        ${diasDiario.map(d => `
-                            <div class="clima-dia-item">
-                                <span class="clima-dia-nombre">${d.nombre}</span>
-                                <span class="clima-dia-emoji">${d.icono}</span>
-                                <span class="clima-dia-temps">
-                                    <span class="clima-dia-max">${d.max}°</span>
-                                    <span class="clima-dia-min">${d.min}°</span>
-                                </span>
-                            </div>
-                        `).join('')}
+                        <div class="clima-semana">
+                            ${diasDiario.map(d => `
+                                <div class="clima-dia-item">
+                                    <span class="clima-dia-nombre">${d.nombre}</span>
+                                    <span class="clima-dia-emoji">${d.icono}</span>
+                                    <span class="clima-dia-temps">
+                                        <span class="clima-dia-max">${d.max}°</span>
+                                        <span class="clima-dia-min">${d.min}°</span>
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
+
                     </div>
                 `);
             },
