@@ -16,15 +16,15 @@ import jakarta.transaction.Transactional;
 @Repository
 public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> {
 
-        interface WorkerProjection {
+    interface WorkerProjection {
 
-                Integer getWorkerId();
+        Integer getWorkerId();
 
-                String getName();
+        String getName();
 
-                String getNotas();
+        String getNotas();
 
-                java.math.BigDecimal getSalary();
+        java.math.BigDecimal getSalary();
 
         String getPhoto();
 
@@ -56,12 +56,12 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
             """, nativeQuery = true)
     List<WorkerProjection> findAllWorkers();
 
-        @Query(value = """
-                        SELECT workerId
-                        FROM agrosys_worker.WORKER
-                        WHERE name = :name
-                        """, nativeQuery = true)
-        Integer existsByName(String name);
+    @Query(value = """
+            SELECT workerId
+            FROM agrosys_worker.WORKER
+            WHERE name = :name
+            """, nativeQuery = true)
+    Integer existsByName(String name);
 
     @Modifying
     @Transactional
@@ -71,13 +71,13 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
             """, nativeQuery = true)
     Integer insertWorker(String name, String notas, java.math.BigDecimal salary, String photo, String photoPublicId);
 
-        @Modifying
-        @Transactional
-        @Query(value = "DELETE FROM agrosys_worker.WORKER WHERE workerId = :id", nativeQuery = true)
-        void deleteWorkerById(@Param("id") Integer id);
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM agrosys_worker.WORKER WHERE workerId = :id", nativeQuery = true)
+    void deleteWorkerById(@Param("id") Integer id);
 
-        @Query(value = "SELECT COUNT(*) FROM agrosys_worker.WORKER WHERE workerId = :id", nativeQuery = true)
-        int countById(@Param("id") Integer id);
+    @Query(value = "SELECT COUNT(*) FROM agrosys_worker.WORKER WHERE workerId = :id", nativeQuery = true)
+    int countById(@Param("id") Integer id);
 
     @Query(value = """
             SELECT
@@ -92,74 +92,84 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
             """, nativeQuery = true)
     WorkerProjection findByIdWorker(Integer id);
 
-        @Query(value = "SELECT workerId FROM agrosys_worker.WORKER WHERE name = :name AND workerId != :excludeId", nativeQuery = true)
-        Integer existsByNameExcludingId(@Param("name") String name, @Param("excludeId") Integer excludeId);
+    @Query(value = "SELECT workerId FROM agrosys_worker.WORKER WHERE name = :name AND workerId != :excludeId", nativeQuery = true)
+    Integer existsByNameExcludingId(@Param("name") String name, @Param("excludeId") Integer excludeId);
 
-        @Modifying
-        @Transactional
-        @Query(value = """
-                        UPDATE agrosys_worker.WORKER
-                        SET name = :name, notas = :notas, salary = :salary, photo = :photo, photo_public_id = :photoPublicId
-                        WHERE workerId = :id
+    @Modifying
+    @Transactional
+    @Query(value = """
+            UPDATE agrosys_worker.WORKER
+            SET name = :name, notas = :notas, salary = :salary, photo = :photo, photo_public_id = :photoPublicId
+            WHERE workerId = :id
+            """, nativeQuery = true)
+    Integer updateWorker(@Param("id") Integer id, @Param("name") String name,
+            @Param("notas") String notas, @Param("salary") java.math.BigDecimal salary,
+            @Param("photo") String photo, @Param("photoPublicId") String photoPublicId);
+
+    // attention: para el módulo de asistencia, podríamos necesitar un método para
+    // obtener solo los trabajadores activos, dependiendo de cómo definamos "activo"
+    // en nuestro modelo de datos. Por ejemplo, si tuviéramos un campo "active" en
+    // la tabla WORKER, podríamos agregar un método como este:
+    @Query(value = "SELECT COUNT(*) FROM agrosys_worker.ATTENDANCE WHERE workerId = :workerId AND date = :date", nativeQuery = true)
+    int existsAttendanceByWorkerAndDate(@Param("workerId") Integer workerId,
+            @Param("date") LocalDate date);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            INSERT INTO agrosys_worker.ATTENDANCE (workerId, date, attended, hoursWorked)
+            VALUES (:workerId, :date, :attended, :hoursWorked)
+            """, nativeQuery = true)
+    Integer insertAttendance(@Param("workerId") Integer workerId, @Param("date") LocalDate date,
+            @Param("attended") Boolean attended, @Param("hoursWorked") Integer hoursWorked);
+
+    // =========================================================================
+    // ================= CONSULTAS DE HISTORIAL DE ASISTENCIA ==================
+    // =========================================================================
+
+    // 1. La proyección para mapear los resultados con el nombre del trabajador
+    interface AttendanceHistoryProjection {
+        Integer getAttendanceId();
+
+        Integer getWorkerId();
+
+        String getWorkerName();
+
+        LocalDate getDate();
+
+        Boolean getAttended();
+
+        Integer getHoursWorked();
+    }
+
+    // 2. La consulta con filtros, paginación y el JOIN para traer el nombre
+    @Query(value = """
+            SELECT
+                a.attendanceId,
+                a.workerId,
+                w.name as workerName,
+                a.date,
+                a.attended,
+                a.hoursWorked
+            FROM agrosys_worker.ATTENDANCE a
+            INNER JOIN agrosys_worker.WORKER w ON a.workerId = w.workerId
+            WHERE (:workerId IS NULL OR a.workerId = :workerId)
+            AND (:startDate IS NULL OR a.date >= :startDate)
+            AND (:endDate IS NULL OR a.date <= :endDate)
+            ORDER BY a.date DESC
+            """, nativeQuery = true)
+    List<AttendanceHistoryProjection> getAttendanceHistory(
+            @Param("workerId") Integer workerId,
+            @Param("startDate") String startDate,
+            @Param("endDate") String endDate);
+
+    // =========================================================================
+    // ================= VALIDAR QUE CHECO ASISTENCIA ==================
+    // =========================================================================
+    @Query(value = """
+            SELECT COUNT(*) > 0 AS asistencia
+                FROM agrosys_worker.ATTENDANCE
+                WHERE DATE(`date`) = CURDATE()
                         """, nativeQuery = true)
-        Integer updateWorker(@Param("id") Integer id, @Param("name") String name,
-                        @Param("notas") String notas, @Param("salary") java.math.BigDecimal salary,
-                        @Param("photo") String photo, @Param("photoPublicId") String photoPublicId);
-
-        // attention: para el módulo de asistencia, podríamos necesitar un método para
-        // obtener solo los trabajadores activos, dependiendo de cómo definamos "activo"
-        // en nuestro modelo de datos. Por ejemplo, si tuviéramos un campo "active" en
-        // la tabla WORKER, podríamos agregar un método como este:
-        @Query(value = "SELECT COUNT(*) FROM agrosys_worker.ATTENDANCE WHERE workerId = :workerId AND date = :date", nativeQuery = true)
-        int existsAttendanceByWorkerAndDate(@Param("workerId") Integer workerId,
-                        @Param("date") LocalDate date);
-
-        @Modifying
-        @Transactional
-        @Query(value = """
-                        INSERT INTO agrosys_worker.ATTENDANCE (workerId, date, attended, hoursWorked)
-                        VALUES (:workerId, :date, :attended, :hoursWorked)
-                        """, nativeQuery = true)
-        Integer insertAttendance(@Param("workerId") Integer workerId, @Param("date") LocalDate date,
-                        @Param("attended") Boolean attended, @Param("hoursWorked") Integer hoursWorked);
-
-        // =========================================================================
-        // ================= CONSULTAS DE HISTORIAL DE ASISTENCIA ==================
-        // =========================================================================
-
-        // 1. La proyección para mapear los resultados con el nombre del trabajador
-        interface AttendanceHistoryProjection {
-                Integer getAttendanceId();
-
-                Integer getWorkerId();
-
-                String getWorkerName();
-
-                LocalDate getDate();
-
-                Boolean getAttended();
-
-                Integer getHoursWorked();
-        }
-
-        // 2. La consulta con filtros, paginación y el JOIN para traer el nombre
-        @Query(value = """
-                        SELECT
-                            a.attendanceId,
-                            a.workerId,
-                            w.name as workerName,
-                            a.date,
-                            a.attended,
-                            a.hoursWorked
-                        FROM agrosys_worker.ATTENDANCE a
-                        INNER JOIN agrosys_worker.WORKER w ON a.workerId = w.workerId
-                        WHERE (:workerId IS NULL OR a.workerId = :workerId)
-                        AND (:startDate IS NULL OR a.date >= :startDate)
-                        AND (:endDate IS NULL OR a.date <= :endDate)
-                        ORDER BY a.date DESC
-                        """, nativeQuery = true)
-        List<AttendanceHistoryProjection> getAttendanceHistory(
-                        @Param("workerId") Integer workerId,
-                        @Param("startDate") String startDate,
-                        @Param("endDate") String endDate);
+    int asistencia();
 }

@@ -1,0 +1,6 @@
+INSERT IGNORE INTO MODULE (moduleId, name) VALUES
+('7',	'DASHBOARD_USER');
+
+UPDATE agrosys_auth.MODULE SET name = 'DASHBOARD_ADMIN' WHERE moduleId = 6; 
+
+
