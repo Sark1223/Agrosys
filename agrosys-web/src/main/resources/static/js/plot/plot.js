@@ -45,9 +45,13 @@ $(document).ready(function () {
 
                     $('#btn-close-add-state').trigger('click');
 
-                    if($f.find('#nombreStateInput').val() == 4) {
+                    if ($f.find('#nombreStateInput').val() == 4) {
                         $('#btnAddStateToPlantation').disable().attr('title', 'No se pueden agregar más etapas a esta plantación');
                     }
+                    $('#fechaInicioStateInput').val($('#fechaFinalizacionStateInput').val()? $('#fechaFinalizacionStateInput').val() : new Date().toISOString().split('T')[0]);
+                    $('#notasStateInput').val('');
+                    $('#fechaFinalizacionStateInput').val('');
+                    // $f[0].reset();
                 }
             });
     });
@@ -58,7 +62,7 @@ $(document).ready(function () {
             .done(function (response) {
                 if (response.success) {
                     //Cerrar modal y recargar información de details
-                    $.fn.getStagesByPlantation($('#plantationIdInputState').val());
+                    $.fn.getStagesByPlantation($('#plantationIdInputDetails').val());
                     $.fn.getAllPlots();
 
                     $('#btn-close-edit-state').trigger('click');
@@ -66,14 +70,20 @@ $(document).ready(function () {
             });
     });
 
-    $.fn.getActiveTab = function () {
-        const activeTabLink = document.querySelector('.nav-link.active');
-        if (activeTabLink) {
-            const href = activeTabLink.getAttribute('href');
-            return href.replace('#', '');
-        }
-        return 'plot';
-    }
+    $('#btn-submit-delete-state').on('click', function () {
+        const $f = $('#deleteStateForm');
+        $.fn.postFormData($f, $f.attr('action'))
+            .done(function (response) {
+                if (response.success) {
+                    //Cerrar modal y recargar información de details
+                    $.fn.getStagesByPlantation($('#plantationIdInputDetails').val());
+
+                    $.fn.getAllPlots();
+                    $('#btn-close-delete-state').trigger('click');
+                }
+            });
+    });
+
 
     $.fn.renderCardPlot = function (plot) {
         return $(`
@@ -107,17 +117,17 @@ $(document).ready(function () {
         );
     }
 
-    $.fn.renderCardPlantation = function (plantacion) {
+    $.fn.renderCardPlantation = function (plantation) { //ri-footprint-line
         return $(`
                     <div class="card mb-2">
                         <div class="card-body d-flex flex-row justify-content-between align-items-center gap-3 overflow-auto">
-                            <p class="card-title text-capitalize p-0 m-0 w-25">${plantacion.name.toLowerCase()}</p>
-                            <p class="card-text p-0 m-0">Fecha de inicio: <span class="text-capitalize">${$.fn.formatDate(plantacion.start_at)}</span></p>
-                            <p class="card-text p-0 m-0">Fecha de finalización: <span class="text-capitalize">${plantacion.end_at !== 'N/A' ? $.fn.formatDate(plantacion.end_at) : plantacion.end_at}</span></p>
+                            <p class="card-title text-capitalize p-0 m-0 w-25">${plantation.name.toLowerCase()}</p>
+                            <p class="card-text p-0 m-0">Fecha de inicio: <span class="text-capitalize">${$.fn.formatDate(plantation.start_at)}</span></p>
+                            <p class="card-text p-0 m-0">Fecha de finalización: <span class="text-capitalize">${plantation.end_at !== 'N/A' ? $.fn.formatDate(plantation.end_at) : plantation.end_at}</span></p>
                             <div class="d-flex flex-row justify-content-end align-items-center gap-4">
-                                <div class="${plantacion.stageId === null ? disenioStages[0].classBorder : disenioStages[plantacion.stageId].classBorder} btn px-1 py-0" id="status-plantacion-${plantacion.plantacioId}"
+                                <div class="${plantation.stageId === null ? disenioStages[0].classBorder : disenioStages[plantation.stageId].classBorder} btn px-1 py-0" id="status-plantacion-${plantation.plantacioId}"
                                     style="pointer-events: none; width: 125px;">
-                                    ${plantacion.stageId === null ? `<span class="${disenioStages[0].classText}">Sin etapa</span>` : `<span class="${disenioStages[plantacion.stageId].classText}">${plantacion.stage}</span>`}
+                                    ${plantation.stageId === null ? `<span class="${disenioStages[0].classText}">Sin etapa</span>` : `<span class="${disenioStages[plantation.stageId].classText}">${plantation.stage}</span>`}
                                 </div>
                                 <div class="dropdown position-static">
                                     <i class="ri-more-2-fill" type="button" id="dropdownMenuButton${plot.plotId}" data-bs-toggle="dropdown" aria-expanded="false">
@@ -125,6 +135,13 @@ $(document).ready(function () {
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton${plot.plotId}">
                                         <li><a class="dropdown-item details-plantation" data-bs-toggle="modal" data-bs-target="#modalDetailsPlantation" href="#"><i
                                                     class="ri-eye-line pe-1"></i>Ver detalles</a></li>
+                                        ${plantation.stageId !== null && plantation.stageId >= 3
+                                            ?
+                                            `<li><a class="dropdown-item lots-plantation" data-bs-toggle="modal" data-bs-target="#modalLotsPlantation" href="#"><i
+                                                    class="ri-mist-line pe-1"></i>Ver lotes</a></li>`
+                                            :
+                                            ``
+                                        }
                                         <li><a class="dropdown-item edit-plantation" data-bs-toggle="modal" data-bs-target="#modalEditPlantation" href="#"><i
                                                     class="ri-pencil-fill pe-1"></i>Editar</a></li>
                                         <li><a class="dropdown-item delete-plantation" data-bs-toggle="modal" data-bs-target="#modalDeletePlantation" href="#"><i
@@ -147,7 +164,6 @@ $(document).ready(function () {
 
                 $("#message-plot").attr("style", "display:none !important;");
                 if (response.success) {
-                    console.log('Parcelas obtenidas:', response.data);
 
                     if (response.data.length === 0) {
                         $("#message-plot").attr("style", "display:block !important;")
@@ -159,7 +175,6 @@ $(document).ready(function () {
                         const accordionItem = $.fn.renderCardPlot(plot);
 
                         const plantaciones = plot.plantatios ? JSON.parse(plot.plantatios) : null;
-                        console.log('Plantaciones:', plantaciones);
 
                         const statusDiv = accordionItem.find(`#status-${plot.plotId}`);
                         if (plantaciones[0] !== null) {
@@ -173,7 +188,6 @@ $(document).ready(function () {
                                 'width': '125px'
                             });
                             plantaciones.forEach(plantacion => {
-                                console.log('Plantación:', plantacion);
                                 const cardPlantacion = $.fn.renderCardPlantation(plantacion);
 
                                 cardPlantacion.find('.edit-plantation').on('click', function (e) {
@@ -200,6 +214,7 @@ $(document).ready(function () {
 
                                 cardPlantacion.find('.details-plantation').on('click', function () {
                                     if (plantacion) {
+                                        $('#plantationIdInputDetails').val(plantacion.plantatioId);
                                         $('#plantationDetailsName').text(`${plantacion.name}`);
                                         $('#plantationDetailsOriginPlot').text(`${plot.name}`);
                                         $('#plantationDetailsStartAt').text($.fn.formatDate(plantacion.start_at));
@@ -211,6 +226,16 @@ $(document).ready(function () {
                                         $.fn.getStagesByPlantation(parseInt(plantacion.plantatioId));
                                     } else {
                                         $.fn.errorAlert('No se pudo cargar la información de la plantación para ver detalles');
+                                    }
+                                });
+
+                                cardPlantacion.find('.lots-plantation').on('click', function () {
+                                    if (plantacion) {
+                                        // $('#plantationIdInputDetails').val(plantacion.plantatioId);
+                                        $('#plantationLotName').text(`${plantacion.name}`);
+                                        $('#plantationLotOriginPlot').text(`${plot.name}`);$('#plantationLotsNotes').text(plantacion.notas);
+                                        $('#plantationIdInputState').val(plantacion.plantatioId);
+                                        $.fn.getLotsByPlantation(parseInt(plantacion.plantatioId));
                                     }
                                 });
                                 collapseBody.append(cardPlantacion);

@@ -7,6 +7,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: agrosys_auth
+      TZ: America/Mexico_City
     ports:
       - "3307:3306"
     volumes:
@@ -24,6 +25,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: agrosys_db
+      TZ: America/Mexico_City
     ports:
       - "3308:3306"
     volumes:

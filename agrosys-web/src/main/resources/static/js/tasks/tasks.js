@@ -591,7 +591,8 @@ function renderSpecialTaskAccordion(tasks) {
         $('#message-special-tasks').html('No hay tareas especiales registradas.').show();
         return;
     }
-    $('#message-special-tasks').hide();
+
+    $('#message-special-tasks').attr('style', 'display:none !important;');
 
     tasks.forEach(function(task) {
         var specialTaskId = task.specialTaskId;

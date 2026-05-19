@@ -27,39 +27,39 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
 
         java.math.BigDecimal getSalary();
 
-        String getPhoto();
+                String getPhoto();
 
-        String getPhotoPublicId();
+                String getPhotoPublicId();
 
-        BigDecimal getHourlyPay();
-    }
+                BigDecimal getHourlyPay();
+        }
 
-    @Query(value = """
-            SELECT
-                w.workerId,
-                w.name,
-                w.notas,
-                w.salary,
-                w.photo,
-                w.photo_public_id,
-                w.hourly_pay
-            FROM agrosys_worker.WORKER w
-            WHERE w.name = :name
-            """, nativeQuery = true)
-    WorkerProjection findByName(String name);
+        @Query(value = """
+                        SELECT
+                            w.workerId,
+                            w.name,
+                            w.notas,
+                            w.salary,
+                            w.photo,
+                            w.photo_public_id,
+                            w.hourly_pay
+                        FROM agrosys_worker.WORKER w
+                        WHERE w.name = :name
+                        """, nativeQuery = true)
+        WorkerProjection findByName(String name);
 
-    @Query(value = """
-            SELECT
-                w.workerId,
-                w.name,
-                w.notas,
-                w.salary,
-                w.photo,
-                w.photo_public_id,
-                w.hourly_pay
-            FROM agrosys_worker.WORKER w
-            """, nativeQuery = true)
-    List<WorkerProjection> findAllWorkers();
+        @Query(value = """
+                        SELECT
+                            w.workerId,
+                            w.name,
+                            w.notas,
+                            w.salary,
+                            w.photo,
+                            w.photo_public_id,
+                            w.hourly_pay
+                        FROM agrosys_worker.WORKER w
+                        """, nativeQuery = true)
+        List<WorkerProjection> findAllWorkers();
 
     @Query(value = """
                         SELECT workerId
@@ -68,13 +68,14 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
                         """, nativeQuery = true)
     Integer existsByName(String name);
 
-    @Modifying
-    @Transactional
-    @Query(value = """
-            INSERT INTO agrosys_worker.WORKER (name, notas, salary, photo, photo_public_id, hourly_pay )
-            VALUES (:name, :notas, :salary, :photo, :photoPublicId, :hourlyPay)
-            """, nativeQuery = true)
-    Integer insertWorker(String name, String notas, java.math.BigDecimal salary, String photo, String photoPublicId, BigDecimal hourlyPay);
+        @Modifying
+        @Transactional
+        @Query(value = """
+                        INSERT INTO agrosys_worker.WORKER (name, notas, salary, photo, photo_public_id, hourly_pay )
+                        VALUES (:name, :notas, :salary, :photo, :photoPublicId, :hourlyPay)
+                        """, nativeQuery = true)
+        Integer insertWorker(String name, String notas, java.math.BigDecimal salary, String photo, String photoPublicId,
+                        BigDecimal hourlyPay);
 
     @Modifying
     @Transactional
@@ -84,33 +85,34 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
     @Query(value = "SELECT COUNT(*) FROM agrosys_worker.WORKER WHERE workerId = :id", nativeQuery = true)
     int countById(@Param("id") Integer id);
 
-    @Query(value = """
-            SELECT
-                w.workerId,
-                w.name,
-                w.notas,
-                w.salary,
-                w.photo,
-                w.photo_public_id,
-                w.hourly_pay
-            FROM agrosys_worker.WORKER w
-            WHERE w.workerId = :id
-            """, nativeQuery = true)
-    WorkerProjection findByIdWorker(Integer id);
+        @Query(value = """
+                        SELECT
+                            w.workerId,
+                            w.name,
+                            w.notas,
+                            w.salary,
+                            w.photo,
+                            w.photo_public_id,
+                            w.hourly_pay
+                        FROM agrosys_worker.WORKER w
+                        WHERE w.workerId = :id
+                        """, nativeQuery = true)
+        WorkerProjection findByIdWorker(Integer id);
 
     @Query(value = "SELECT workerId FROM agrosys_worker.WORKER WHERE name = :name AND workerId != :excludeId", nativeQuery = true)
     Integer existsByNameExcludingId(@Param("name") String name, @Param("excludeId") Integer excludeId);
 
-    @Modifying
-    @Transactional
-    @Query(value = """
+        @Modifying
+        @Transactional
+        @Query(value = """
                         UPDATE agrosys_worker.WORKER
                         SET name = :name, notas = :notas, salary = :salary, photo = :photo, photo_public_id = :photoPublicId, hourly_pay = :hourlyPay
                         WHERE workerId = :id
                         """, nativeQuery = true)
-    Integer updateWorker(@Param("id") Integer id, @Param("name") String name,
-            @Param("notas") String notas, @Param("salary") java.math.BigDecimal salary,
-            @Param("photo") String photo, @Param("photoPublicId") String photoPublicId, @Param("hourlyPay") BigDecimal hourlyPay);
+        Integer updateWorker(@Param("id") Integer id, @Param("name") String name,
+                        @Param("notas") String notas, @Param("salary") java.math.BigDecimal salary,
+                        @Param("photo") String photo, @Param("photoPublicId") String photoPublicId,
+                        @Param("hourlyPay") BigDecimal hourlyPay);
 
     
     @Query(value = "SELECT COUNT(*) FROM agrosys_worker.ATTENDANCE WHERE workerId = :workerId AND date = :date", nativeQuery = true)
@@ -145,12 +147,12 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
     // La consulta con filtros, paginación y el JOIN para traer el nombre
     @Query(value = """
                         SELECT
-                            a.attendanceId,
-                            a.workerId,
-                            w.name as workerName,
-                            a.date,
-                            a.attended,
-                            a.hoursWorked
+                                a.attendanceId,
+                                a.workerId,
+                                w.name as workerName,
+                                a.date,
+                                a.attended,
+                                a.hoursWorked
                         FROM agrosys_worker.ATTENDANCE a
                         INNER JOIN agrosys_worker.WORKER w ON a.workerId = w.workerId
                         WHERE (:workerId IS NULL OR a.workerId = :workerId)
@@ -158,8 +160,18 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
                         AND (:endDate IS NULL OR a.date <= :endDate)
                         ORDER BY a.date DESC
                         """, nativeQuery = true)
-    List<AttendanceHistoryProjection> getAttendanceHistory(
-            @Param("workerId") Integer workerId,
-            @Param("startDate") String startDate,
-            @Param("endDate") String endDate);
+        List<AttendanceHistoryProjection> getAttendanceHistory(
+                        @Param("workerId") Integer workerId,
+                        @Param("startDate") String startDate,
+                        @Param("endDate") String endDate);
+
+        // =========================================================================
+        // ================= VALIDAR QUE CHECO ASISTENCIA ==================
+        // =========================================================================
+        @Query(value = """
+                        SELECT COUNT(*) > 0 AS asistencia
+                        FROM agrosys_worker.ATTENDANCE
+                        WHERE DATE(`date`) = CURDATE()
+                                    """, nativeQuery = true)
+        int asistencia();
 }
