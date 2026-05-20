@@ -1,5 +1,6 @@
 package com.agrosys.worker.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.agrosys.worker.dto.AttendanceRequest;
 import com.agrosys.worker.dto.Response;
 import com.agrosys.worker.repository.WorkerRepository;
 import com.agrosys.worker.service.AttendanceService;
@@ -42,7 +44,7 @@ public class AgrosysAttendanceController {
 
     @PostMapping("/register-bulk")
     @PreAuthorize("hasAuthority('MODULE_TRABAJADORES')")
-    public ResponseEntity<Response> registerBulkAttendance(@RequestBody List<Map<String, Object>> requests) { 
+    public ResponseEntity<Response> registerBulkAttendance(@RequestBody List<AttendanceRequest> requests) {
         log.info("[REQUEST] - Registrando asistencia masiva");
 
         try {
@@ -53,14 +55,15 @@ public class AgrosysAttendanceController {
                     .message("Asistencia guardada correctamente")
                     .build();
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-            
+
         } catch (Exception e) {
             log.error("[FAILED] - Error al guardar la asistencia masiva: {}", e.getMessage());
-
-            throw new RuntimeException("Error: " + e.getMessage());
+            return ResponseEntity.badRequest().body(
+                Response.builder().success(false).message(e.getMessage()).build()
+            );
         }
     }
-
+    
     @GetMapping("/history")
     @PreAuthorize("hasAuthority('MODULE_TRABAJADORES')")
     public ResponseEntity<Response> getAttendanceHistory(
@@ -79,6 +82,24 @@ public class AgrosysAttendanceController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             throw new RuntimeException("Error: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/check")
+    @PreAuthorize("hasAuthority('MODULE_TRABAJADORES')")
+    public ResponseEntity<Response> checkAttendance(@RequestParam String date) {
+        try {
+            boolean existe = attendanceService.verificarAsistenciaGuardada(LocalDate.parse(date));
+            Response response = Response.builder()
+                    .success(true)
+                    .message("Verificación exitosa")
+                    .data(existe) // Devolverá true o false
+                    .build();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                Response.builder().success(false).message(e.getMessage()).build()
+            );
         }
     }
 }
