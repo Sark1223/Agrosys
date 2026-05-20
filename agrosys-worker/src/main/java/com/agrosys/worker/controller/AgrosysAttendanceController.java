@@ -1,5 +1,6 @@
 package com.agrosys.worker.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.agrosys.worker.dto.AttendanceRequest;
 import com.agrosys.worker.dto.Response;
 import com.agrosys.worker.repository.WorkerRepository;
 import com.agrosys.worker.service.AttendanceService;
@@ -43,7 +45,7 @@ public class AgrosysAttendanceController {
 
     @PostMapping("/register-bulk")
     @PreAuthorize("hasAuthority('MODULE_TRABAJADORES')")
-    public ResponseEntity<Response> registerBulkAttendance(@RequestBody List<Map<String, Object>> requests) {
+    public ResponseEntity<Response> registerBulkAttendance(@RequestBody List<AttendanceRequest> requests) {
         log.info("[REQUEST] - Registrando asistencia masiva");
 
         try {
@@ -57,11 +59,12 @@ public class AgrosysAttendanceController {
 
         } catch (Exception e) {
             log.error("[FAILED] - Error al guardar la asistencia masiva: {}", e.getMessage());
-
-            throw new RuntimeException("Error: " + e.getMessage());
+            return ResponseEntity.badRequest().body(
+                Response.builder().success(false).message(e.getMessage()).build()
+            );
         }
     }
-
+    
     @GetMapping("/history")
     @PreAuthorize("hasAuthority('MODULE_TRABAJADORES')")
     public ResponseEntity<Response> getAttendanceHistory(
@@ -84,21 +87,21 @@ public class AgrosysAttendanceController {
         }
     }
 
-    @GetMapping("/asistence")
+    @GetMapping("/check")
     @PreAuthorize("hasAuthority('MODULE_TRABAJADORES')")
-    public ResponseEntity<Response> asistence() {
+    public ResponseEntity<Response> checkAttendance(@RequestParam String date) {
         try {
-            int asistencia = workerRepository.asistencia();
+            boolean existe = attendanceService.verificarAsistenciaGuardada(LocalDate.parse(date));
             Response response = Response.builder()
                     .success(true)
-                    .message("Asistencia obtenida")
-                    .data(asistencia)
+                    .message("Verificación exitosa")
+                    .data(existe) // Devolverá true o false
                     .build();
             return ResponseEntity.ok(response);
-
         } catch (Exception e) {
-            throw new RuntimeException("Error: " + e.getMessage());
+            return ResponseEntity.badRequest().body(
+                Response.builder().success(false).message(e.getMessage()).build()
+            );
         }
     }
-
 }

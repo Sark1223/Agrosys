@@ -81,22 +81,17 @@ public class AttendanceController {
         }
     }
 
-    @GetMapping("/asistence")
-    public ResponseEntity<Response> asistence(
-            HttpSession session) {
+    @GetMapping("/check")
+    @ResponseBody
+    public ResponseEntity<Response> checkAttendance(@RequestParam String date, HttpSession session) {
         try {
-
             String token = (String) session.getAttribute("JWT_TOKEN");
-
-            Response response = gatewayClient.get(
-                    "/api/workers/attendance/asistence",
-                    Response.class,
-                    token);
-
+            // El puente hacia el nuevo endpoint del worker
+            String url = "/api/workers/attendance/check?date=" + date;
+            Response response = gatewayClient.get(url, Response.class, token);
             return ResponseEntity.ok(response);
-
         } catch (Exception e) {
-            log.error("[FAILED] - Error al obtener historial: {}", e.getMessage());
+            log.error("[FAILED] - Error al verificar asistencia: {}", e.getMessage());
             throw new RuntimeException("Error: " + e.getMessage());
         }
     }

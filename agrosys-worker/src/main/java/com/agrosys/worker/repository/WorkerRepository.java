@@ -162,14 +162,18 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
                         @Param("workerId") Integer workerId,
                         @Param("startDate") String startDate,
                         @Param("endDate") String endDate);
-
-        // =========================================================================
-        // ================= VALIDAR QUE CHECO ASISTENCIA ==================
-        // =========================================================================
+        // Método que nos faltaba para actualizar (Upsert)
+        @Modifying
+        @Transactional
         @Query(value = """
-                        SELECT COUNT(*) > 0 AS asistencia
-                        FROM agrosys_worker.ATTENDANCE
-                        WHERE DATE(`date`) = CURDATE()
-                                """, nativeQuery = true)
-        int asistencia();
+                        UPDATE agrosys_worker.ATTENDANCE
+                        SET attended = :attended, hoursWorked = :hoursWorked
+                        WHERE workerId = :workerId AND date = :date
+                        """, nativeQuery = true)
+        Integer updateAttendance(@Param("workerId") Integer workerId, @Param("date") LocalDate date,
+                        @Param("attended") Boolean attended, @Param("hoursWorked") Integer hoursWorked);
+
+        // Método para que el Frontend sepa si ya hay asistencia y cambie el botón a verde
+        @Query(value = "SELECT COUNT(*) FROM agrosys_worker.ATTENDANCE WHERE date = :date", nativeQuery = true)
+        int countAttendanceByDate(@Param("date") LocalDate date);             
 }

@@ -295,6 +295,7 @@ $(document).ready(function() {
         $('#attendanceDate').val(hoy);
         
         $.fn.getWorkersForAttendance();
+        $.fn.checkAttendanceStatus();
     });
 
     $('a[data-bs-toggle="tab"][href="#historial"]').on('shown.bs.tab', function (e) {
@@ -303,6 +304,11 @@ $(document).ready(function() {
     if (!$('#filterStartDate').val()) $('#filterStartDate').val(hoy);
     if (!$('#filterEndDate').val()) $('#filterEndDate').val(hoy);
         $.fn.getAttendanceHistory();
+    });
+
+    // Disparar validación al cambiar la fecha en el input
+    $('#attendanceDate').on('change', function() {
+        $.fn.checkAttendanceStatus();
     });
 });
 
@@ -437,6 +443,7 @@ $('#btnSaveAttendance').on('click', function(e) {
         success: function(response) {
             if (response.success) {
                 Swal.fire({ icon: 'success', title: '¡Guardado!', text: 'La asistencia se registró correctamente' });
+                $.fn.checkAttendanceStatus();
             } else {
                 Swal.fire({ icon: 'error', title: 'Error', text: response.message || 'No se pudo guardar la asistencia' });
             }
@@ -501,6 +508,30 @@ $.fn.getAttendanceHistory = function() {
         },
         error: function() {
             Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo cargar el historial' });
+        }
+    });
+};
+
+$.fn.checkAttendanceStatus = function() {
+    const dateVal = $('#attendanceDate').val();
+    if (!dateVal) return; // Si no hay fecha, no hacemos nada
+
+    $.ajax({
+        url: '/agrosys/workers/attendance/check', // Nuestro nuevo puente
+        type: 'GET',
+        data: { date: dateVal },
+        success: function(response) {
+            const btn = $('#btnSaveAttendance');
+            
+            if (response.success && response.data === true) {
+                // Si la asistencia ya existe, botón gris y texto cambiado
+                btn.html('<i class="ri-check-double-line me-1"></i> Asistencia ya guardada');
+                btn.removeClass('btn-success').addClass('btn-secondary');
+            } else {
+                // Si no existe, botón verde normal
+                btn.html('<i class="ri-save-line me-1"></i> Guardar Asistencia');
+                btn.removeClass('btn-secondary').addClass('btn-success');
+            }
         }
     });
 };
