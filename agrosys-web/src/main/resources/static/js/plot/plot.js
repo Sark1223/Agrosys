@@ -19,7 +19,7 @@ $(document).ready(function () {
     $('#btn-submit-add-plantation').on('click', function () {
         const $f = $('#addPlantationForm');
         const activeTab = $.fn.getActiveTab();
-        $.fn.postFormData($f, $f.attr('action'), '/agrosys/plots?tab=' + activeTab);
+        $.fn.postFormData($f, $f.attr('action'), `/agrosys/plots?tab=${activeTab}&plotId=${$('#plotIdInputPlantation').val()}`);
     });
 
     $('#btn-submit-edit-plantation').on('click', function () {
@@ -41,6 +41,7 @@ $(document).ready(function () {
             });
     });
 
+    // ======================= Configuración de estados =======================
     $('#btn-submit-add-state').on('click', function () {
         const $f = $('#addStateForm');
         $.fn.postFormData($f, $f.attr('action'))
@@ -91,6 +92,42 @@ $(document).ready(function () {
             });
     });
 
+    $.fn.getActivePlantation = function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const plantatioIdToOpen = urlParams.get('plantatioId');
+
+        if (plantatioIdToOpen) {
+            const card = $('#card-plantation-' + plantatioIdToOpen);
+            if (card.length) {
+                // Buscar el acordeón padre
+                const collapseBody = card.closest('.accordion-collapse');
+                if (collapseBody.length) {
+                    const bsCollapse = new bootstrap.Collapse(collapseBody[0], { toggle: true });
+                }
+
+                //Abrir modal de ver lotes
+                const lotsButton = card.find('.lots-plantation');
+                if (lotsButton.length) {
+                    // lotsButton.trigger('click');
+                    lotsButton.get(0).click();
+                }
+            }
+        }
+    };
+
+    $.fn.getActivePlotById = function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const plotIdToOpen = urlParams.get('plotId');
+
+        if (plotIdToOpen) {
+            // Buscar el collapse asociado al plotId
+            const collapseBody = $('#collapse-' + plotIdToOpen);
+            if (collapseBody.length) {
+                // Abrir el acordeón usando Bootstrap Collapse
+                new bootstrap.Collapse(collapseBody[0], { toggle: true });
+            }
+        }
+    };
 
     $.fn.renderCardPlot = function (plot) {
         return $(`
@@ -124,7 +161,7 @@ $(document).ready(function () {
         );
     }
 
-    $.fn.renderCardPlantation = function (plantation) { //ri-footprint-line
+    $.fn.renderCardPlantation = function (plantation) {
         return $(`
                     <div class="card mb-2" id="card-plantation-${plantation.plantatioId}">
                         <div class="card-body d-flex flex-row justify-content-between align-items-center gap-3 overflow-auto">
@@ -274,6 +311,9 @@ $(document).ready(function () {
                         accordion.append(accordionItem);
 
                     });
+
+                    $.fn.getActivePlantation();
+                    $.fn.getActivePlotById();
 
                 } else {
                     $("#message-plot").attr("style", "display:block !important;").html('Sin parcelas, intente recargar la página!');

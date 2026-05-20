@@ -266,7 +266,7 @@ $(document).ready(function () {
 
         // Navegación de botones
         $('#btnRegistrarNuevoLote').click(function () {
-            window.location.href = '/agrosys/plots';
+            $('#plantationIdLotInput').removeAttr('disabled');
         });
 
         $('#btnRegistrarNuevaTransaccion').click(function () {

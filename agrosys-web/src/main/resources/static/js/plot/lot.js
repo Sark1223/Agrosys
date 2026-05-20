@@ -138,8 +138,15 @@ $(document).ready(function () {
         $.fn.postFormData($f, $f.attr('action')) //, '/agrosys/plots?tab=' + activeTab
             .done(function (response) {
                 if (response.success) {
-                    $.fn.getLotsByPlantation(parseInt($('#plantationIdInputLots').val()));
-                    $('#btn-close-add-lot').trigger('click');
+                    if ($('#plantationIdLotInput').is(':disabled')) {
+                        $.fn.getLotsByPlantation(parseInt($('#plantationIdInputLots').val()));
+                        $('#btn-close-add-lot').trigger('click');
+                    } else {
+
+                        const plantatioId = $('#plantationIdLotInput').val();
+                        window.location.href = '/agrosys/plots?plantatioId=' + plantatioId;
+                    }
+
                 }
             });
     });
@@ -369,11 +376,6 @@ $(document).ready(function () {
 
         });
     };
-
-
-
-    // $('#btnAddPlantationLot').on('click', function () {
-    // });
 
     $.fn.getPlantationsSelect();
 

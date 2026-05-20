@@ -225,8 +225,7 @@ $.fn.getLotsByPlantation = function (plantationId) {
             if (response.success) {
 
                 $('#btnAddPlantationLot').on('click', function () {
-                    console.log('Agregar lote a la plantación con ID:', plantationId);
-                    $('#plantationIdLotInput').val(plantationId);
+                    $('#plantationIdLotInput').val(plantationId).attr('disabled', 'disabled');
                 });
 
                 $('#plantationIdInputLots').val(plantationId);
@@ -283,7 +282,7 @@ $.fn.getLotsByPlantation = function (plantationId) {
                         $('#lotTradeIdEdit').val(lot.lotTradeId);
 
                         $('#nombreLotInputEdit').val(lot.name);
-                        $('#plantationIdLotInputEdit').val(lot.plantationId);
+                        $('#plantationIdLotInputEdit').val(lot.plantationId).attr('disabled', 'disabled');
                         $('#productTypeLotInputEdit').val(lot.productType);
                         $('#unitTypeLotInputEdit').val(lot.unitType);
                         $('#unitCostLotInputEdit').val(`${lot.unitCost.toFixed(2)}`);
@@ -422,7 +421,7 @@ $.fn.getAllPlantations = function () {
 
                     $card.find('.lots-plantation').on('click', function () {
                         if (plantation) {
-                            $('#plantationIdLotInput').val(plantation.plantatioId);
+                            $('#plantationIdLotInput').val(plantation.plantatioId).attr('disabled', 'disabled');
                             $('#plantationLotName').text(`${plantation.name}`);
                             $('#plantationLotOriginPlot').text(`${plantation.plotName}`);
                             $('#plantationLotsNotes').text(plantation.notas);
@@ -461,8 +460,6 @@ $.fn.getAllPlantations = function () {
         }
     });
 };
-
-
 
 $('#tabPlantations').on('click', function (e) {
     // aquí ya se activó el tab "Plantaciones"
