@@ -1,4 +1,4 @@
-package com.agrosys.web.dto.plot;
+package com.agrosys.web.dto.plot.parcelas;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

@@ -70,11 +70,31 @@ public class AttendanceController {
             String url = "/api/workers/attendance/history?";
             if (workerId != null)
                 url += "workerId=" + workerId + "&";
-            
+
             url += "startDate=" + startDate + "&endDate=" + endDate;
 
             Response response = gatewayClient.get(url, Response.class, token);
             return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("[FAILED] - Error al obtener historial: {}", e.getMessage());
+            throw new RuntimeException("Error: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/asistence")
+    public ResponseEntity<Response> asistence(
+            HttpSession session) {
+        try {
+
+            String token = (String) session.getAttribute("JWT_TOKEN");
+
+            Response response = gatewayClient.get(
+                    "/api/workers/attendance/asistence",
+                    Response.class,
+                    token);
+
+            return ResponseEntity.ok(response);
+
         } catch (Exception e) {
             log.error("[FAILED] - Error al obtener historial: {}", e.getMessage());
             throw new RuntimeException("Error: " + e.getMessage());
