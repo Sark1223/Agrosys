@@ -47,15 +47,19 @@ public class TransactionController {
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate,
             @RequestParam(required = false) String type,
+            @RequestParam(required = false) Integer plotId,
             HttpSession session) {
         List<String> modules = jwtHelper.getUserModules(session);
         if (!modules.contains("MODULE_FINANZAS")) {
             return ResponseEntity.status(403).build();
         }
 
-        String url = "/api/transaction/list?startDate=" + startDate + "&endDate" + endDate;
+        String url = "/api/transaction/list?startDate=" + startDate + "&endDate=" + endDate;
         if (type != null && !type.isEmpty()) {
             url += "&type=" + type;
+        }
+        if (plotId != null) {
+            url += "&plotId=" + plotId;
         }
         Response response = gatewayClient.get(url, Response.class, session.getAttribute("JWT_TOKEN").toString());
         return ResponseEntity.ok(response);
@@ -66,7 +70,8 @@ public class TransactionController {
             @RequestParam String transactionType,
             @RequestParam LocalDate createAt,
             @RequestParam java.math.BigDecimal amount,
-            @RequestParam String description,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) Integer plotId,
             @RequestParam(required = false) Integer lotTradeId,
             HttpSession session) {
         List<String> modules = jwtHelper.getUserModules(session);
@@ -78,10 +83,11 @@ public class TransactionController {
         request.setTransactionType(transactionType);
         request.setCreateAt(createAt);
         request.setAmount(amount);
-        request.setDescription(description);
+        request.setDescription(description != null && !description.isBlank() ? description : null);
+        request.setPlotId(plotId);
         request.setLotTradeId(lotTradeId);
 
-        Response response = gatewayClient.post("api/transaction/register", request, Response.class, session.getAttribute("JWT_TOKEN").toString());
+        Response response = gatewayClient.post("/api/transaction/register", request, Response.class, session.getAttribute("JWT_TOKEN").toString());
         return ResponseEntity.ok(response);
     }
 
@@ -91,7 +97,8 @@ public class TransactionController {
             @RequestParam String transactionType,
             @RequestParam LocalDate createAt,
             @RequestParam java.math.BigDecimal amount,
-            @RequestParam String description,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) Integer plotId,
             @RequestParam(required = false) Integer lotTradeId,
             HttpSession session) {
         List<String> modules = jwtHelper.getUserModules(session);
@@ -103,10 +110,11 @@ public class TransactionController {
         request.setTransactionType(transactionType);
         request.setCreateAt(createAt);
         request.setAmount(amount);
-        request.setDescription(description);
+        request.setDescription(description != null && !description.isBlank() ? description : null);
+        request.setPlotId(plotId);
         request.setLotTradeId(lotTradeId);
 
-        Response response = gatewayClient.put("api/transaction/update" + id, request, Response.class, session.getAttribute("JWT_TOKEN").toString());
+        Response response = gatewayClient.put("/api/transaction/update/" + id, request, Response.class, session.getAttribute("JWT_TOKEN").toString());
         return ResponseEntity.ok(response);
     }
 
@@ -116,7 +124,7 @@ public class TransactionController {
         if (!modules.contains("MODULE_FINANZAS")) {
             return ResponseEntity.status(403).build();
         }
-        Response response = gatewayClient.delete("api/transaction/delete/" + id, Response.class, session.getAttribute("JWT_TOKEN").toString());
+        Response response = gatewayClient.delete("/api/transaction/delete/" + id, Response.class, session.getAttribute("JWT_TOKEN").toString());
         return ResponseEntity.ok(response);
     }
 }

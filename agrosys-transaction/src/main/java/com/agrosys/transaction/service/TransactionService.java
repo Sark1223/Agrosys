@@ -36,8 +36,8 @@ public class TransactionService {
     }
 
     public AgrosysTransaction getById(Integer id) {
-    return transactionRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Transacción no encontrada"));
+        return transactionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Transacción no encontrada"));
     }
 
     @Transactional
@@ -47,6 +47,7 @@ public class TransactionService {
         transaction.setCreateAt(request.getCreateAt());
         transaction.setAmount(request.getAmount());
         transaction.setDescription(request.getDescription());
+        transaction.setPlotId(request.getPlotId());
         transaction.setLotTradeId(request.getLotTradeId());
         transactionRepository.save(transaction);
         log.info("Transaccion creada: {}", transaction);
@@ -61,6 +62,7 @@ public class TransactionService {
         transaction.setCreateAt(request.getCreateAt());
         transaction.setAmount(request.getAmount());
         transaction.setDescription(request.getDescription());
+        transaction.setPlotId(request.getPlotId());
         transaction.setLotTradeId(request.getLotTradeId());
         transactionRepository.save(transaction);
         log.info("Transacción actualizada: {}", transaction);
@@ -79,5 +81,20 @@ public class TransactionService {
                 .success(true)
                 .message("Transacción eliminada exitosamente")
                 .build();
+    }
+
+    public List<TransactionRepository.TransactionProjection> getAllWithPlot(
+            Integer plotId, LocalDate startDate, LocalDate endDate, String type
+    ) {
+        if (startDate == null || endDate == null) {
+            throw new IllegalArgumentException("Las fechas de inicio y fin son obligatorias");
+        }
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("La fecha de inicio no puede ser mayor a la fecha de fin");
+        }
+        log.info("Obteniendo transacciones con filtros - plot; {}, desde: {}, hasta: {}, tipo: {}",
+                plotId, startDate, endDate, type);
+
+        return transactionRepository.findByFiltersWithPlot(plotId, startDate, endDate, type);
     }
 }

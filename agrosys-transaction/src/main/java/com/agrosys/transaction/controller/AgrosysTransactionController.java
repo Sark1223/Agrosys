@@ -3,14 +3,18 @@ package com.agrosys.transaction.controller;
 import com.agrosys.transaction.dto.Response;
 import com.agrosys.transaction.dto.TransactionRequest;
 import com.agrosys.transaction.entity.AgrosysTransaction;
+import com.agrosys.transaction.repository.TransactionRepository;
 import com.agrosys.transaction.service.TransactionService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -27,8 +31,10 @@ public class AgrosysTransactionController {
     public ResponseEntity<Response> getAll(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(required = false) String type) {
-        List<AgrosysTransaction> transactions = transactionService.getAll(startDate, endDate, type);
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) Integer plotId) {
+        List<TransactionRepository.TransactionProjection> transactions =
+                transactionService.getAllWithPlot(plotId, startDate, endDate, type);
         return ResponseEntity.ok(Response.builder()
                 .success(true)
                 .message("Transacciones obtenidas exitosamente")

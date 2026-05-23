@@ -40,6 +40,9 @@ public class AgrosysTransaction {
     @Column(name= "description", length=256)
     private String description;
 
+    @Column(name= "plot_id")
+    private Integer plotId;
+
     @Column(name= "lot_trade_id")
     private Integer lotTradeId;
 

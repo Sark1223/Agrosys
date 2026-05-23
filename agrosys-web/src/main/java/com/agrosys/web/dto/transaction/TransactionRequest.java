@@ -11,6 +11,7 @@ public class TransactionRequest {
     private LocalDate createAt;
     private BigDecimal amount;
     private String description;
+    private Integer plotId;
     private Integer lotTradeId;
 
 }

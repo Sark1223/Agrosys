@@ -13,9 +13,8 @@ public class TransactionRequest {
     @NotNull(message = "La fecha es requerida")
     private LocalDate createAt;
     @NotNull(message = "El monto es requerido")
-    @Positive(message = "El monto debe ser mayor a cero")
     private BigDecimal amount;
-    @NotBlank(message = "La descripción es requerida")
     private String description;
+    private Integer plotId;
     private Integer lotTradeId;
 }
