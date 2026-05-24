@@ -62,6 +62,23 @@ public interface SpecialTaskRepository extends JpaRepository<SpecialTask, Intege
         """, nativeQuery = true)
     SpecialTaskWithWorkersProjection findSpecialTaskWithWorkersById(@Param("specialTaskId") Integer specialTaskId);
 
+    @Modifying
+    @Transactional
+    @Query(value = """
+        INSERT INTO agrosys_task.SPECIAL_TASK (name, payment_amount, create_at, task_stage_id, end_at, description)
+        VALUES (:name, :paymentAmount, :createAt, :taskStageId, :endAt, :description)
+        """, nativeQuery = true)
+    void insertSpecialTask(
+            @Param("name") String name,
+            @Param("paymentAmount") BigDecimal paymentAmount,
+            @Param("createAt") LocalDate createAt,
+            @Param("taskStageId") Integer taskStageId,
+            @Param("endAt") LocalDate endAt,
+            @Param("description") String description);
+
+    @Query(value = "SELECT LAST_INSERT_ID()", nativeQuery = true)
+    Integer getLastInsertId();
+
     @Query(value = "SELECT COUNT(*) FROM agrosys_task.SPECIAL_TASK WHERE special_task_id = :specialTaskId", nativeQuery = true)
     int countBySpecialTaskId(@Param("specialTaskId") Integer specialTaskId);
 

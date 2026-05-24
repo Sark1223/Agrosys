@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -70,7 +69,6 @@ public class TransactionController {
         if (!modules.contains("MODULE_FINANZAS")) {
             return ResponseEntity.status(403).build();
         }
-        String token = (String) session.getAttribute("JWT_TOKEN");
         String url = "/api/transaction/list?startDate=" + startDate + "&endDate=" + endDate;
         if (type != null && !type.isEmpty()) {
             url += "&type=" + type;
@@ -94,7 +92,14 @@ public class TransactionController {
 
     @PostMapping("/register")
     @ResponseBody
-    public ResponseEntity<Response> register(@RequestBody com.agrosys.web.dto.transaction.TransactionRequest request, HttpSession session) {
+    public ResponseEntity<Response> register(
+            @RequestParam String transactionType,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createAt,
+            @RequestParam java.math.BigDecimal amount,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) Integer plotId,
+            @RequestParam(required = false) Integer lotTradeId,
+            HttpSession session) {
         List<String> modules = jwtHelper.getUserModules(session);
         if (!modules.contains("MODULE_FINANZAS")) {
             return ResponseEntity.status(403).build();
@@ -104,7 +109,7 @@ public class TransactionController {
         request.setTransactionType(transactionType);
         request.setCreateAt(createAt);
         request.setAmount(amount);
-        request.setDescription(description != null && !description.isBlank() ? description : null);
+        request.setDescription(description);
         request.setPlotId(plotId);
         request.setLotTradeId(lotTradeId);
 
@@ -114,7 +119,15 @@ public class TransactionController {
 
     @PutMapping("/update/{id}")
     @ResponseBody
-    public ResponseEntity<Response> update(@PathVariable Integer id, @RequestBody com.agrosys.web.dto.transaction.TransactionRequest request, HttpSession session) {
+    public ResponseEntity<Response> update(
+            @PathVariable Integer id,
+            @RequestParam String transactionType,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createAt,
+            @RequestParam java.math.BigDecimal amount,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) Integer plotId,
+            @RequestParam(required = false) Integer lotTradeId,
+            HttpSession session) {
         List<String> modules = jwtHelper.getUserModules(session);
         if (!modules.contains("MODULE_FINANZAS")) {
             return ResponseEntity.status(403).build();
@@ -124,7 +137,7 @@ public class TransactionController {
         request.setTransactionType(transactionType);
         request.setCreateAt(createAt);
         request.setAmount(amount);
-        request.setDescription(description != null && !description.isBlank() ? description : null);
+        request.setDescription(description);
         request.setPlotId(plotId);
         request.setLotTradeId(lotTradeId);
 

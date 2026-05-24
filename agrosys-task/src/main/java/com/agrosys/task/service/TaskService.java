@@ -122,16 +122,16 @@ public class TaskService {
     public SpecialTaskResponse createSpecialTask(SpecialTaskRequest request) {
         log.info("Creando tarea especial: {}", request.getName());
 
-        SpecialTask entity = new SpecialTask();
-        entity.setName(request.getName());
-        entity.setPaymentAmount(request.getPaymentAmount());
-        entity.setCreateAt(request.getCreateAt());
-        entity.setTaskStageId(request.getTaskStageId() != null ? request.getTaskStageId() : STAGE_PENDIENTE);
-        entity.setEndAt(request.getEndAt());
-        entity.setDescription(request.getDescription());
-        entity = specialTaskRepository.save(entity);
+        Integer taskStageId = request.getTaskStageId() != null ? request.getTaskStageId() : STAGE_PENDIENTE;
+        specialTaskRepository.insertSpecialTask(
+                request.getName(),
+                request.getPaymentAmount(),
+                request.getCreateAt(),
+                taskStageId,
+                request.getEndAt(),
+                request.getDescription());
 
-        Integer specialTaskId = entity.getSpecialTaskId();
+        Integer specialTaskId = specialTaskRepository.getLastInsertId();
         log.info("Tarea especial creada con ID: {}", specialTaskId);
 
         if (request.getWorkerIds() != null) {
