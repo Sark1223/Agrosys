@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,8 +14,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.agrosys.web.dto.Response;
 import com.agrosys.web.dto.transaction.CreatePaymentRequest;
@@ -32,8 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TransactionController {
 
-    private final JwtHelper jwtHelper;
     private final GatewayClient gatewayClient;
+    private final JwtHelper jwtHelper;
 
     @GetMapping
     public String transactionPage(HttpSession session, Model model) {
@@ -56,9 +59,10 @@ public class TransactionController {
     }
 
     @GetMapping("/history")
+    @ResponseBody
     public ResponseEntity<Response> getHistory(
-            @RequestParam LocalDate startDate,
-            @RequestParam LocalDate endDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) String type,
             @RequestParam(required = false) Integer plotId,
             HttpSession session) {
@@ -66,7 +70,7 @@ public class TransactionController {
         if (!modules.contains("MODULE_FINANZAS")) {
             return ResponseEntity.status(403).build();
         }
-
+        String token = (String) session.getAttribute("JWT_TOKEN");
         String url = "/api/transaction/list?startDate=" + startDate + "&endDate=" + endDate;
         if (type != null && !type.isEmpty()) {
             url += "&type=" + type;
@@ -89,14 +93,8 @@ public class TransactionController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Response> create(
-            @RequestParam String transactionType,
-            @RequestParam LocalDate createAt,
-            @RequestParam java.math.BigDecimal amount,
-            @RequestParam(required = false) String description,
-            @RequestParam(required = false) Integer plotId,
-            @RequestParam(required = false) Integer lotTradeId,
-            HttpSession session) {
+    @ResponseBody
+    public ResponseEntity<Response> register(@RequestBody com.agrosys.web.dto.transaction.TransactionRequest request, HttpSession session) {
         List<String> modules = jwtHelper.getUserModules(session);
         if (!modules.contains("MODULE_FINANZAS")) {
             return ResponseEntity.status(403).build();
@@ -115,15 +113,8 @@ public class TransactionController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Response> update(
-            @PathVariable Integer id,
-            @RequestParam String transactionType,
-            @RequestParam LocalDate createAt,
-            @RequestParam java.math.BigDecimal amount,
-            @RequestParam(required = false) String description,
-            @RequestParam(required = false) Integer plotId,
-            @RequestParam(required = false) Integer lotTradeId,
-            HttpSession session) {
+    @ResponseBody
+    public ResponseEntity<Response> update(@PathVariable Integer id, @RequestBody com.agrosys.web.dto.transaction.TransactionRequest request, HttpSession session) {
         List<String> modules = jwtHelper.getUserModules(session);
         if (!modules.contains("MODULE_FINANZAS")) {
             return ResponseEntity.status(403).build();
@@ -142,6 +133,7 @@ public class TransactionController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @ResponseBody
     public ResponseEntity<Response> delete(@PathVariable Integer id, HttpSession session) {
         List<String> modules = jwtHelper.getUserModules(session);
         if (!modules.contains("MODULE_FINANZAS")) {

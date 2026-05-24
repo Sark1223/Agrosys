@@ -49,5 +49,4 @@ public interface TransactionRepository extends JpaRepository<AgrosysTransaction,
         ORDER BY t.create_at DESC, t.transaction_id DESC
         """, nativeQuery = true)
     List<AgrosysTransaction> findByFilters(LocalDate startDate, LocalDate endDate, String type);
-
 }

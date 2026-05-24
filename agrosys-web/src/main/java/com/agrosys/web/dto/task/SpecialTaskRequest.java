@@ -15,5 +15,4 @@ public class SpecialTaskRequest {
     private LocalDate endAt;
     private String description;
     private List<Integer> workerIds;
-
 }

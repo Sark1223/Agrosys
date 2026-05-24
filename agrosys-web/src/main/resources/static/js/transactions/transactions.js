@@ -36,7 +36,8 @@ $(document).ready(function () {
         $.ajax({
             url: url,
             type: id ? 'PUT' : 'POST',
-            data: data,
+            contentType: 'application/json',
+            data: JSON.stringify(data),
             success: function (response) {
                 if (response.success) {
                     Swal.fire({ icon: 'success', title: 'Éxito', text: response.message });

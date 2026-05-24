@@ -7,18 +7,11 @@ import com.agrosys.transaction.entity.AgrosysTransaction;
 import com.agrosys.transaction.repository.TransactionRepository;
 import com.agrosys.transaction.service.TransactionService;
 import com.agrosys.transaction.service.WeeklyPayTransactionService;
+import com.agrosys.transaction.service.WeeklyPayTransactionService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/transaction")
@@ -27,6 +20,7 @@ import java.util.List;
 public class AgrosysTransactionController {
 
     private final TransactionService transactionService;
+    private final WeeklyPayTransactionService weeklyPayTransactionService;
     private final WeeklyPayTransactionService weeklyPayTransactionService;
 
     @GetMapping("/list")
@@ -51,7 +45,7 @@ public class AgrosysTransactionController {
         AgrosysTransaction transaction = transactionService.getById(id);
         return ResponseEntity.ok(Response.builder()
                 .success(true)
-                .message("Transacción obtenida exitosamente")
+                .message("Transacci\u00f3n obtenida exitosamente")
                 .data(transaction)
                 .build());
     }
@@ -59,7 +53,7 @@ public class AgrosysTransactionController {
     @PostMapping("/register")
     @PreAuthorize("hasAuthority('MODULE_FINANZAS')")
     public ResponseEntity<Response> create(@Valid @RequestBody TransactionRequest request) {
-        log.info("[REQUEST] - Crear transacción: {}", request);
+        log.info("[REQUEST] - Crear transacci\u00f3n: {}", request);
         Response response = transactionService.create(request);
         return ResponseEntity.ok(response);
     }
@@ -67,7 +61,7 @@ public class AgrosysTransactionController {
     @PutMapping("/update/{id}")
     @PreAuthorize("hasAuthority('MODULE_FINANZAS')")
     public ResponseEntity<Response> update(@PathVariable Integer id, @Valid @RequestBody TransactionRequest request) {
-        log.info("[REQUEST] - Actualizar transacción {}: {}", id, request);
+        log.info("[REQUEST] - Actualizar transacci\u00f3n {}: {}", id, request);
         Response response = transactionService.update(id, request);
         return ResponseEntity.ok(response);
     }
@@ -75,7 +69,7 @@ public class AgrosysTransactionController {
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAuthority('MODULE_FINANZAS')")
     public ResponseEntity<Response> delete(@PathVariable Integer id) {
-        log.info("[REQUEST] - Eliminar transacción: {}", id);
+        log.info("[REQUEST] - Eliminar transacci\u00f3n: {}", id);
         Response response = transactionService.delete(id);
         return ResponseEntity.ok(response);
     }

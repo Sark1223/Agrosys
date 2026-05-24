@@ -2,7 +2,7 @@ $(document).ready(function () {
     $('#fechaInicioStateInput').val(new Date().toISOString().split('T')[0]);
     $('#fechaInicioStateInputEdit').val(new Date().toISOString().split('T')[0]);
 
-    // ======================= Configuración de plots ======================= 
+    // Configuración de plots
     $('#btn-submit-add-plot').on('click', function () {
         const $f = $('#addPlotForm');
         const activeTab = $.fn.getActiveTab();
@@ -19,7 +19,7 @@ $(document).ready(function () {
     $('#btn-submit-add-plantation').on('click', function () {
         const $f = $('#addPlantationForm');
         const activeTab = $.fn.getActiveTab();
-        $.fn.postFormData($f, $f.attr('action'), `/agrosys/plots?tab=${activeTab}&plotId=${$('#plotIdInputPlantation').val()}`);
+        $.fn.postFormData($f, $f.attr('action'), '/agrosys/plots?tab=' + activeTab);
     });
 
     $('#btn-submit-edit-plantation').on('click', function () {
@@ -31,17 +31,9 @@ $(document).ready(function () {
     $('#btn-submit-delete-plantation').on('click', function () {
         const $f = $('#deletePlantationForm');
         const activeTab = $.fn.getActiveTab();
-        // $.fn.postFormData($f, $f.attr('action'), '/agrosys/plots?tab=' + activeTab);
-        $.fn.postFormData($f, $f.attr('action'))
-            .done(function (response) {
-                if (response.success) {
-                    $('#btn-close-delete-plantation').trigger('click');
-                    $("#card-plantation-" + $('#plantationIdInputDelete').val()).remove();
-                }
-            });
+        $.fn.postFormData($f, $f.attr('action'), '/agrosys/plots?tab=' + activeTab);
     });
 
-    // ======================= Configuración de estados =======================
     $('#btn-submit-add-state').on('click', function () {
         const $f = $('#addStateForm');
         $.fn.postFormData($f, $f.attr('action'))
@@ -53,13 +45,9 @@ $(document).ready(function () {
 
                     $('#btn-close-add-state').trigger('click');
 
-                    if ($f.find('#nombreStateInput').val() == 4) {
+                    if($f.find('#nombreStateInput').val() == 4) {
                         $('#btnAddStateToPlantation').disable().attr('title', 'No se pueden agregar más etapas a esta plantación');
                     }
-                    $('#fechaInicioStateInput').val($('#fechaFinalizacionStateInput').val() ? $('#fechaFinalizacionStateInput').val() : new Date().toISOString().split('T')[0]);
-                    $('#notasStateInput').val('');
-                    $('#fechaFinalizacionStateInput').val('');
-                    // $f[0].reset();
                 }
             });
     });
@@ -70,7 +58,7 @@ $(document).ready(function () {
             .done(function (response) {
                 if (response.success) {
                     //Cerrar modal y recargar información de details
-                    $.fn.getStagesByPlantation($('#plantationIdInputDetails').val());
+                    $.fn.getStagesByPlantation($('#plantationIdInputState').val());
                     $.fn.getAllPlots();
 
                     $('#btn-close-edit-state').trigger('click');
@@ -78,56 +66,14 @@ $(document).ready(function () {
             });
     });
 
-    $('#btn-submit-delete-state').on('click', function () {
-        const $f = $('#deleteStateForm');
-        $.fn.postFormData($f, $f.attr('action'))
-            .done(function (response) {
-                if (response.success) {
-                    //Cerrar modal y recargar información de details
-                    $.fn.getStagesByPlantation($('#plantationIdInputDetails').val());
-
-                    $.fn.getAllPlots();
-                    $('#btn-close-delete-state').trigger('click');
-                }
-            });
-    });
-
-    $.fn.getActivePlantation = function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const plantatioIdToOpen = urlParams.get('plantatioId');
-
-        if (plantatioIdToOpen) {
-            const card = $('#card-plantation-' + plantatioIdToOpen);
-            if (card.length) {
-                // Buscar el acordeón padre
-                const collapseBody = card.closest('.accordion-collapse');
-                if (collapseBody.length) {
-                    const bsCollapse = new bootstrap.Collapse(collapseBody[0], { toggle: true });
-                }
-
-                //Abrir modal de ver lotes
-                const lotsButton = card.find('.lots-plantation');
-                if (lotsButton.length) {
-                    // lotsButton.trigger('click');
-                    lotsButton.get(0).click();
-                }
-            }
+    $.fn.getActiveTab = function () {
+        const activeTabLink = document.querySelector('.nav-link.active');
+        if (activeTabLink) {
+            const href = activeTabLink.getAttribute('href');
+            return href.replace('#', '');
         }
-    };
-
-    $.fn.getActivePlotById = function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const plotIdToOpen = urlParams.get('plotId');
-
-        if (plotIdToOpen) {
-            // Buscar el collapse asociado al plotId
-            const collapseBody = $('#collapse-' + plotIdToOpen);
-            if (collapseBody.length) {
-                // Abrir el acordeón usando Bootstrap Collapse
-                new bootstrap.Collapse(collapseBody[0], { toggle: true });
-            }
-        }
-    };
+        return 'plot';
+    }
 
     $.fn.renderCardPlot = function (plot) {
         return $(`
@@ -161,17 +107,17 @@ $(document).ready(function () {
         );
     }
 
-    $.fn.renderCardPlantation = function (plantation) {
+    $.fn.renderCardPlantation = function (plantacion) {
         return $(`
-                    <div class="card mb-2" id="card-plantation-${plantation.plantatioId}">
+                    <div class="card mb-2">
                         <div class="card-body d-flex flex-row justify-content-between align-items-center gap-3 overflow-auto">
-                            <p class="card-title text-capitalize p-0 m-0 w-25">${plantation.name.toLowerCase()}</p>
-                            <p class="card-text p-0 m-0">Fecha de inicio: <span class="text-capitalize">${$.fn.formatDate(plantation.start_at)}</span></p>
-                            <p class="card-text p-0 m-0">Fecha de finalización: <span class="text-capitalize">${plantation.end_at !== 'N/A' ? $.fn.formatDate(plantation.end_at) : plantation.end_at}</span></p>
+                            <p class="card-title text-capitalize p-0 m-0 w-25">${plantacion.name.toLowerCase()}</p>
+                            <p class="card-text p-0 m-0">Fecha de inicio: <span class="text-capitalize">${$.fn.formatDate(plantacion.start_at)}</span></p>
+                            <p class="card-text p-0 m-0">Fecha de finalización: <span class="text-capitalize">${plantacion.end_at !== 'N/A' ? $.fn.formatDate(plantacion.end_at) : plantacion.end_at}</span></p>
                             <div class="d-flex flex-row justify-content-end align-items-center gap-4">
-                                <div class="${plantation.stageId === null ? disenioStages[0].classBorder : disenioStages[plantation.stageId].classBorder} btn px-1 py-0" id="status-plantacion-${plantation.plantacioId}"
+                                <div class="${plantacion.stageId === null ? disenioStages[0].classBorder : disenioStages[plantacion.stageId].classBorder} btn px-1 py-0" id="status-plantacion-${plantacion.plantacioId}"
                                     style="pointer-events: none; width: 125px;">
-                                    ${plantation.stageId === null ? `<span class="${disenioStages[0].classText}">Sin etapa</span>` : `<span class="${disenioStages[plantation.stageId].classText}">${plantation.stage}</span>`}
+                                    ${plantacion.stageId === null ? `<span class="${disenioStages[0].classText}">Sin etapa</span>` : `<span class="${disenioStages[plantacion.stageId].classText}">${plantacion.stage}</span>`}
                                 </div>
                                 <div class="dropdown position-static">
                                     <i class="ri-more-2-fill" type="button" id="dropdownMenuButton${plot.plotId}" data-bs-toggle="dropdown" aria-expanded="false">
@@ -179,13 +125,6 @@ $(document).ready(function () {
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton${plot.plotId}">
                                         <li><a class="dropdown-item details-plantation" data-bs-toggle="modal" data-bs-target="#modalDetailsPlantation" href="#"><i
                                                     class="ri-eye-line pe-1"></i>Ver detalles</a></li>
-                                        ${plantation.stageId !== null && plantation.stageId >= 3
-                ?
-                `<li><a class="dropdown-item lots-plantation" data-bs-toggle="modal" data-bs-target="#modalLotsPlantation" href="#"><i
-                                                    class="ri-mist-line pe-1"></i>Ver lotes</a></li>`
-                :
-                ``
-            }
                                         <li><a class="dropdown-item edit-plantation" data-bs-toggle="modal" data-bs-target="#modalEditPlantation" href="#"><i
                                                     class="ri-pencil-fill pe-1"></i>Editar</a></li>
                                         <li><a class="dropdown-item delete-plantation" data-bs-toggle="modal" data-bs-target="#modalDeletePlantation" href="#"><i
@@ -208,6 +147,7 @@ $(document).ready(function () {
 
                 $("#message-plot").attr("style", "display:none !important;");
                 if (response.success) {
+                    console.log('Parcelas obtenidas:', response.data);
 
                     if (response.data.length === 0) {
                         $("#message-plot").attr("style", "display:block !important;")
@@ -219,6 +159,7 @@ $(document).ready(function () {
                         const accordionItem = $.fn.renderCardPlot(plot);
 
                         const plantaciones = plot.plantatios ? JSON.parse(plot.plantatios) : null;
+                        console.log('Plantaciones:', plantaciones);
 
                         const statusDiv = accordionItem.find(`#status-${plot.plotId}`);
                         if (plantaciones[0] !== null) {
@@ -232,6 +173,7 @@ $(document).ready(function () {
                                 'width': '125px'
                             });
                             plantaciones.forEach(plantacion => {
+                                console.log('Plantación:', plantacion);
                                 const cardPlantacion = $.fn.renderCardPlantation(plantacion);
 
                                 cardPlantacion.find('.edit-plantation').on('click', function (e) {
@@ -249,8 +191,7 @@ $(document).ready(function () {
 
                                 cardPlantacion.find('.delete-plantation').on('click', function () {
                                     if (plantacion) {
-                                        console.log("plantacion: ", plantacion);
-                                        $('#textDeletePlantation').text(`¿Está seguro de que desea eliminar la plantacion ${plantacion.name} ${$.fn.formatDate(plantacion.start_at)}?`);
+                                        $('#textDeletePlantation').text(`¿Está seguro de que desea eliminar la plantacion ${plantacion.name} ${plantacion.startAt}?`);
                                         $('#plantationIdInputDelete').val(plantacion.plantatioId);
                                     } else {
                                         $.fn.errorAlert('No se pudo cargar la información de la plantación para eliminar');
@@ -259,7 +200,6 @@ $(document).ready(function () {
 
                                 cardPlantacion.find('.details-plantation').on('click', function () {
                                     if (plantacion) {
-                                        $('#plantationIdInputDetails').val(plantacion.plantatioId);
                                         $('#plantationDetailsName').text(`${plantacion.name}`);
                                         $('#plantationDetailsOriginPlot').text(`${plot.name}`);
                                         $('#plantationDetailsStartAt').text($.fn.formatDate(plantacion.start_at));
@@ -271,16 +211,6 @@ $(document).ready(function () {
                                         $.fn.getStagesByPlantation(parseInt(plantacion.plantatioId));
                                     } else {
                                         $.fn.errorAlert('No se pudo cargar la información de la plantación para ver detalles');
-                                    }
-                                });
-
-                                cardPlantacion.find('.lots-plantation').on('click', function () {
-                                    if (plantacion) {
-                                        // $('#plantationIdInputDetails').val(plantacion.plantatioId);
-                                        $('#plantationLotName').text(`${plantacion.name}`);
-                                        $('#plantationLotOriginPlot').text(`${plot.name}`); $('#plantationLotsNotes').text(plantacion.notas);
-                                        $('#plantationIdInputState').val(plantacion.plantatioId);
-                                        $.fn.getLotsByPlantation(parseInt(plantacion.plantatioId));
                                     }
                                 });
                                 collapseBody.append(cardPlantacion);
@@ -312,17 +242,14 @@ $(document).ready(function () {
 
                     });
 
-                    $.fn.getActivePlantation();
-                    $.fn.getActivePlotById();
-
                 } else {
-                    $("#message-plot").attr("style", "display:block !important;").html('Sin parcelas, intente recargar la página!');
+                    $("#message-plot").attr("style", "display:block !important;").$html('Sin parcelas, intente recargar la página!');
                     $.fn.errorAlert(response.message || 'Ocurrió un error inesperado al obtener las parcelas');
                 }
                 //
             },
             error: function (xhr, status, error) {
-                $("#message-plot").attr("style", "display:block !important;").html('Sin parcelas, intente recargar la página!');
+                $("#message-plot").attr("style", "display:block !important;").$html('Sin parcelas, intente recargar la página!');
                 $.fn.errorAlert('Ocurrió un error al comunicarse con el servidor');
             }
 

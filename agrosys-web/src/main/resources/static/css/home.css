@@ -12,39 +12,13 @@
 
 .content-area p {
     color: #374151;
-    margin-bottom: 15px;
+    margin-bottom: 24px;
 }
 
 .profile-icon {
     font-size: 22px;
     color: #1f2937;
 }
-
-.dashboard-card {
-    background-color: #ffffff;
-    border-radius: 10px;
-    padding: 18px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-}
-
-.dashboard-card h3 {
-    text-align: center;
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 16px;
-    color: #111111;
-}
-
-.clima-error {
-    font-size: 13px;
-    color: #d32f2f;
-    margin-top: 20px;
-}
-
-
-/* ================================================
-   ADMIN
-   ================================================ */
 
 .dashboard-actions {
     display: grid;
@@ -88,15 +62,30 @@
     gap: 28px;
 }
 
-.filtros-card {
-    display: flex;
-    flex-direction: column;
-    height: 190px;
+.dashboard-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.dashboard-card h3 {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #111111;
 }
 
 .filtros-card h3 {
     font-size: 13px;
     margin-bottom: 12px;
+}
+
+.filtros-card {
+    display: flex;
+    flex-direction: column;
+    height: 190px;
 }
 
 .filtros-card label {
@@ -143,6 +132,25 @@
     grid-column: 3 / 4;
 }
 
+@media (max-width: 992px) {
+    .dashboard-actions {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+
+    .clima-card,
+    .tareas-card,
+    .grafica-card {
+        grid-column: auto;
+        grid-row: auto;
+    }
+}
+
 .clima-contenido {
     text-align: center;
     margin-top: 18px;
@@ -184,326 +192,8 @@
     margin: 2px 0;
 }
 
-@media (max-width: 992px) {
-    .dashboard-actions {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
-
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto;
-    }
-
-    .clima-card,
-    .tareas-card,
-    .grafica-card {
-        grid-column: auto;
-        grid-row: auto;
-    }
-}
-
-
-/* ================================================
-   USER
-   ================================================ */
-
-/* Reloj */
-.reloj-card {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 200px;
-}
-
-.reloj-contenido {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-}
-
-.reloj-horizontal {
-    display: flex;
-    align-items: baseline;
-    gap: 2px;
-}
-
-.reloj-numero-grande {
-    font-size: 3.2rem;
-    font-weight: 700;
-    color: #1f2937;
-    line-height: 1;
-    letter-spacing: -1px;
-}
-
-.reloj-separador {
-    font-size: 3.2rem;
-    font-weight: 700;
-    color: #1f2937;
-    line-height: 1;
-    margin: 0 2px;
-}
-
-.reloj-separador-chico {
-    font-size: 1.4rem;
-    margin: 0 1px;
-}
-
-.reloj-numero-chico {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: #6b7280;
-    line-height: 1;
-}
-
-.reloj-ampm {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #6b7280;
-    margin-left: 6px;
-    align-self: flex-end;
-    padding-bottom: 6px;
-}
-
-.usuario-grid {
-    display: grid;
-    grid-template-columns: 340px 1fr;
-    gap: 28px;
-    align-items: start;
-}
-
-.usuario-grid .reloj-card {
-    grid-column: 1;
-    grid-row: 1;
-}
-
-.usuario-grid .clima-card {
-    grid-column: 2;
-    grid-row: 1;
-    height: auto !important;
-    overflow: visible;
-    align-self: start;
-}
-
-#cardClima {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    padding: 1.2rem 1.4rem;
-    overflow: visible;
-    height: auto !important;
-    align-self: start;
-}
-
-#cardClima h3 {
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
-    color: #888;
-    margin-bottom: 0.75rem;
-    text-align: center;
-}
-
-#climaContenido {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    width: 100%;
-    overflow: visible;
-}
-
-/* Temp actual */
-.clima-top {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    padding-bottom: 0.9rem;
-}
-
-.clima-ciudad {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #222;
-    text-align: center;
-}
-
-.clima-actual-row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.clima-temp-grande {
-    font-size: 2.8rem;
-    font-weight: 700;
-    line-height: 1;
-    color: #111;
-}
-
-.clima-icono-desc {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.1rem;
-}
-
-.clima-emoji {
-    font-size: 2rem;
-    line-height: 1;
-}
-
-.clima-desc {
-    font-size: 0.75rem;
-    color: #555;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-}
-
-.clima-sub-datos {
-    display: flex;
-    gap: 1rem;
-    font-size: 0.78rem;
-    color: #666;
-    flex-wrap: wrap;
-}
-
-.clima-divider {
-    width: 100%;
-    height: 1px;
-    background: rgba(0, 0, 0, 0.08);
-    margin: 0.6rem 0;
-}
-
-.clima-cuerpo {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    align-items: start;
-}
-
-.clima-horas-scroll {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    max-height: 320px;
-    overflow-y: auto;
-    padding-right: 0.3rem;
-    scrollbar-width: thin;
-    scrollbar-color: #ddd transparent;
-}
-
-.clima-horas-scroll::-webkit-scrollbar {
-    width: 4px;
-}
-
-.clima-horas-scroll::-webkit-scrollbar-thumb {
-    background: #ddd;
-    border-radius: 4px;
-}
-
-.clima-hora-item {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    background: rgba(0, 0, 0, 0.03);
-    border-radius: 10px;
-    padding: 0.4rem 0.7rem;
-}
-
-.clima-hora-lbl {
-    font-size: 0.72rem;
-    color: #777;
-    white-space: nowrap;
-    width: 4.5rem;
-    flex-shrink: 0;
-}
-
-.clima-hora-emoji {
-    font-size: 1.2rem;
-}
-
-.clima-hora-temp {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #222;
-    margin-left: auto;
-}
-
-.clima-semana {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-}
-
-.clima-dia-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.4rem 0.5rem;
-    border-radius: 8px;
-    transition: background 0.15s;
-}
-
-.clima-dia-item:hover {
-    background: rgba(0, 0, 0, 0.04);
-}
-
-.clima-dia-nombre {
-    font-size: 0.82rem;
-    font-weight: 500;
-    color: #333;
-    width: 2.8rem;
-    flex-shrink: 0;
-}
-
-.clima-dia-emoji {
-    font-size: 1.1rem;
-    flex: 1;
-    text-align: center;
-}
-
-.clima-dia-temps {
-    display: flex;
-    gap: 0.5rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-}
-
-.clima-dia-max { color: #222; }
-.clima-dia-min { color: #aaa; }
-
-@media (max-width: 992px) {
-    .usuario-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .usuario-grid .reloj-card,
-    .usuario-grid .clima-card {
-        grid-column: 1;
-        grid-row: auto;
-    }
-}
-
-@media (max-width: 700px) {
-    .clima-cuerpo {
-        grid-template-columns: 1fr;
-    }
-
-    .clima-horas-scroll {
-        flex-direction: row;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        overflow-y: visible;
-        max-height: none;
-    }
-
-    .clima-hora-item {
-        flex-direction: column;
-        min-width: 54px;
-        gap: 0.25rem;
-        padding: 0.5rem 0.3rem;
-    }
-
-    .clima-hora-lbl { width: auto; }
-    .clima-hora-temp { margin-left: 0; }
+.clima-error {
+    font-size: 13px;
+    color: #d32f2f;
+    margin-top: 20px;
 }
