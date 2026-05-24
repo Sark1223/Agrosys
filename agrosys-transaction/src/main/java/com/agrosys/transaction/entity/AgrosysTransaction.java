@@ -5,6 +5,8 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,8 +27,9 @@ public class AgrosysTransaction {
     @Column(name = "transaction_id")
     private Integer transactionId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type", nullable = false, length = 50)
-    private String transactionType;
+    private AgrosysTransactionType transactionType;
 
     @Column(name = "create_at", nullable = false)
     private LocalDate createAt;

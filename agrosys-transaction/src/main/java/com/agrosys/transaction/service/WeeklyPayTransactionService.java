@@ -10,6 +10,7 @@ import com.agrosys.transaction.dto.CreatePaymentRequest;
 import com.agrosys.transaction.dto.CreatePaymentRequest.PaymentItem;
 import com.agrosys.transaction.dto.Response;
 import com.agrosys.transaction.entity.AgrosysTransaction;
+import com.agrosys.transaction.entity.AgrosysTransactionType;
 import com.agrosys.transaction.repository.TransactionRepository;
 
 import jakarta.transaction.Transactional;
@@ -37,7 +38,7 @@ public class WeeklyPayTransactionService {
 
         for (PaymentItem item : payments) {
             AgrosysTransaction tx = new AgrosysTransaction();
-            tx.setTransactionType("EXPENSE");
+            tx.setTransactionType(AgrosysTransactionType.EXPENSE);
             tx.setCreateAt(endDate);
             tx.setAmount(item.getTotal());
             tx.setDescription("Pago semanal - " + item.getWorkerName() + " - " + weekId);

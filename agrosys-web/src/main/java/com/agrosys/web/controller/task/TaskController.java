@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -253,23 +254,16 @@ public class TaskController {
     }
 
     // Special Tasks
-    @PostMapping(value = "/special/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping("/special/register")
     @ResponseBody
     public ResponseEntity<Response> registerSpecialTask(
-            @RequestParam Integer taskId,
-            @RequestParam Integer workerId,
-            @RequestParam java.math.BigDecimal paymentAmount,
+            @RequestBody SpecialTaskRequest request,
             HttpSession session) {
         try {
             List<String> modules = jwtHelper.getUserModules(session);
             if (!modules.contains("MODULE_TAREAS")) {
                 return ResponseEntity.status(403).build();
             }
-
-            SpecialTaskRequest request = new SpecialTaskRequest();
-            request.setTaskId(taskId);
-            request.setWorkerId(workerId);
-            request.setPaymentAmount(paymentAmount);
 
             String token = (String) session.getAttribute("JWT_TOKEN");
             Response response = gatewayClient.post(
@@ -341,22 +335,42 @@ public class TaskController {
         }
     }
 
-    @PutMapping(value = "/special/edit/{taskId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @DeleteMapping("/special/delete/{taskId}")
     @ResponseBody
-    public ResponseEntity<Response> updateSpecialTask(@PathVariable Integer taskId,
-            @RequestParam Integer workerId,
-            @RequestParam java.math.BigDecimal paymentAmount,
-            HttpSession session) {
+    public ResponseEntity<Response> deleteSpecialTask(@PathVariable Integer taskId, HttpSession session) {
         try {
             List<String> modules = jwtHelper.getUserModules(session);
             if (!modules.contains("MODULE_TAREAS")) {
                 return ResponseEntity.status(403).build();
             }
 
-            SpecialTaskRequest request = new SpecialTaskRequest();
-            request.setTaskId(taskId);
-            request.setWorkerId(workerId);
-            request.setPaymentAmount(paymentAmount);
+            String token = (String) session.getAttribute("JWT_TOKEN");
+            Response response = gatewayClient.delete(
+                    "/api/tasks/special/delete/" + taskId,
+                    Response.class,
+                    token);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("[FAILED] - Error al eliminar tarea especial: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Error al eliminar tarea especial: " + e.getMessage())
+                            .build());
+        }
+    }
+
+    @PutMapping("/special/edit/{taskId}")
+    @ResponseBody
+    public ResponseEntity<Response> updateSpecialTask(@PathVariable Integer taskId,
+            @RequestBody SpecialTaskRequest request,
+            HttpSession session) {
+        try {
+            List<String> modules = jwtHelper.getUserModules(session);
+            if (!modules.contains("MODULE_TAREAS")) {
+                return ResponseEntity.status(403).build();
+            }
 
             String token = (String) session.getAttribute("JWT_TOKEN");
             Response response = gatewayClient.put(
