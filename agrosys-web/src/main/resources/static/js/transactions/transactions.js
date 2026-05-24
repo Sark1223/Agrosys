@@ -167,22 +167,20 @@ $.fn.getTransactions = function () {
                 $('.btn-edit').on('click', function () {
                     const id = $(this).data('id');
                     $.ajax({
-                        url: '/agrosys/transactions/history?startDate=2000-01-01&endDate=2100-12-31',
+                        url: '/agrosys/transactions/' + id,
                         type: 'GET',
                         success: function (r) {
                             if (r.success && r.data) {
-                                const tx = r.data.find(function (t) { return t.transactionId === id; });
-                                if (tx) {
-                                    editingId = tx.transactionId;
-                                    $('#transactionIdInput').val(tx.transactionId);
-                                    $('#formType').val(tx.transactionType);
-                                    $('#formDate').val(tx.createAt);
-                                    $('#formAmount').val(tx.amount);
-                                    $('#formPlot').val(tx.plotId || '');
-                                    $('#formDescription').val(tx.description);
-                                    $('#modalTitle').text('Editar Transacción');
-                                    $('#modalAddTransaction').modal('show');
-                                }
+                                const tx = r.data;
+                                editingId = tx.transactionId;
+                                $('#transactionIdInput').val(tx.transactionId);
+                                $('#formType').val(tx.transactionType);
+                                $('#formDate').val(tx.createAt);
+                                $('#formAmount').val(tx.amount);
+                                $('#formPlot').val(tx.plotId || '');
+                                $('#formDescription').val(tx.description);
+                                $('#modalTitle').text('Editar Transacción');
+                                $('#modalAddTransaction').modal('show');
                             }
                         }
                     });

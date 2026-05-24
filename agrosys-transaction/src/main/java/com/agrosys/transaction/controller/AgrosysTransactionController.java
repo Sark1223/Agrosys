@@ -1,10 +1,12 @@
 package com.agrosys.transaction.controller;
 
+import com.agrosys.transaction.dto.CreatePaymentRequest;
 import com.agrosys.transaction.dto.Response;
 import com.agrosys.transaction.dto.TransactionRequest;
 import com.agrosys.transaction.entity.AgrosysTransaction;
 import com.agrosys.transaction.repository.TransactionRepository;
 import com.agrosys.transaction.service.TransactionService;
+import com.agrosys.transaction.service.WeeklyPayTransactionService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import java.util.List;
 public class AgrosysTransactionController {
 
     private final TransactionService transactionService;
+    private final WeeklyPayTransactionService weeklyPayTransactionService;
 
     @GetMapping("/list")
     @PreAuthorize("hasAuthority('MODULE_FINANZAS')")
@@ -74,6 +77,16 @@ public class AgrosysTransactionController {
     public ResponseEntity<Response> delete(@PathVariable Integer id) {
         log.info("[REQUEST] - Eliminar transacción: {}", id);
         Response response = transactionService.delete(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/register-payments")
+    @PreAuthorize("hasAuthority('MODULE_FINANZAS')")
+    public ResponseEntity<Response> registerPayments(@Valid @RequestBody CreatePaymentRequest request) {
+        log.info("[REQUEST] - Registrar pagos semanales: {} pagos para semana {}",
+                request.getPayments() != null ? request.getPayments().size() : 0,
+                request.getWeekId());
+        Response response = weeklyPayTransactionService.createPayments(request);
         return ResponseEntity.ok(response);
     }
 }

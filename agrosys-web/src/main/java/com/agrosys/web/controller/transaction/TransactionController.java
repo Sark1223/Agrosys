@@ -2,6 +2,7 @@ package com.agrosys.web.controller.transaction;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -11,10 +12,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.agrosys.web.dto.Response;
+import com.agrosys.web.dto.transaction.CreatePaymentRequest;
 import com.agrosys.web.dto.transaction.TransactionRequest;
 import com.agrosys.web.utils.GatewayClient;
 import com.agrosys.web.utils.JwtHelper;
@@ -42,6 +45,16 @@ public class TransactionController {
         return "home/transactions/transactions";
     }
 
+    @GetMapping("/payments")
+    public String paymentsPage(HttpSession session, Model model) {
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_FINANZAS")) {
+            return "redirect:/access-denied";
+        }
+        model.addAttribute("modules", modules);
+        return "home/transactions/payments";
+    }
+
     @GetMapping("/history")
     public ResponseEntity<Response> getHistory(
             @RequestParam LocalDate startDate,
@@ -61,7 +74,17 @@ public class TransactionController {
         if (plotId != null) {
             url += "&plotId=" + plotId;
         }
-        Response response = gatewayClient.get(url, Response.class, session.getAttribute("JWT_TOKEN").toString());
+        Response response = gatewayClient.get(url, Response.class, getToken(session));
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Response> getById(@PathVariable Integer id, HttpSession session) {
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_FINANZAS")) {
+            return ResponseEntity.status(403).build();
+        }
+        Response response = gatewayClient.get("/api/transaction/" + id, Response.class, getToken(session));
         return ResponseEntity.ok(response);
     }
 
@@ -87,7 +110,7 @@ public class TransactionController {
         request.setPlotId(plotId);
         request.setLotTradeId(lotTradeId);
 
-        Response response = gatewayClient.post("/api/transaction/register", request, Response.class, session.getAttribute("JWT_TOKEN").toString());
+        Response response = gatewayClient.post("/api/transaction/register", request, Response.class, getToken(session));
         return ResponseEntity.ok(response);
     }
 
@@ -114,7 +137,7 @@ public class TransactionController {
         request.setPlotId(plotId);
         request.setLotTradeId(lotTradeId);
 
-        Response response = gatewayClient.put("/api/transaction/update/" + id, request, Response.class, session.getAttribute("JWT_TOKEN").toString());
+        Response response = gatewayClient.put("/api/transaction/update/" + id, request, Response.class, getToken(session));
         return ResponseEntity.ok(response);
     }
 
@@ -124,7 +147,51 @@ public class TransactionController {
         if (!modules.contains("MODULE_FINANZAS")) {
             return ResponseEntity.status(403).build();
         }
-        Response response = gatewayClient.delete("/api/transaction/delete/" + id, Response.class, session.getAttribute("JWT_TOKEN").toString());
+        Response response = gatewayClient.delete("/api/transaction/delete/" + id, Response.class, getToken(session));
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/weekly-pay/weeks")
+    public ResponseEntity<Response> getWeeks(HttpSession session) {
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_FINANZAS")) {
+            return ResponseEntity.status(403).build();
+        }
+        Response response = gatewayClient.get("/api/workers/weekly-pay/weeks", Response.class, getToken(session));
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/weekly-pay/summary")
+    public ResponseEntity<Response> getPaymentSummary(@RequestParam Integer weekId, HttpSession session) {
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_FINANZAS")) {
+            return ResponseEntity.status(403).build();
+        }
+        Response response = gatewayClient.get("/api/workers/weekly-pay/summary?weekId=" + weekId, Response.class, getToken(session));
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/weekly-pay/upsert")
+    public ResponseEntity<Response> upsertWeeklyPay(@RequestBody Map<String, Object> request, HttpSession session) {
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_FINANZAS")) {
+            return ResponseEntity.status(403).build();
+        }
+        Response response = gatewayClient.post("/api/workers/weekly-pay/upsert", request, Response.class, getToken(session));
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/weekly-pay/create")
+    public ResponseEntity<Response> createPayments(@RequestBody CreatePaymentRequest request, HttpSession session) {
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_FINANZAS")) {
+            return ResponseEntity.status(403).build();
+        }
+        Response response = gatewayClient.post("/api/transaction/register-payments", request, Response.class, getToken(session));
+        return ResponseEntity.ok(response);
+    }
+
+    private String getToken(HttpSession session) {
+        return session.getAttribute("JWT_TOKEN").toString();
     }
 }

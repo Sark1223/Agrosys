@@ -32,6 +32,8 @@
                 class="text-decoration-none "><i class="ri-plant-fill fs-5 text-light" id="iconPlots"></i></a>
             <a th:href="@{/transactions}" th:if="${#lists.contains(modules, 'MODULE_FINANZAS')}"
                 class="text-decoration-none "><i class="ri-cash-line fs-5 text-light" id="iconTransactions"></i></a>
+            <a th:href="@{/transactions/payments}" th:if="${#lists.contains(modules, 'MODULE_FINANZAS')}"
+                class="text-decoration-none "><i class="ri-money-dollar-circle-line fs-5 text-light" id="iconPayments"></i></a>
             <a th:href="@{/workers}" th:if="${#lists.contains(modules, 'MODULE_TRABAJADORES')}"
                 class="text-decoration-none "><i class="ri-team-fill fs-5 text-light" id="iconWorkers"></i></a>
             <a th:href="@{/tasks}" th:if="${#lists.contains(modules, 'MODULE_TAREAS')}"

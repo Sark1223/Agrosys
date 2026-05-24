@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: html_head}"></head>
+<body>
+    <div class="d-flex vh-100">
+        <div th:replace="~{fragments :: sidebar}"></div>
+        <main class="content-area p-4 w-100 bg-light">
+            <header class="d-flex justify-content-between">
+                <h1>Pagos Semanales</h1>
+                <i class="ri-user-3-fill profile-icon"></i>
+            </header>
+            <div class="page-content">
+                <div class="options p-2 d-flex justify-content-between align-items-center mb-3 border-bottom pb-3">
+                    <div class="row g-3 align-items-end w-100">
+                        <div class="col-md-4">
+                            <label class="fw-bold small">Semana <span class="text-danger">*</span></label>
+                            <select id="weekSelect" class="form-select" required>
+                                <option value="">Seleccione una semana...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex gap-2">
+                            <button class="btn btn-primary w-50" id="btnLoadSummary">
+                                <i class="ri-search-line"></i> Cargar
+                            </button>
+                            <button class="btn btn-success w-50" id="btnGeneratePayments">
+                                <i class="ri-money-dollar-circle-line"></i> Generar Pagos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Trabajador</th>
+                                <th>Salario Base</th>
+                                <th>Pago Semanal</th>
+                                <th>Bonos</th>
+                                <th>Total</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodySummary">
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">
+                                    Selecciona una semana y presiona Cargar
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- Modal Editar Pago -->
+    <div class="modal fade" id="modalEditPay" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Pago Semanal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editPayForm">
+                        <input type="hidden" id="editWorkerId">
+                        <input type="hidden" id="editWeekId">
+                        <div class="mb-3">
+                            <label class="form-label">Trabajador</label>
+                            <input type="text" id="editWorkerName" class="form-control" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Pago Semanal (base) <span class="text-danger">*</span></label>
+                            <input type="number" id="editAmount" class="form-control" step="0.01" required>
+                            <small class="text-muted">Los bonos por tareas especiales se suman automáticamente</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="btnSavePay">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/transactions/payments.js}"></script>
+</body>
+</html>
