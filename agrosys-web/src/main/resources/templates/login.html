@@ -4,148 +4,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar sesión · Agrosys</title>
+    <title>Login</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
 
-    <!-- RemixIcon (ya instalada en tu proyecto) -->
-    <link rel="stylesheet" th:href="@{/css/remixicon/remixicon.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
 
     <link rel="stylesheet" th:href="@{/css/login.css}">
 </head>
 
 <body>
 
-    <div class="scene">
+    <div class="container">
+        <div class="alert alert-dismissible alert-warning py-2 mt-4" th:if="${info}">
+            <button type="button" class="btn-close py-0 h-100" data-bs-dismiss="alert"></button>
+            <strong>Oh no!</strong> La sesión ha expirado :(
+        </div>
+        <h2>Iniciar sesión</h2>
 
-        <!-- ── Panel izquierdo: ilustración + branding ── -->
-        <div class="left-panel">
-            <svg class="field-svg" viewBox="0 0 300 580" preserveAspectRatio="xMidYMid slice"
-                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <rect width="300" height="580" fill="#0e2c1c"/>
-                <ellipse cx="150" cy="620" rx="260" ry="160" fill="#133d22"/>
-                <ellipse cx="150" cy="660" rx="220" ry="130" fill="#1a5230"/>
-                <g opacity="0.75">
-                    <path d="M30 420 Q35 360 40 300 Q45 360 50 420Z"  fill="#22c55e"/>
-                    <path d="M40 420 Q43 370 46 340 Q49 370 52 420Z"  fill="#16a34a"/>
-                    <path d="M55 430 Q63 355 70 290 Q77 355 84 430Z"  fill="#22c55e"/>
-                    <path d="M68 430 Q74 365 78 325 Q82 365 86 430Z"  fill="#15803d"/>
-                    <path d="M90 415 Q97 345 102 280 Q107 345 112 415Z" fill="#22c55e"/>
-                    <path d="M102 415 Q107 360 110 330 Q113 360 116 415Z" fill="#16a34a"/>
-                    <path d="M118 420 Q126 350 132 285 Q138 350 144 420Z" fill="#22c55e"/>
-                    <path d="M130 420 Q135 362 138 328 Q141 362 144 420Z" fill="#15803d"/>
-                    <path d="M150 415 Q158 340 164 270 Q170 340 176 415Z" fill="#22c55e"/>
-                    <path d="M163 415 Q168 357 171 322 Q174 357 177 415Z" fill="#16a34a"/>
-                    <path d="M180 420 Q188 350 194 285 Q200 350 206 420Z" fill="#22c55e"/>
-                    <path d="M193 420 Q198 363 201 330 Q204 363 207 420Z" fill="#15803d"/>
-                    <path d="M212 415 Q220 345 226 278 Q232 345 238 415Z" fill="#22c55e"/>
-                    <path d="M225 415 Q230 358 233 325 Q236 358 239 415Z" fill="#16a34a"/>
-                    <path d="M245 420 Q253 350 258 285 Q263 350 268 420Z" fill="#22c55e"/>
-                    <path d="M258 420 Q263 363 266 330 Q269 363 272 420Z" fill="#15803d"/>
-                </g>
-                <rect x="0" y="400" width="300" height="8"   fill="#0a2010"/>
-                <rect x="0" y="408" width="300" height="172" fill="#081a0e"/>
-                <circle cx="210" cy="140" r="55" fill="#0f2a1a"/>
-                <circle cx="210" cy="140" r="38" fill="#fbbf24" opacity="0.12"/>
-                <circle cx="210" cy="140" r="25" fill="#fbbf24" opacity="0.18"/>
-                <circle cx="60"  cy="60"  r="3"   fill="#fff" opacity="0.50"/>
-                <circle cx="120" cy="30"  r="2"   fill="#fff" opacity="0.40"/>
-                <circle cx="180" cy="80"  r="2.5" fill="#fff" opacity="0.30"/>
-                <circle cx="250" cy="50"  r="2"   fill="#fff" opacity="0.45"/>
-                <circle cx="270" cy="100" r="1.5" fill="#fff" opacity="0.35"/>
-                <circle cx="80"  cy="110" r="2"   fill="#fff" opacity="0.30"/>
-                <circle cx="20"  cy="180" r="1.5" fill="#fff" opacity="0.40"/>
-                <circle cx="140" cy="200" r="1.5" fill="#fff" opacity="0.25"/>
-            </svg>
-
-            <div class="left-content">
-                <div class="brand-badge">
-                    <i class="ri-leaf-line" aria-hidden="true"></i>
-                    <span>AGROSYS</span>
-                </div>
-                <h1>Cultiva el<br><span class="accent">futuro</span> de<br>tus campos</h1>
-                <p>Gestiona ciclos, parcelas y procesos agrícolas desde un solo lugar.</p>
-                <div class="stats-row">
-                    <div class="stat-pill">
-                        <span class="num ri-plant-fill"></span>
-                        <span class="lbl">Parcelas</span>
-                    </div>
-                    <div class="stat-pill">
-                        <span class="num ri-cash-line"></span>
-                        <span class="lbl">Finanzas</span>
-                    </div>
-                    <div class="stat-pill">
-                        <span class="num ri-bar-chart-2-line"></span>
-                        <span class="lbl">Monitoreo</span>
-                    </div>
-                </div>
+        <form method="post" th:action="@{/login}">
+            <div class="input-group">
+                <label for="username">Nombre de usuario:</label>
+                <input id="username" type="text" name="username" placeholder="Ingrese su nombre de usuario" />
             </div>
+            <div class="input-group">
+                <label for="password">Contraseña:</label>
+                <input id="password" type="password" name="password" placeholder="Ingrese su contraseña" />
+            </div>
+            <!-- <div class="button-group">
+                <button class="btn-ingresar" type="submit">Ingresar</button>
+            </div> -->
+
+            <button class="btn-ingresar" type="submit">Ingresar</button>
+
+        </form>
+        <div class="alert alert-dismissible alert-danger py-2 mt-4" th:if="${error}">
+            <button type="button" class="btn-close py-0 h-100" data-bs-dismiss="alert"></button>
+            <strong>Oh no!</strong> Las credenciales son inválidas :(
         </div>
 
-        <!-- ── Panel derecho: formulario ── -->
-        <div class="right-panel">
 
-            <!-- Alerta: sesión expirada -->
-            <div class="alert-strip alert-info" th:if="${info}">
-                <i class="ri-information-line" aria-hidden="true"></i>
-                <span>La sesión ha expirado, por favor ingresa de nuevo.</span>
-            </div>
-
-            <!-- Alerta: credenciales inválidas -->
-            <div class="alert-strip alert-error" th:if="${error}">
-                <i class="ri-error-warning-line" aria-hidden="true"></i>
-                <span>Las credenciales son inválidas :(</span>
-            </div>
-
-            <div class="form-header">
-                <p class="eyebrow">Bienvenido de vuelta</p>
-                <h2>Iniciar sesión</h2>
-                <p class="subtitle">Ingresa tus credenciales para continuar</p>
-            </div>
-
-            <form method="post" th:action="@{/login}">
-
-                <div class="field-wrap">
-                    <label for="username">Nombre de usuario</label>
-                    <div class="input-box">
-                        <i class="ri-user-3-line" aria-hidden="true"></i>
-                        <input id="username" type="text" name="username" placeholder="tu.usuario" autocomplete="username" />
-                    </div>
-                </div>
-
-                <div class="field-wrap">
-                    <label for="password">Contraseña</label>
-                    <div class="input-box">
-                        <i class="ri-lock-line" aria-hidden="true"></i>
-                        <input id="password" type="password" name="password" placeholder="••••••••" autocomplete="current-password" />
-                        <button type="button" class="eye-btn" id="togglePassword" aria-label="Mostrar u ocultar contraseña">
-                            <i class="ri-eye-line" id="eyeIcon" aria-hidden="true"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="divider">
-                    <hr/><span>acceso seguro</span><hr/>
-                </div>
-
-                <button class="btn-main" type="submit">
-                    <i class="ri-login-box-line" aria-hidden="true"></i>
-                    Ingresar al sistema
-                </button>
-
-            </form>
-
-            <p class="footer-note">
-                <i class="ri-shield-check-line" aria-hidden="true"></i>
-                Conexión cifrada · @2026 Agrosys 
-            </p>
-
-        </div>
     </div>
-
-    <script th:src="@{/js/login.js}"></script>
 </body>
 
 </html>

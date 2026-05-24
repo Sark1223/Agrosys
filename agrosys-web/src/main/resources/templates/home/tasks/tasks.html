@@ -43,9 +43,9 @@
                             <button class="btn btn-primary" data-bs-toggle="modal"
                                 data-bs-target="#modalAddSpecialTask"><i class="ri-add-line pe-1"></i>Agregar Tarea Especial</button>
                         </div>
-                        <div class="align-items-center d-flex fs-4 fst-italic justify-content-center text-body-tertiary text-center w-100"
-                            style="height: 100px; display: none;" id="message-special-tasks">Cargando información...</div>
-                        <div class="accordion p-2" id="accordionContainerSpecialTasks">
+                        <div class="d-flex justify-content-center align-items-center text-body-tertiary fs-4 fst-italic w-100"
+                            style="height: 100px; display: none;" id="message-special-tasks">No hay tareas especiales registradas.</div>
+                        <div class="cards d-flex flex-wrap flex-row g-2" id="cardsContainerSpecialTasks">
                             <!-- Se carga por JavaScript -->
                         </div>
                     </div>
@@ -230,49 +230,23 @@
                         <form method="post" th:action="@{/tasks/special/register}" id="addSpecialTaskForm" class="needs-validation"
                             novalidate>
                             <div>
-                                <label for="nameInputSpecial" class="form-label mt-4">Nombre <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="nameInputSpecial" name="name" maxlength="100"
-                                    placeholder="Ingrese el nombre" autocomplete="off" required>
-                                <div class="invalid-feedback">El nombre es requerido</div>
-                            </div>
-                            <div>
-                                <label for="paymentAmountInputSpecial" class="form-label mt-4">Monto de pago <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="paymentAmountInputSpecial" name="paymentAmount" 
-                                    min="0.01" step="0.01" placeholder="Ingrese el monto de pago" autocomplete="off" required>
-                                <div class="invalid-feedback">El pago es requerido</div>
-                            </div>
-                            <div>
-                                <label for="createAtInputSpecial" class="form-label mt-4">Fecha de inicio <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" id="createAtInputSpecial" name="createAt" autocomplete="off" required>
-                                <div class="invalid-feedback">La fecha es requerida</div>
-                            </div>
-                            <div>
-                                <label for="taskStageIdInputSpecial" class="form-label mt-4">Estado</label>
-                                <select class="form-select" id="taskStageIdInputSpecial" name="taskStageId">
-                                    <option value="1">Pendiente</option>
-                                    <option value="2">En Proceso</option>
-                                    <option value="3">Finalizada</option>
+                                <label for="taskIdInputSpecial" class="form-label mt-4">Tarea General <span class="text-danger">*</span></label>
+                                <select class="form-select" id="taskIdInputSpecial" name="taskId" required>
+                                    <option value="">Seleccione una tarea</option>
                                 </select>
+                                <div class="invalid-feedback">La tarea es requerida</div>
                             </div>
                             <div>
-                                <label for="endAtInputSpecial" class="form-label mt-4">Fecha fin (opcional)</label>
-                                <input type="date" class="form-control" id="endAtInputSpecial" name="endAt" autocomplete="off">
+                                <label for="workerIdInputSpecial" class="form-label mt-4">Worker <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="workerIdInputSpecial" name="workerId" 
+                                    placeholder="Ingrese el ID del worker" autocomplete="off" required>
+                                <div class="invalid-feedback">El worker es requerido</div>
                             </div>
                             <div>
-                                <label for="descriptionInputSpecial" class="form-label mt-4">Descripción (opcional)</label>
-                                <input type="text" class="form-control" id="descriptionInputSpecial" name="description"
-                                    maxlength="256" placeholder="Ingrese la descripción" autocomplete="off">
-                            </div>
-                            <div class="worker-selector">
-                                <label class="form-label mt-4">Workers</label>
-                                <div class="selected-workers d-flex flex-wrap gap-1 mb-1" id="selectedWorkersAdd"></div>
-                                <div class="position-relative">
-                                    <input type="text" class="form-control worker-search-input" id="workerSearchAdd"
-                                        placeholder="Escriba para buscar y asignar workers..." autocomplete="off">
-                                    <div class="worker-dropdown d-none border rounded position-absolute w-100 bg-white shadow-sm"
-                                        style="max-height: 150px; overflow-y: auto; z-index: 1050;" id="workerDropdownAdd">
-                                    </div>
-                                </div>
+                                <label for="paymentAmountInputSpecial" class="form-label mt-4">Pago <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="paymentAmountInputSpecial" name="paymentAmount" 
+                                    min="0" step="0.01" placeholder="Ingrese el monto de pago" autocomplete="off" required>
+                                <div class="invalid-feedback">El pago es requerido</div>
                             </div>
                         </form>
                     </div>
@@ -280,122 +254,6 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="button" class="btn btn-success" id="btn-submit-add-special-task">
                             Guardar
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- EDITAR TAREA ESPECIAL -->
-        <div class="modal fade" id="modalEditSpecialTask" tabindex="-1" aria-labelledby="modalEditSpecialTask" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Editar Tarea Especial</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="editSpecialTaskForm" class="needs-validation" novalidate>
-                            <input type="hidden" id="specialTaskIdInputEdit">
-                            <div>
-                                <label for="nameInputSpecialEdit" class="form-label mt-4">Nombre <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="nameInputSpecialEdit" name="name" maxlength="100"
-                                    placeholder="Ingrese el nombre" autocomplete="off" required>
-                                <div class="invalid-feedback">El nombre es requerido</div>
-                            </div>
-                            <div>
-                                <label for="paymentAmountInputSpecialEdit" class="form-label mt-4">Monto de pago <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="paymentAmountInputSpecialEdit" name="paymentAmount"
-                                    min="0.01" step="0.01" placeholder="Ingrese el monto de pago" autocomplete="off" required>
-                                <div class="invalid-feedback">El pago es requerido</div>
-                            </div>
-                            <div>
-                                <label for="createAtInputSpecialEdit" class="form-label mt-4">Fecha de inicio <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" id="createAtInputSpecialEdit" name="createAt" autocomplete="off" required>
-                                <div class="invalid-feedback">La fecha es requerida</div>
-                            </div>
-                            <div>
-                                <label for="taskStageIdInputSpecialEdit" class="form-label mt-4">Estado</label>
-                                <select class="form-select" id="taskStageIdInputSpecialEdit" name="taskStageId">
-                                    <option value="1">Pendiente</option>
-                                    <option value="2">En Proceso</option>
-                                    <option value="3">Finalizada</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="endAtInputSpecialEdit" class="form-label mt-4">Fecha fin (opcional)</label>
-                                <input type="date" class="form-control" id="endAtInputSpecialEdit" name="endAt" autocomplete="off">
-                            </div>
-                            <div>
-                                <label for="descriptionInputSpecialEdit" class="form-label mt-4">Descripción (opcional)</label>
-                                <input type="text" class="form-control" id="descriptionInputSpecialEdit" name="description"
-                                    maxlength="256" placeholder="Ingrese la descripción" autocomplete="off">
-                            </div>
-                            <div class="worker-selector">
-                                <label class="form-label mt-4">Workers</label>
-                                <div class="selected-workers d-flex flex-wrap gap-1 mb-1" id="selectedWorkersEdit"></div>
-                                <div class="position-relative">
-                                    <input type="text" class="form-control worker-search-input" id="workerSearchEdit"
-                                        placeholder="Escriba para buscar y asignar workers..." autocomplete="off">
-                                    <div class="worker-dropdown d-none border rounded position-absolute w-100 bg-white shadow-sm"
-                                        style="max-height: 150px; overflow-y: auto; z-index: 1050;" id="workerDropdownEdit">
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-success" id="btn-submit-edit-special-task">
-                            Guardar
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VER TAREA ESPECIAL -->
-        <div class="modal fade" id="modalViewSpecialTask" tabindex="-1" aria-labelledby="modalViewSpecialTask" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Detalles de la Tarea Especial</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body text-center">
-                        <h4 id="viewSpecialTaskName" class="mb-3"></h4>
-                        <div class="text-start">
-                            <p><strong>ID:</strong> <span id="viewSpecialTaskId"></span></p>
-                            <p><strong>Descripción:</strong> <span id="viewSpecialTaskDescription"></span></p>
-                            <p><strong>Fecha inicio:</strong> <span id="viewSpecialTaskCreateAt"></span></p>
-                            <p><strong>Fecha fin:</strong> <span id="viewSpecialTaskEndAt"></span></p>
-                            <p><strong>Pago:</strong> $<span id="viewSpecialTaskPayment"></span></p>
-                            <p><strong>Estado:</strong> <span id="viewSpecialTaskStage"></span></p>
-                            <p><strong>Workers:</strong> <span id="viewSpecialTaskWorkers"></span></p>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ELIMINAR TAREA ESPECIAL -->
-        <div class="modal fade" id="modalDeleteSpecialTask" tabindex="-1" aria-labelledby="modalDeleteSpecialTask" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                <div class="modal-content border-danger text-white bg-dark">
-                    <div class="modal-header border-danger">
-                        <h5 class="modal-title">Eliminar Tarea Especial</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p id="textDeleteSpecialTask">¿Está seguro de que desea eliminar la tarea especial?</p>
-                    </div>
-                    <div class="modal-footer border-danger fw-bolder">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-danger" id="btn-submit-delete-special-task">
-                            Eliminar
                         </button>
                     </div>
                 </div>

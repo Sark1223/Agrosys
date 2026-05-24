@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PlantatioService {
     private final PlantatioRespository plantatioRespository;
 
-    public List<PlantatioRespository.PlantatiosByPlotProjection> getAllPlantatioByPlotId(Integer plotId) {
+    public List<PlantatioRespository.PlantatioProjection> getAllPlantatioByPlotId(Integer plotId) {
         log.info("Obteniendo plantaciones por id de parcela: {}", plotId);
         return plantatioRespository.findByPlotId(plotId);
     }
@@ -74,13 +74,6 @@ public class PlantatioService {
 
     @Transactional
     public Response deletePlantatio(Integer plantatioId) {
-
-        Integer lotes = plantatioRespository.countLotsByPlantatio(plantatioId);
-        if (lotes > 0) {
-            throw new IllegalArgumentException(
-                    "No se puede eliminar la plantación porque existen lotes asociados");
-        }
-
         Integer delete = plantatioRespository.deletePlantatio(plantatioId);
 
         if (delete.equals(0)) {
@@ -397,34 +390,4 @@ public class PlantatioService {
                 .success(true)
                 .build();
     }
-
-    public Response deleteStageOfPlantatio(Integer plantationId, Integer id) {
-        if (id.equals(3) || id.equals(4)) {
-            if (plantatioRespository.countLotsByPlantatio(plantationId) > 0) {
-                throw new IllegalArgumentException(
-                        "No se puede eliminar esta etapa porque existen lotes asociados a esta plantación");
-            }
-        }
-
-        Integer delete = plantatioRespository.deleteStageOfPlantatio(plantationId, id);
-        log.info("Delete stage of plantatio result: {}", delete);
-        if (delete.equals(0)) {
-            throw new RuntimeException("No se pudo eliminar la etapa de la plantacion");
-        }
-
-        return Response.builder()
-                .message("Etapa de plantacion eliminada exitosamente")
-                .success(true)
-                .build();
-    }
-
-	public Response getAllPlantations(String initDate, String endDate) {
-		List<PlantatioRespository.PlantatioWithStageProjection> lista = plantatioRespository.findAllPlantations(initDate, endDate);
-        return Response.builder()
-                .success(true)
-                .message("Plantacione obtenidas correctamente")
-                .data(lista)
-                .build();
-	}
-
 }

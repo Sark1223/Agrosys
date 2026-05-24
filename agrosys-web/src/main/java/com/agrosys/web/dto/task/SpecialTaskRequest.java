@@ -1,19 +1,22 @@
 package com.agrosys.web.dto.task;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 @Data
 public class SpecialTaskRequest {
-    private String name;
-    private BigDecimal paymentAmount;
-    private LocalDate createAt;
-    private Integer taskStageId;
-    private LocalDate endAt;
-    private String description;
-    private List<Integer> workerIds;
 
+    @NotNull(message = "El ID de la tarea es obligatorio")
+    private Integer taskId;
+
+    @NotNull(message = "El ID del trabajador es obligatorio")
+    private Integer workerId;
+
+    @Positive(message = "El monto de pago debe ser positivo")
+    private BigDecimal paymentAmount;
+
+    private Integer taskStageId;
 }

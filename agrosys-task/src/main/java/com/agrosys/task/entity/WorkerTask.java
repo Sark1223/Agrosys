@@ -11,7 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "WORKER_TASK", catalog ="agrosys_task")
+@Table(name = "WORKER_TASK", schema= "agrosys_task")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

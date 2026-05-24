@@ -7,8 +7,7 @@
     <div class="d-flex vh-100">
         <div th:replace="~{fragments :: sidebar}"></div>
 
-        <main class="content-area p-4 w-100 bg-light" th:if="${admin}">
-
+        <main class="content-area p-4 w-100 bg-light">
 
             <header class="d-flex justify-content-between">
                 <div>
@@ -20,24 +19,19 @@
             </header>
 
             <section class="dashboard-actions">
-                <button id="btnRegistrarAsistencia" class="dashboard-btn btn-asistencia"
-                    th:data-worker-id="${workerId}">
+                <button id="btnRegistrarAsistencia" class="dashboard-btn btn-asistencia">
                     Registrar asistencia
                 </button>
 
-                <button id="btnRegistrarNuevoLote" class="dashboard-btn btn-lote"
-                    th:if="${#lists.contains(modules, 'MODULE_PARCELAS')}" data-bs-toggle="modal"
-                    data-bs-target="#modalAddLot">
+                <button id="btnRegistrarNuevoLote" class="dashboard-btn btn-lote">
                     Registrar nuevo lote
                 </button>
 
-                <button id="btnRegistrarNuevaTransaccion" class="dashboard-btn btn-transaccion"
-                    th:if="${#lists.contains(modules, 'MODULE_FINANZAS')}">
+                <button id="btnRegistrarNuevaTransaccion" class="dashboard-btn btn-transaccion">
                     Registrar nueva transaccion
                 </button>
 
-                <button id="btnVerSalarios" class="dashboard-btn btn-salarios"
-                    th:if="${#lists.contains(modules, 'MODULE_FINANZAS')}">
+                <button id="btnVerSalarios" class="dashboard-btn btn-salarios">
                     Ver salarios
                 </button>
             </section>
@@ -85,53 +79,8 @@
                 </div>
             </section>
         </main>
-
-        <main class="content-area p-4 w-100 bg-light" th:unless="${admin}">
-
-            <header class="d-flex justify-content-between">
-                <div>
-                    <h1>Bienvenid@!</h1>
-                    <p>Aquí tienes el estatus general. (:</p>
-                </div>
-                <i class="ri-user-3-fill profile-icon"></i>
-            </header>
-
-            <section class="dashboard-grid usuario-grid">
-
-                <!-- Reloj -->
-                <div id="cardReloj" class="dashboard-card reloj-card">
-                    <div class="reloj-contenido">
-                        <div class="reloj-horizontal">
-                            <span id="relojHoras" class="reloj-numero-grande">00</span>
-                            <span class="reloj-separador">:</span>
-                            <span id="relojMinutos" class="reloj-numero-grande">00</span>
-                            <span class="reloj-separador reloj-separador-chico">:</span>
-                            <span id="relojSegundos" class="reloj-numero-chico">00</span>
-                            <span id="relojAmPm" class="reloj-ampm">AM</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Clima -->
-                <div id="cardClima" class="dashboard-card clima-card">
-                    <h3>CLIMA</h3>
-                    <div id="climaContenido" class="clima-contenido">
-                        <p id="climaEstado">Cargando clima...</p>
-                    </div>
-                </div>
-
-            </section>
-        </main>
     </div>
-
-    <div th:if="${#lists.contains(modules, 'MODULE_PARCELAS')}">
-        <div th:if="${admin}" th:replace="~{home/plot/_modalsPlot :: fLotModalAdd}"></div>
-
-        <script th:src="@{/js/home/home.js}"></script>
-        <script th:src="@{/js/plot/plantatio.js}"></script>
-        <script th:src="@{/js/plot/lot.js}"></script>
-    </div>
-
+    <script th:src="@{/js/home/home.js}"></script>
 </body>
 
 </html>

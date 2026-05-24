@@ -14,7 +14,7 @@ import jakarta.transaction.Transactional;
 @Repository
 public interface PlantatioRespository extends JpaRepository<AgrosysPlantatio, Integer> {
 
-        interface PlantatiosByPlotProjection {
+        interface PlantatioProjection {
                 Integer getPlantatioId();
 
                 String getName();
@@ -40,66 +40,7 @@ public interface PlantatioRespository extends JpaRepository<AgrosysPlantatio, In
                         WHERE plotId = :plotId
                         ORDER BY plantatioId DESC
                         """, nativeQuery = true)
-        List<PlantatiosByPlotProjection> findByPlotId(Integer plotId);
-
-        interface PlantatioWithStageProjection {
-                Integer getPlantatioId();
-
-                String getName();
-
-                String getPlotName();
-
-                String getStartAt();
-
-                String getEndAt();
-
-                String getNotas();
-
-                Integer getPlotId();
-
-                String getStageId();
-
-                String getStage();
-
-        }
-
-        @Query(value = """
-                        /*SELECT
-                                plantatioId,
-                                name,
-                                start_at,
-                                end_at,
-                                notas,
-                                plotId
-                        FROM agrosys_db.plantatio
-                        WHERE (start_at BETWEEN :initDate AND :endDate) OR (end_at BETWEEN :initDate AND :endDate)
-                        ORDER BY plantatioId DESC*/
-                        WITH ranked AS (SELECT
-                                        p.plantatioId,
-                                        p.name,
-                                        plot.name as plotName,
-                                        p.start_at,
-                                        COALESCE(p.end_at, 'N/A') as 'endAt',
-                                        p.notas,
-                                        p.plotId,
-                                        stage.stageId,
-                                        stage.name AS stage,
-                                        ROW_NUMBER() OVER (
-                                        PARTITION BY p.plantatioId
-                                        ORDER BY relation.stageId DESC
-                                        ) AS rn
-                        FROM agrosys_db.plantatio p
-                        LEFT JOIN agrosys_db.plantatio_stage_relation relation
-                                ON relation.plantatioId = p.plantatioId
-                        LEFT JOIN agrosys_db.plantatio_stage stage
-                                ON relation.stageId = stage.stageId
-                        LEFT JOIN agrosys_db.plot plot
-                                ON plot.plotId = p.plotId)
-                        SELECT * FROM ranked
-                                WHERE rn = 1
-                                        AND ((start_at BETWEEN :initDate AND :endDate) OR (endAt BETWEEN :initDate AND :endDate));
-                        """, nativeQuery = true)
-        List<PlantatioWithStageProjection> findAllPlantations(String initDate, String endDate);
+        List<PlantatioProjection> findByPlotId(Integer plotId);
 
         @Query(value = """
                         SELECT plantatioId
@@ -271,18 +212,13 @@ public interface PlantatioRespository extends JpaRepository<AgrosysPlantatio, In
                         """, nativeQuery = true)
         Integer updatePlantatioStartDate(Integer plantatioId, String start_at);
 
-        @Query(value = """
-                        SELECT COUNT(*) FROM LOT WHERE plantationId = :plantatioId;
-                        """, nativeQuery = true)
-        Integer countLotsByPlantatio(Integer plantatioId);
-
         @Transactional
         @Modifying
         @Query(value = """
                         DELETE FROM agrosys_db.plantatio_stage_relation
                         WHERE plantatioId = :plantatioId AND stageId = :stageId
                         """, nativeQuery = true)
-        Integer deleteStageOfPlantatio(Integer plantatioId, Integer stageId);
+        Integer deletePlantatioStage(Integer plantatioId, Integer stageId);
 
         interface PlantatioStageProjection {
                 Integer getId();
