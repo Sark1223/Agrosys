@@ -93,25 +93,12 @@ public class TransactionController {
     @PostMapping("/register")
     @ResponseBody
     public ResponseEntity<Response> register(
-            @RequestParam String transactionType,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createAt,
-            @RequestParam java.math.BigDecimal amount,
-            @RequestParam(required = false) String description,
-            @RequestParam(required = false) Integer plotId,
-            @RequestParam(required = false) Integer lotTradeId,
+            @RequestBody TransactionRequest request,
             HttpSession session) {
         List<String> modules = jwtHelper.getUserModules(session);
         if (!modules.contains("MODULE_FINANZAS")) {
             return ResponseEntity.status(403).build();
         }
-
-        TransactionRequest request = new TransactionRequest();
-        request.setTransactionType(transactionType);
-        request.setCreateAt(createAt);
-        request.setAmount(amount);
-        request.setDescription(description);
-        request.setPlotId(plotId);
-        request.setLotTradeId(lotTradeId);
 
         Response response = gatewayClient.post("/api/transaction/register", request, Response.class, getToken(session));
         return ResponseEntity.ok(response);
@@ -121,25 +108,12 @@ public class TransactionController {
     @ResponseBody
     public ResponseEntity<Response> update(
             @PathVariable Integer id,
-            @RequestParam String transactionType,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createAt,
-            @RequestParam java.math.BigDecimal amount,
-            @RequestParam(required = false) String description,
-            @RequestParam(required = false) Integer plotId,
-            @RequestParam(required = false) Integer lotTradeId,
+            @RequestBody TransactionRequest request,
             HttpSession session) {
         List<String> modules = jwtHelper.getUserModules(session);
         if (!modules.contains("MODULE_FINANZAS")) {
             return ResponseEntity.status(403).build();
         }
-
-        TransactionRequest request = new TransactionRequest();
-        request.setTransactionType(transactionType);
-        request.setCreateAt(createAt);
-        request.setAmount(amount);
-        request.setDescription(description);
-        request.setPlotId(plotId);
-        request.setLotTradeId(lotTradeId);
 
         Response response = gatewayClient.put("/api/transaction/update/" + id, request, Response.class, getToken(session));
         return ResponseEntity.ok(response);
