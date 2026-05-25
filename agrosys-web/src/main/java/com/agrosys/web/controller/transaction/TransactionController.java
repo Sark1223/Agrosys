@@ -115,7 +115,8 @@ public class TransactionController {
             return ResponseEntity.status(403).build();
         }
 
-        Response response = gatewayClient.put("/api/transaction/update/" + id, request, Response.class, getToken(session));
+        Response response = gatewayClient.put("/api/transaction/update/" + id, request, Response.class,
+                getToken(session));
         return ResponseEntity.ok(response);
     }
 
@@ -146,7 +147,8 @@ public class TransactionController {
         if (!modules.contains("MODULE_FINANZAS")) {
             return ResponseEntity.status(403).build();
         }
-        Response response = gatewayClient.get("/api/workers/weekly-pay/summary?weekId=" + weekId, Response.class, getToken(session));
+        Response response = gatewayClient.get("/api/workers/weekly-pay/summary?weekId=" + weekId, Response.class,
+                getToken(session));
         return ResponseEntity.ok(response);
     }
 
@@ -156,7 +158,8 @@ public class TransactionController {
         if (!modules.contains("MODULE_FINANZAS")) {
             return ResponseEntity.status(403).build();
         }
-        Response response = gatewayClient.post("/api/workers/weekly-pay/upsert", request, Response.class, getToken(session));
+        Response response = gatewayClient.post("/api/workers/weekly-pay/upsert", request, Response.class,
+                getToken(session));
         return ResponseEntity.ok(response);
     }
 
@@ -166,11 +169,30 @@ public class TransactionController {
         if (!modules.contains("MODULE_FINANZAS")) {
             return ResponseEntity.status(403).build();
         }
-        Response response = gatewayClient.post("/api/transaction/register-payments", request, Response.class, getToken(session));
+        Response response = gatewayClient.post("/api/transaction/register-payments", request, Response.class,
+                getToken(session));
         return ResponseEntity.ok(response);
     }
 
     private String getToken(HttpSession session) {
         return session.getAttribute("JWT_TOKEN").toString();
     }
+
+    /* CONTENEDORES DE INGRESOS Y GASTOS */
+    @GetMapping("/transaction")
+    @ResponseBody
+    public ResponseEntity<Response> gettransaction(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            HttpSession session) {
+        List<String> modules = jwtHelper.getUserModules(session);
+        if (!modules.contains("MODULE_FINANZAS")) {
+            return ResponseEntity.status(403).build();
+        }
+        String url = "/api/transaction/totals?startDate=" + startDate + "&endDate=" + endDate;
+
+        Response response = gatewayClient.get(url, Response.class, getToken(session));
+        return ResponseEntity.ok(response);
+    }
+
 }

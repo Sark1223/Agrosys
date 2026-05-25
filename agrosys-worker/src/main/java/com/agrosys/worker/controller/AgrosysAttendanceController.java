@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AgrosysAttendanceController {
 
     private final AttendanceService attendanceService;
+    private final WorkerRepository workerRepository;
 
     @GetMapping("/active-workers")
     @PreAuthorize("hasAuthority('MODULE_TRABAJADORES')")

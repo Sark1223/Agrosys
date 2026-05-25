@@ -18,14 +18,16 @@ $(document).ready(function () {
             data: { workerId: workerId },
             success: function (response) {
                 if (response.data > 0) {
-                    Swal.fire({ icon: 'warning', title: 'Asistencia', text: 'Ya se registró la asistencia del día de hoy.'
+                    Swal.fire({
+                        icon: 'warning', title: 'Asistencia', text: 'Ya se registró la asistencia del día de hoy.'
                     });
                 } else {
                     window.location.href = '/agrosys/workers';
                 }
             },
             error: function () {
-                Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo validar la asistencia.'
+                Swal.fire({
+                    icon: 'error', title: 'Error', text: 'No se pudo validar la asistencia.'
                 });
             }
         });
@@ -231,6 +233,62 @@ $(document).ready(function () {
         }
     }
 
+    // ===============================
+    // INGRESOS Y GASTOS
+    // ===============================
+    $.fn.cargarTransacciones = function (anio, mes, dia) {
+        const fecha = anio + '-' + String(mes).padStart(2, '0') + '-' + String(dia).padStart(2, '0');
+
+        $.ajax({
+            url: '/agrosys/transactions/transaction?startDate=' + fecha + '&endDate=' + fecha,
+            type: 'GET',
+            success: function (response) {
+                const data = response.data;
+                const ingresos = data?.totalIngresos ?? 0;
+                const egresos = data?.totalEgresos ?? 0;
+
+                // Card Ingresos
+                if (ingresos === 0) {
+                    $('#cardIngresos').html(`
+                    <h3>INGRESOS</h3>
+                    <p style="color:#9ca3af;font-size:13px;margin-top:16px;align-self: center;">No hay ingresos para este día.</p>
+                `);
+                } else {
+                    $('#cardIngresos').html(`
+                    <h3>INGRESOS</h3>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:8px;">
+                        <div style="width:64px;height:64px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;">
+                            <i class="ri-arrow-up-line" style="font-size:28px;color:#16a34a;"></i>
+                        </div>
+                        <span style="font-size:20px;font-weight:700;color:#16a34a;">+$${parseFloat(ingresos).toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                `);
+                }
+
+                // Card Gastos
+                if (egresos === 0) {
+                    $('#cardGastos').html(`
+                    <h3>GASTOS</h3>
+                    <p style="color:#9ca3af;font-size:13px;margin-top:16px; align-self: center;">No hay gastos para este día.</p>
+                `);
+                } else {
+                    $('#cardGastos').html(`
+                    <h3>GASTOS</h3>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:8px;">
+                        <div style="width:64px;height:64px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;">
+                            <i class="ri-bank-card-line" style="font-size:28px;color:#dc2626;"></i>
+                        </div>
+                        <span style="font-size:20px;font-weight:700;color:#dc2626;">-$${parseFloat(egresos).toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                `);
+                }
+            },
+            error: function () {
+                $('#cardIngresos').html('<h3>INGRESOS</h3><p style="color:#d32f2f;font-size:13px;margin-top:16px;">Error al cargar.</p>');
+                $('#cardGastos').html('<h3>GASTOS</h3><p style="color:#d32f2f;font-size:13px;margin-top:16px;">Error al cargar.</p>');
+            }
+        });
+    };
     // ===============================
     // LÓGICA EXCLUSIVA DEL ADMIN
     // ===============================
@@ -461,10 +519,6 @@ $(document).ready(function () {
             return parseInt(partes[2]) + ' ' + meses[parseInt(partes[1]) - 1] + ' ' + partes[0];
         }
 
-        $('#btnVerSalarios').click(function () {
-            window.location.href = '/';
-        });
-
         $.fn.initFiltros = function () {
             const anioSelect = $('#filtroAnio');
             const mesSelect = $('#filtroMes');
@@ -488,8 +542,8 @@ $(document).ready(function () {
                 mesSelect.append(`<option value="${mes.valor}">${mes.nombre}</option>`);
             });
 
-            anioSelect.val('2026');
-            mesSelect.val('4');
+            //anioSelect.val('2026');
+            mesSelect.val('5');
             $.fn.cargarDiasFiltro();
         };
 
@@ -517,6 +571,7 @@ $(document).ready(function () {
                 const dia = filtros.dia != '1' ? filtros.dia : null;
                 $.fn.cargarGraficoTareas(filtros.anio, filtros.mes, dia);
                 $.fn.cargarGraficoTareasPorTrabajador(filtros.anio, filtros.mes, dia);
+                $.fn.cargarTransacciones(filtros.anio, filtros.mes, filtros.dia);
             });
         };
 
@@ -568,7 +623,7 @@ $(document).ready(function () {
                         type: 'bar',
                         data: {
                             labels: ['Pendiente', 'En Proceso', 'Finalizada'],
-                            datasets: [{ label: 'Tareas', data: valores, backgroundColor: ['#ffc107', '#0d6efd', '#198754'], borderRadius: 6, borderWidth: 0 }]
+                            datasets: [{ label: 'Tareas', data: valores, backgroundColor: ['#FFB86A', '#8EC5FF', '#BBF451'], borderRadius: 6, borderWidth: 0 }]
                         },
                         options: {
                             indexAxis: 'y', responsive: true,
@@ -600,9 +655,9 @@ $(document).ready(function () {
                         data: {
                             labels: data.map(d => d.workerName),
                             datasets: [
-                                { label: 'Pendiente', data: data.map(d => d['Pendiente']), backgroundColor: '#ffc107', borderRadius: 4, borderWidth: 0 },
-                                { label: 'En Proceso', data: data.map(d => d['En Proceso']), backgroundColor: '#0d6efd', borderRadius: 4, borderWidth: 0 },
-                                { label: 'Finalizada', data: data.map(d => d['Finalizada']), backgroundColor: '#198754', borderRadius: 4, borderWidth: 0 }
+                                { label: 'Pendiente', data: data.map(d => d['Pendiente']), backgroundColor: '#FFB86A', borderRadius: 4, borderWidth: 0 },
+                                { label: 'En Proceso', data: data.map(d => d['En Proceso']), backgroundColor: '#8EC5FF', borderRadius: 4, borderWidth: 0 },
+                                { label: 'Finalizada', data: data.map(d => d['Finalizada']), backgroundColor: '#BBF451', borderRadius: 4, borderWidth: 0 }
                             ]
                         },
                         options: {
@@ -623,6 +678,9 @@ $(document).ready(function () {
         const filtrosIniciales = $.fn.getFiltrosSeleccionados();
         $.fn.cargarGraficoTareas(filtrosIniciales.anio, filtrosIniciales.mes, null);
         $.fn.cargarGraficoTareasPorTrabajador(filtrosIniciales.anio, filtrosIniciales.mes, null);
+
+        const hoy = new Date();
+        $.fn.cargarTransacciones(hoy.getFullYear(), hoy.getMonth() + 1, hoy.getDate());
     }
 
     // ===============================

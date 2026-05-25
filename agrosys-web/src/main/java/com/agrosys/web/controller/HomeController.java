@@ -26,12 +26,17 @@ public class HomeController {
         if (session.getAttribute("JWT_TOKEN") == null) {
             return "login";
         }
-
         List<String> modules = jwtHelper.getUserModules(session);
-        if (!modules.contains("MODULE_PARCELAS"))
-            return "redirect:/access-denied";
-        
+        log.info("modules", modules);
         model.addAttribute("modules", modules);
-        return "home/home";
+        if (modules.contains("MODULE_DASHBOARD_ADMIN")) {
+            log.info("ENTRO AQUI");
+            model.addAttribute("admin", "estoy entrando");
+            return "home/home";
+        } else if (modules.contains("MODULE_DASHBOARD_USER")) {
+            log.info("ENTRO AQUI 2");
+            return "home/home";
+        } else
+            return "redirect:/access-denied";
     }
 }

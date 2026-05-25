@@ -3,6 +3,7 @@ package com.agrosys.transaction.controller;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.apache.catalina.startup.ClassLoaderFactory.Repository;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,6 +22,7 @@ import com.agrosys.transaction.dto.Response;
 import com.agrosys.transaction.dto.TransactionRequest;
 import com.agrosys.transaction.entity.AgrosysTransaction;
 import com.agrosys.transaction.repository.TransactionRepository;
+import com.agrosys.transaction.repository.TransactionRepository.TransactionTotalsProjection;
 import com.agrosys.transaction.service.TransactionService;
 import com.agrosys.transaction.service.WeeklyPayTransactionService;
 
@@ -34,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AgrosysTransactionController {
 
+    private final TransactionRepository transactionRepository;
     private final TransactionService transactionService;
     private final WeeklyPayTransactionService weeklyPayTransactionService;
 
@@ -44,8 +47,8 @@ public class AgrosysTransactionController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) String type,
             @RequestParam(required = false) Integer plotId) {
-        List<TransactionRepository.TransactionProjection> transactions =
-                transactionService.getAllWithPlot(plotId, startDate, endDate, type);
+        List<TransactionRepository.TransactionProjection> transactions = transactionService.getAllWithPlot(plotId,
+                startDate, endDate, type);
         return ResponseEntity.ok(Response.builder()
                 .success(true)
                 .message("Transacciones obtenidas exitosamente")
@@ -97,4 +100,21 @@ public class AgrosysTransactionController {
         Response response = weeklyPayTransactionService.createPayments(request);
         return ResponseEntity.ok(response);
     }
+
+    /* CONTENEDORES DE INGRESOS Y GASTOS */
+    @GetMapping("/totals") 
+    @PreAuthorize("hasAuthority('MODULE_FINANZAS')")
+    public ResponseEntity<Response> transaction(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        TransactionTotalsProjection totals = transactionRepository.getTransactionTotals(startDate, endDate);
+
+        return ResponseEntity.ok(Response.builder()
+                .success(true)
+                .message("Transacciones obtenidas exitosamente")
+                .data(totals)
+                .build());
+    }
+
 }
