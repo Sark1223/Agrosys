@@ -256,7 +256,7 @@ $(document).ready(function () {
 
                         $card.find(`.edit-${tm.origin}`).on('click', function (e) {
 
-                            $('#qtyLotTrade').val(pu.qty);
+                            $('#qtyLotTrade').val(tm.qty);
                             $('#idTradeModeEdit').val(tm.id);
                             $('#nameTradeModeInputEdit').val(tm.name);
                             $('#cBxActiveTradeModeEdit').prop('checked', active);
@@ -347,7 +347,7 @@ $(document).ready(function () {
 
                         $card.find(`.edit-${pt.origin}`).on('click', function (e) {
 
-                            $('#qtyLotTrade').val(pu.qty);
+                            $('#qtyLotTrade').val(pt.qty);
                             $('#idProductTypeEdit').val(pt.id);
                             $('#nameProductTypeInputEdit').val(pt.name);
                             $('#cBxActiveProductTypeEdit').prop('checked', active);

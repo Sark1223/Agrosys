@@ -70,7 +70,7 @@ public class AttendanceController {
             String url = "/api/workers/attendance/history?";
             if (workerId != null)
                 url += "workerId=" + workerId + "&";
-
+            
             url += "startDate=" + startDate + "&endDate=" + endDate;
 
             Response response = gatewayClient.get(url, Response.class, token);

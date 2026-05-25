@@ -36,56 +36,55 @@ public interface SpecialTaskRepository extends JpaRepository<SpecialTask, Intege
     }
 
     @Query(value = """
-            SELECT
-                st.special_task_id AS specialTaskId,
-                st.name,
-                st.payment_amount AS paymentAmount,
-                st.create_at AS createAt,
-                st.task_stage_id AS taskStageId,
-                st.end_at AS endAt,
-                st.description,
-                GROUP_CONCAT(wt.worker_id ORDER BY wt.worker_id SEPARATOR ',') AS workerIds
-            FROM agrosys_task.SPECIAL_TASK st
-            LEFT JOIN agrosys_task.WORKER_TASK wt ON st.special_task_id = wt.special_task_id
-            GROUP BY st.special_task_id
-            ORDER BY st.create_at DESC
-            """, nativeQuery = true)
+        SELECT st.special_task_id, st.name, st.payment_amount, st.create_at,
+               st.task_stage_id, st.end_at, st.description,
+               GROUP_CONCAT(wt.worker_id ORDER BY wt.worker_id SEPARATOR ',') AS worker_ids
+        FROM agrosys_task.SPECIAL_TASK st
+        LEFT JOIN agrosys_task.WORKER_TASK wt ON wt.special_task_id = st.special_task_id
+        GROUP BY st.special_task_id
+        ORDER BY st.create_at DESC
+        """, nativeQuery = true)
     List<SpecialTaskWithWorkersProjection> findAllSpecialTasksWithWorkers();
 
     @Query(value = """
-            SELECT
-                st.special_task_id AS specialTaskId,
-                st.name,
-                st.payment_amount AS paymentAmount,
-                st.create_at AS createAt,
-                st.task_stage_id AS taskStageId,
-                st.end_at AS endAt,
-                st.description,
-                GROUP_CONCAT(wt.worker_id ORDER BY wt.worker_id SEPARATOR ',') AS workerIds
-            FROM agrosys_task.SPECIAL_TASK st
-            LEFT JOIN agrosys_task.WORKER_TASK wt ON st.special_task_id = wt.special_task_id
-            WHERE st.special_task_id = :specialTaskId
-            GROUP BY st.special_task_id
-            """, nativeQuery = true)
-    SpecialTaskWithWorkersProjection findSpecialTaskWithWorkersById(@Param("specialTaskId") Integer specialTaskId);
+        SELECT st.special_task_id, st.name, st.payment_amount, st.create_at,
+               st.task_stage_id, st.end_at, st.description,
+               GROUP_CONCAT(wt.worker_id ORDER BY wt.worker_id SEPARATOR ',') AS worker_ids
+        FROM agrosys_task.SPECIAL_TASK st
+        INNER JOIN agrosys_task.WORKER_TASK wt ON wt.special_task_id = st.special_task_id
+        WHERE wt.worker_id = :workerId
+        GROUP BY st.special_task_id
+        ORDER BY st.create_at DESC
+        """, nativeQuery = true)
+    List<SpecialTaskWithWorkersProjection> findSpecialTasksByWorkerId(@Param("workerId") Integer workerId);
 
     @Query(value = """
-            SELECT
-                st.special_task_id AS specialTaskId,
-                st.name,
-                st.payment_amount AS paymentAmount,
-                st.create_at AS createAt,
-                st.task_stage_id AS taskStageId,
-                st.end_at AS endAt,
-                st.description,
-                GROUP_CONCAT(wt.worker_id ORDER BY wt.worker_id SEPARATOR ',') AS workerIds
-            FROM agrosys_task.SPECIAL_TASK st
-            INNER JOIN agrosys_task.WORKER_TASK wt ON st.special_task_id = wt.special_task_id
-            WHERE wt.worker_id = :workerId
-            GROUP BY st.special_task_id
-            ORDER BY st.create_at DESC
-            """, nativeQuery = true)
-    List<SpecialTaskWithWorkersProjection> findSpecialTasksByWorkerId(@Param("workerId") Integer workerId);
+        SELECT st.special_task_id, st.name, st.payment_amount, st.create_at,
+               st.task_stage_id, st.end_at, st.description,
+               GROUP_CONCAT(wt.worker_id ORDER BY wt.worker_id SEPARATOR ',') AS worker_ids
+        FROM agrosys_task.SPECIAL_TASK st
+        LEFT JOIN agrosys_task.WORKER_TASK wt ON wt.special_task_id = st.special_task_id
+        WHERE st.special_task_id = :specialTaskId
+        GROUP BY st.special_task_id
+        """, nativeQuery = true)
+    SpecialTaskWithWorkersProjection findSpecialTaskWithWorkersById(@Param("specialTaskId") Integer specialTaskId);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+        INSERT INTO agrosys_task.SPECIAL_TASK (name, payment_amount, create_at, task_stage_id, end_at, description)
+        VALUES (:name, :paymentAmount, :createAt, :taskStageId, :endAt, :description)
+        """, nativeQuery = true)
+    void insertSpecialTask(
+            @Param("name") String name,
+            @Param("paymentAmount") BigDecimal paymentAmount,
+            @Param("createAt") LocalDate createAt,
+            @Param("taskStageId") Integer taskStageId,
+            @Param("endAt") LocalDate endAt,
+            @Param("description") String description);
+
+    @Query(value = "SELECT LAST_INSERT_ID()", nativeQuery = true)
+    Integer getLastInsertId();
 
     @Query(value = "SELECT COUNT(*) FROM agrosys_task.SPECIAL_TASK WHERE special_task_id = :specialTaskId", nativeQuery = true)
     int countBySpecialTaskId(@Param("specialTaskId") Integer specialTaskId);
@@ -93,16 +92,16 @@ public interface SpecialTaskRepository extends JpaRepository<SpecialTask, Intege
     @Modifying
     @Transactional
     @Query(value = """
-            UPDATE agrosys_task.SPECIAL_TASK
-            SET name = :name,
-                payment_amount = :paymentAmount,
-                create_at = :createAt,
-                task_stage_id = :taskStageId,
-                end_at = :endAt,
-                description = :description
-            WHERE special_task_id = :specialTaskId
-            """, nativeQuery = true)
-    Integer updateSpecialTask(
+        UPDATE agrosys_task.SPECIAL_TASK
+        SET name = :name,
+            payment_amount = :paymentAmount,
+            create_at = :createAt,
+            task_stage_id = :taskStageId,
+            end_at = :endAt,
+            description = :description
+        WHERE special_task_id = :specialTaskId
+        """, nativeQuery = true)
+    int updateSpecialTask(
             @Param("specialTaskId") Integer specialTaskId,
             @Param("name") String name,
             @Param("paymentAmount") BigDecimal paymentAmount,

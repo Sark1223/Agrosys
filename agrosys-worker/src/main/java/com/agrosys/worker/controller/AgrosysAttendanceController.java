@@ -27,13 +27,12 @@ import lombok.extern.slf4j.Slf4j;
 public class AgrosysAttendanceController {
 
     private final AttendanceService attendanceService;
-    private final WorkerRepository workerRepository;
 
     @GetMapping("/active-workers")
     @PreAuthorize("hasAuthority('MODULE_TRABAJADORES')")
     public ResponseEntity<Response> getActiveWorkersForAttendance() {
         log.info("[REQUEST] - Obteniendo trabajadores para registro de asistencia");
-
+        
         Response response = Response.builder()
                 .success(true)
                 .message("Trabajadores obtenidos")
@@ -43,7 +42,7 @@ public class AgrosysAttendanceController {
 
     @PostMapping("/register-bulk")
     @PreAuthorize("hasAuthority('MODULE_TRABAJADORES')")
-    public ResponseEntity<Response> registerBulkAttendance(@RequestBody List<Map<String, Object>> requests) {
+    public ResponseEntity<Response> registerBulkAttendance(@RequestBody List<Map<String, Object>> requests) { 
         log.info("[REQUEST] - Registrando asistencia masiva");
 
         try {
@@ -54,7 +53,7 @@ public class AgrosysAttendanceController {
                     .message("Asistencia guardada correctamente")
                     .build();
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-
+            
         } catch (Exception e) {
             log.error("[FAILED] - Error al guardar la asistencia masiva: {}", e.getMessage());
 
@@ -68,11 +67,10 @@ public class AgrosysAttendanceController {
             @RequestParam(required = false) Integer workerId,
             @RequestParam String startDate,
             @RequestParam String endDate) {
-
+        
         try {
-            List<WorkerRepository.AttendanceHistoryProjection> historial = attendanceService
-                    .consultarHistorial(workerId, startDate, endDate);
-
+            List<WorkerRepository.AttendanceHistoryProjection> historial = attendanceService.consultarHistorial(workerId, startDate, endDate);
+            
             Response response = Response.builder()
                     .success(true)
                     .message("Historial obtenido")
