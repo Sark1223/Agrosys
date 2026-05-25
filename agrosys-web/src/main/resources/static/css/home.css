@@ -3,6 +3,10 @@
     overflow-y: auto;
 }
 
+.grafica-card canvas {
+    margin-top: 8px;
+}
+
 .content-area h1 {
     font-size: 30px;
     font-weight: 600;
@@ -84,7 +88,7 @@
 .dashboard-grid {
     display: grid;
     grid-template-columns: 160px 1fr 1fr 250px;
-    grid-template-rows: 180px 180px;
+    grid-template-rows: 180px auto;
     gap: 28px;
 }
 
@@ -137,6 +141,7 @@
 
 .tareas-card {
     grid-column: 1 / 3;
+    height: auto;
 }
 
 .grafica-card {
@@ -469,8 +474,13 @@
     font-weight: 600;
 }
 
-.clima-dia-max { color: #222; }
-.clima-dia-min { color: #aaa; }
+.clima-dia-max {
+    color: #222;
+}
+
+.clima-dia-min {
+    color: #aaa;
+}
 
 @media (max-width: 992px) {
     .usuario-grid {
@@ -504,6 +514,11 @@
         padding: 0.5rem 0.3rem;
     }
 
-    .clima-hora-lbl { width: auto; }
-    .clima-hora-temp { margin-left: 0; }
+    .clima-hora-lbl {
+        width: auto;
+    }
+
+    .clima-hora-temp {
+        margin-left: 0;
+    }
 }

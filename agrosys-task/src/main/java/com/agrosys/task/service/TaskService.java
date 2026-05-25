@@ -2,8 +2,11 @@ package com.agrosys.task.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -49,8 +52,7 @@ public class TaskService {
                 request.getCreateAt(),
                 request.getEndAt(),
                 STAGE_PENDIENTE,
-                request.getPlantationId()
-        );
+                request.getPlantationId());
 
         if (inserted == null || inserted == 0) {
             throw new RuntimeException("No se pudo crear la tarea");
@@ -112,8 +114,7 @@ public class TaskService {
         return List.of(
                 Response.builder().success(true).message("1").data("Pendiente").build(),
                 Response.builder().success(true).message("2").data("En Proceso").build(),
-                Response.builder().success(true).message("3").data("Finalizada").build()
-        );
+                Response.builder().success(true).message("3").data("Finalizada").build());
     }
 
     // Special Tasks
@@ -151,12 +152,14 @@ public class TaskService {
     }
 
     public List<SpecialTaskResponse> getAllSpecialTasks() {
-        List<SpecialTaskRepository.SpecialTaskWithWorkersProjection> tasks = specialTaskRepository.findAllSpecialTasksWithWorkers();
+        List<SpecialTaskRepository.SpecialTaskWithWorkersProjection> tasks = specialTaskRepository
+                .findAllSpecialTasksWithWorkers();
         return tasks.stream().map(this::specialProjectionToResponse).collect(Collectors.toList());
     }
 
     public List<SpecialTaskResponse> getSpecialTasksByWorker(Integer workerId) {
-        List<SpecialTaskRepository.SpecialTaskWithWorkersProjection> tasks = specialTaskRepository.findSpecialTasksByWorkerId(workerId);
+        List<SpecialTaskRepository.SpecialTaskWithWorkersProjection> tasks = specialTaskRepository
+                .findSpecialTasksByWorkerId(workerId);
         return tasks.stream().map(this::specialProjectionToResponse).collect(Collectors.toList());
     }
 
@@ -172,27 +175,26 @@ public class TaskService {
 
     @Transactional
     public SpecialTaskResponse updateSpecialTask(Integer specialtaskId, SpecialTaskRequest request) {
-        if (specialTaskRepository.countBySpecialTaskId(specialtaskId)== 0) {
+        if (specialTaskRepository.countBySpecialTaskId(specialtaskId) == 0) {
             throw new RuntimeException("Tarea especial no encontrada con id: " + specialtaskId);
         }
 
         LocalDate endAt = request.getEndAt();
-        if(request.getTaskStageId() == STAGE_FINALIZADA && endAt == null){
+        if (request.getTaskStageId() == STAGE_FINALIZADA && endAt == null) {
             endAt = LocalDate.now();
         }
         specialTaskRepository.updateSpecialTask(
-            specialtaskId, 
-            request.getName(), 
-            request.getPaymentAmount(),
-            request.getCreateAt(),
-            request.getTaskStageId(),
-            endAt,
-            request.getDescription()
-        );
+                specialtaskId,
+                request.getName(),
+                request.getPaymentAmount(),
+                request.getCreateAt(),
+                request.getTaskStageId(),
+                endAt,
+                request.getDescription());
 
         workerTaskRepository.deleteBySpecialTaskId(specialtaskId);
-        if(request.getWorkerIds() != null){
-            for(Integer workerId : request.getWorkerIds()){
+        if (request.getWorkerIds() != null) {
+            for (Integer workerId : request.getWorkerIds()) {
                 workerTaskRepository.insertWorkerAssignment(workerId, specialtaskId);
             }
         }
@@ -212,14 +214,16 @@ public class TaskService {
     }
 
     private SpecialTaskResponse specialTaskToResponse(Integer specialTaskId) {
-        SpecialTaskRepository.SpecialTaskWithWorkersProjection proj = specialTaskRepository.findSpecialTaskWithWorkersById(specialTaskId);
+        SpecialTaskRepository.SpecialTaskWithWorkersProjection proj = specialTaskRepository
+                .findSpecialTaskWithWorkersById(specialTaskId);
         if (proj == null) {
             throw new RuntimeException("Tarea especial no encontrada");
         }
         return specialProjectionToResponse(proj);
     }
 
-    private SpecialTaskResponse specialProjectionToResponse(SpecialTaskRepository.SpecialTaskWithWorkersProjection proj) {
+    private SpecialTaskResponse specialProjectionToResponse(
+            SpecialTaskRepository.SpecialTaskWithWorkersProjection proj) {
         List<Integer> workerIds = null;
         if (proj.getWorkerIds() != null && !proj.getWorkerIds().isEmpty()) {
             workerIds = Arrays.stream(proj.getWorkerIds().split(","))
@@ -236,5 +240,80 @@ public class TaskService {
                 .description(proj.getDescription())
                 .workerIds(workerIds)
                 .build();
+    }
+
+    /*
+     * === ENDPOINT PARA EL GRAFICO ===
+     * public Map<String, Long> getTaskSummary() {
+     * List<Object[]> results = taskRepository.countTasksByStage();
+     * 
+     * Map<String, Long> summary = new LinkedHashMap<>();
+     * summary.put("Pendiente", 0L);
+     * summary.put("En Proceso", 0L);
+     * summary.put("Finalizada", 0L);
+     * 
+     * for (Object[] row : results) {
+     * int stage = ((Number) row[0]).intValue();
+     * long total = ((Number) row[1]).longValue();
+     * 
+     * switch (stage) {
+     * case STAGE_PENDIENTE -> summary.put("Pendiente", total);
+     * case STAGE_EN_PROCESO -> summary.put("En Proceso", total);
+     * case STAGE_FINALIZADA -> summary.put("Finalizada", total);
+     * }
+     * }
+     * return summary;
+     * }
+     * 
+     * public List<Map<String, Object>> getSpecialTaskSummaryByWorker() {
+     * List<Object[]> results = specialTaskRepository.countSpecialTasksByWorker();
+     * 
+     * List<Map<String, Object>> summary = new ArrayList<>();
+     * 
+     * for (Object[] row : results) {
+     * Map<String, Object> entry = new LinkedHashMap<>();
+     * entry.put("workerName", row[1].toString());
+     * entry.put("Pendiente", ((Number) row[2]).longValue());
+     * entry.put("En Proceso", ((Number) row[3]).longValue());
+     * entry.put("Finalizada", ((Number) row[4]).longValue());
+     * summary.add(entry);
+     * }
+     * 
+     * return summary;
+     * }
+     */
+    public Map<String, Long> getTaskSummaryFiltered(Integer anio, Integer mes, Integer dia) {
+        List<Object[]> results = taskRepository.countTasksByStageFiltered(anio, mes, dia);
+
+        Map<String, Long> summary = new LinkedHashMap<>();
+        summary.put("Pendiente", 0L);
+        summary.put("En Proceso", 0L);
+        summary.put("Finalizada", 0L);
+
+        for (Object[] row : results) {
+            int stage = ((Number) row[0]).intValue();
+            long total = ((Number) row[1]).longValue();
+            switch (stage) {
+                case STAGE_PENDIENTE -> summary.put("Pendiente", total);
+                case STAGE_EN_PROCESO -> summary.put("En Proceso", total);
+                case STAGE_FINALIZADA -> summary.put("Finalizada", total);
+            }
+        }
+        return summary;
+    }
+
+    public List<Map<String, Object>> getSpecialTaskSummaryByWorkerFiltered(Integer anio, Integer mes, Integer dia) {
+        List<Object[]> results = specialTaskRepository.countSpecialTasksByWorkerFiltered(anio, mes, dia);
+
+        List<Map<String, Object>> summary = new ArrayList<>();
+        for (Object[] row : results) {
+            Map<String, Object> entry = new LinkedHashMap<>();
+            entry.put("workerName", row[1].toString());
+            entry.put("Pendiente", ((Number) row[2]).longValue());
+            entry.put("En Proceso", ((Number) row[3]).longValue());
+            entry.put("Finalizada", ((Number) row[4]).longValue());
+            summary.add(entry);
+        }
+        return summary;
     }
 }

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+    <div th:fragment="modalResumenSalariosFragment">
+        <div class="modal fade" id="modalResumenSalarios" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <div>
+                            <h5 class="modal-title" style="font-weight: 600; color: #1f2937;">Resumen semanal de
+                                salarios</h5>
+                            <p id="modalSalariosSubtitle" class="mb-0" style="font-size: 12px; color: #6b7280;"></p>
+                        </div>
+                    </div>
+
+                    <div class="modal-body p-0">
+
+                        <!-- Loading -->
+                        <div id="modalSalariosLoading" class="text-center py-5">
+                            <div class="spinner-border text-secondary" role="status"
+                                style="width: 1.5rem; height: 1.5rem;">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <p class="mt-2 mb-0" style="font-size: 13px; color: #6b7280;">Cargando reporte...</p>
+                        </div>
+
+                        <!-- Tabla -->
+                        <div id="modalSalariosContenido" style="display: none; overflow-x: auto;">
+                            <table class="table mb-0" style="font-size: 13px;">
+                                <thead style="background-color: #f9fafb;">
+                                    <tr>
+                                        <th
+                                            style="padding: 10px 16px; font-weight: 500; color: #6b7280; border-bottom: 1px solid #e5e7eb; min-width: 130px;">
+                                            Nombre</th>
+                                        <th class="text-center"
+                                            style="padding: 10px 8px; font-weight: 500; color: #6b7280; border-bottom: 1px solid #e5e7eb;">
+                                            Lunes</th>
+                                        <th class="text-center"
+                                            style="padding: 10px 8px; font-weight: 500; color: #6b7280; border-bottom: 1px solid #e5e7eb;">
+                                            Martes</th>
+                                        <th class="text-center"
+                                            style="padding: 10px 8px; font-weight: 500; color: #6b7280; border-bottom: 1px solid #e5e7eb;">
+                                            Miérc.</th>
+                                        <th class="text-center"
+                                            style="padding: 10px 8px; font-weight: 500; color: #6b7280; border-bottom: 1px solid #e5e7eb;">
+                                            Jueves</th>
+                                        <th class="text-center"
+                                            style="padding: 10px 8px; font-weight: 500; color: #6b7280; border-bottom: 1px solid #e5e7eb;">
+                                            Viernes</th>
+                                        <th class="text-center"
+                                            style="padding: 10px 8px; font-weight: 500; color: #6b7280; border-bottom: 1px solid #e5e7eb;">
+                                            Extras</th>
+                                        <th class="text-center"
+                                            style="padding: 10px 8px; font-weight: 500; color: #6b7280; border-bottom: 1px solid #e5e7eb;">
+                                            Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="modalSalariosBody">
+                                    <!-- filas generadas por JS -->
+                                </tbody>
+                                <tfoot id="modalSalariosFoot" style="background-color: #f9fafb;">
+                                    <!-- fila de totales por día generada por JS -->
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <!-- Total general -->
+                        <div id="modalSalariosTotal"
+                            style="display: flex;padding: 12px 16px; background-color: beige;justify-content: space-between;align-items: center;">
+                            <span style="font-size: 13px; font-weight: 500; color: #6b7280;">Total: </span>
+                            <span id="modalSalariosGrandTotal"
+                                style="font-size: 16px; font-weight: 600; color: #1f2937;"></span>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer" style="border-top: 1px solid #e5e7eb; padding: 10px 16px; gap: 8px;">
+                        <button type="button" class="dashboard-btn btn-lote px-3"
+                            style="height: 32px; font-size: 12px; border-radius: 8px;" id="btnModificarSalarios">
+                            Modificar
+                        </button>
+                        <button type="button" class="dashboard-btn btn-transaccion px-3"
+                            style="height: 32px; font-size: 12px; border-radius: 8px;" id="btnGenerarPago">
+                            Generar pago
+                        </button>
+                        <button type="button" class="dashboard-btn btn-salarios px-3"
+                            style="height: 32px; font-size: 12px; border-radius: 8px;" data-bs-dismiss="modal">
+                            Cerrar
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -17,6 +17,15 @@ import jakarta.transaction.Transactional;
 @Repository
 public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> {
 
+        interface WeeklySalaryProjection {
+                Integer getWorkerId();
+                String getName();
+                BigDecimal getHourlyPay();
+                LocalDate getDate(); 
+                Integer getHoursWorked();
+                BigDecimal getExtras(); 
+        }
+
         interface WorkerProjection {
 
                 Integer getWorkerId();
@@ -172,4 +181,29 @@ public interface WorkerRepository extends JpaRepository<AgrosysWorker, Integer> 
                         WHERE DATE(`date`) = CURDATE()
                                 """, nativeQuery = true)
         int asistencia();
+
+        // ================= REPORTE SEMANAL DE SALARIOS ===================
+        @Query(value = """
+                        SELECT
+                            w.workerId,
+                            w.name,
+                            w.hourly_pay AS hourlyPay,
+                            a.date,
+                            a.hoursWorked,
+                            COALESCE(SUM(st.payment_amount), 0) AS extras /*si la suma es null (porque no tiene tareas), pon 0 en su lugar*/
+                        FROM agrosys_worker.WORKER w
+                        LEFT JOIN agrosys_worker.ATTENDANCE a
+                            ON w.workerId = a.workerId
+                            AND a.date BETWEEN :weekStart AND :weekEnd
+                        LEFT JOIN agrosys_task.WORKER_TASK wt
+                            ON w.workerId = wt.worker_id
+                        LEFT JOIN agrosys_task.SPECIAL_TASK st
+                            ON wt.special_task_id = st.special_task_id
+                            AND DATE(st.create_at) BETWEEN :weekStart AND :weekEnd /*extrae solo la fecha del campo datetime*/
+                        GROUP BY w.workerId, w.name, w.hourly_pay, a.date, a.hoursWorked
+                        ORDER BY w.name, a.date
+                        """, nativeQuery = true)
+        List<WeeklySalaryProjection> getWeeklySalaryReport(
+                        @Param("weekStart") LocalDate weekStart,
+                        @Param("weekEnd") LocalDate weekEnd);
 }

@@ -262,7 +262,7 @@ public class AgrosysTaskController {
 
     @PutMapping("/special/edit/{taskId}")
     @PreAuthorize("hasAuthority('MODULE_TAREAS')")
-    public ResponseEntity<Response> updateSpecialTask(@PathVariable Integer taskId, 
+    public ResponseEntity<Response> updateSpecialTask(@PathVariable Integer taskId,
             @Valid @RequestBody SpecialTaskRequest request) {
         log.info("[REQUEST SPECIAL UPDATE] - taskId: {}, request: {}", taskId, request);
         try {
@@ -308,4 +308,94 @@ public class AgrosysTaskController {
                             .build());
         }
     }
+
+    /*
+     * === ENDPOINT PARA EL GRAFICO ===
+     * 
+     * @GetMapping("/summary")
+     * 
+     * @PreAuthorize("hasAuthority('MODULE_TAREAS')")
+     * public ResponseEntity<Response> getTaskSummary() {
+     * try {
+     * return ResponseEntity.ok(Response.builder()
+     * .success(true)
+     * .message("Resumen de tareas obtenido exitosamente")
+     * .data(taskService.getTaskSummary())
+     * .build());
+     * } catch (Exception e) {
+     * log.error("[ERROR] - Error al obtener resumen de tareas: {}", e.getMessage(),
+     * e);
+     * return ResponseEntity.badRequest()
+     * .body(Response.builder()
+     * .success(false)
+     * .message("Error al obtener resumen: " + e.getMessage())
+     * .build());
+     * }
+     * }
+     * 
+     * @GetMapping("/summary/by-worker")
+     * 
+     * @PreAuthorize("hasAuthority('MODULE_TAREAS')")
+     * public ResponseEntity<Response> getSpecialTaskSummaryByWorker() {
+     * try {
+     * return ResponseEntity.ok(Response.builder()
+     * .success(true)
+     * .message("Resumen por trabajador obtenido exitosamente")
+     * .data(taskService.getSpecialTaskSummaryByWorker())
+     * .build());
+     * } catch (Exception e) {
+     * log.error("[ERROR] - Error al obtener resumen por trabajador: {}",
+     * e.getMessage(), e);
+     * return ResponseEntity.badRequest()
+     * .body(Response.builder()
+     * .success(false)
+     * .message("Error al obtener resumen por trabajador: " + e.getMessage())
+     * .build());
+     * }
+     * }
+     */
+    @GetMapping("/summary")
+    @PreAuthorize("hasAuthority('MODULE_TAREAS')")
+    public ResponseEntity<Response> getTaskSummary(
+            @RequestParam Integer anio,
+            @RequestParam(required = false) Integer mes,
+            @RequestParam(required = false) Integer dia) {
+        try {
+            return ResponseEntity.ok(Response.builder()
+                    .success(true)
+                    .message("Resumen de tareas obtenido exitosamente")
+                    .data(taskService.getTaskSummaryFiltered(anio, mes, dia))
+                    .build());
+        } catch (Exception e) {
+            log.error("[ERROR] - Error al obtener resumen de tareas: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Error al obtener resumen: " + e.getMessage())
+                            .build());
+        }
+    }
+
+    @GetMapping("/summary/by-worker")
+    @PreAuthorize("hasAuthority('MODULE_TAREAS')")
+    public ResponseEntity<Response> getSpecialTaskSummaryByWorker(
+            @RequestParam Integer anio,
+            @RequestParam(required = false) Integer mes,
+            @RequestParam(required = false) Integer dia) {
+        try {
+            return ResponseEntity.ok(Response.builder()
+                    .success(true)
+                    .message("Resumen por trabajador obtenido exitosamente")
+                    .data(taskService.getSpecialTaskSummaryByWorkerFiltered(anio, mes, dia))
+                    .build());
+        } catch (Exception e) {
+            log.error("[ERROR] - Error al obtener resumen por trabajador: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Error al obtener resumen por trabajador: " + e.getMessage())
+                            .build());
+        }
+    }
+
 }

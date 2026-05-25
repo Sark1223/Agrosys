@@ -286,8 +286,7 @@ public class TaskController {
                 request.setWorkerIds(
                         java.util.Arrays.stream(workerIds.split(","))
                                 .map(Integer::parseInt)
-                                .collect(java.util.stream.Collectors.toList())
-                );
+                                .collect(java.util.stream.Collectors.toList()));
             }
 
             String token = (String) session.getAttribute("JWT_TOKEN");
@@ -393,8 +392,7 @@ public class TaskController {
                 request.setWorkerIds(
                         java.util.Arrays.stream(workerIds.split(","))
                                 .map(Integer::parseInt)
-                                .collect(java.util.stream.Collectors.toList())
-                );
+                                .collect(java.util.stream.Collectors.toList()));
             }
 
             String token = (String) session.getAttribute("JWT_TOKEN");
@@ -521,6 +519,130 @@ public class TaskController {
                     .body(Response.builder()
                             .success(false)
                             .message("Error al obtener plantíos: " + e.getMessage())
+                            .build());
+        }
+    }
+
+    /*
+     * === ENDPOINT PARA EL GRAFICO ===
+     * 
+     * @GetMapping("/summary")
+     * 
+     * @ResponseBody
+     * public ResponseEntity<Response> getTaskSummary(HttpSession session) {
+     * try {
+     * List<String> modules = jwtHelper.getUserModules(session);
+     * if (!modules.contains("MODULE_TAREAS")) {
+     * return ResponseEntity.status(403).build();
+     * }
+     * 
+     * String token = (String) session.getAttribute("JWT_TOKEN");
+     * Response response = gatewayClient.get(
+     * "/api/tasks/summary",
+     * Response.class,
+     * token);
+     * 
+     * return ResponseEntity.ok(response);
+     * } catch (Exception e) {
+     * log.error("[FAILED] - Error al obtener resumen de tareas: {}",
+     * e.getMessage(), e);
+     * return ResponseEntity.badRequest()
+     * .body(Response.builder()
+     * .success(false)
+     * .message("Error al obtener resumen: " + e.getMessage())
+     * .build());
+     * }
+     * }
+     * 
+     * @GetMapping("/summary/by-worker")
+     * 
+     * @ResponseBody
+     * public ResponseEntity<Response> getSpecialTaskSummaryByWorker(HttpSession
+     * session) {
+     * try {
+     * List<String> modules = jwtHelper.getUserModules(session);
+     * if (!modules.contains("MODULE_TAREAS")) {
+     * return ResponseEntity.status(403).build();
+     * }
+     * 
+     * String token = (String) session.getAttribute("JWT_TOKEN");
+     * Response response = gatewayClient.get(
+     * "/api/tasks/summary/by-worker",
+     * Response.class,
+     * token);
+     * 
+     * return ResponseEntity.ok(response);
+     * } catch (Exception e) {
+     * log.error("[FAILED] - Error al obtener resumen por trabajador: {}",
+     * e.getMessage(), e);
+     * return ResponseEntity.badRequest()
+     * .body(Response.builder()
+     * .success(false)
+     * .message("Error al obtener resumen por trabajador: " + e.getMessage())
+     * .build());
+     * }
+     * }
+     */
+    @GetMapping("/summary")
+    @ResponseBody
+    public ResponseEntity<Response> getTaskSummary(
+            @RequestParam Integer anio,
+            @RequestParam(required = false) Integer mes,
+            @RequestParam(required = false) Integer dia,
+            HttpSession session) {
+        try {
+            List<String> modules = jwtHelper.getUserModules(session);
+            if (!modules.contains("MODULE_TAREAS")) {
+                return ResponseEntity.status(403).build();
+            }
+
+            String url = "/api/tasks/summary?anio=" + anio;
+            if (mes != null)
+                url += "&mes=" + mes;
+            if (dia != null)
+                url += "&dia=" + dia;
+
+            String token = (String) session.getAttribute("JWT_TOKEN");
+            Response response = gatewayClient.get(url, Response.class, token);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("[FAILED] - Error al obtener resumen de tareas: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Error al obtener resumen: " + e.getMessage())
+                            .build());
+        }
+    }
+
+    @GetMapping("/summary/by-worker")
+    @ResponseBody
+    public ResponseEntity<Response> getSpecialTaskSummaryByWorker(
+            @RequestParam Integer anio,
+            @RequestParam(required = false) Integer mes,
+            @RequestParam(required = false) Integer dia,
+            HttpSession session) {
+        try {
+            List<String> modules = jwtHelper.getUserModules(session);
+            if (!modules.contains("MODULE_TAREAS")) {
+                return ResponseEntity.status(403).build();
+            }
+
+            String url = "/api/tasks/summary/by-worker?anio=" + anio;
+            if (mes != null)
+                url += "&mes=" + mes;
+            if (dia != null)
+                url += "&dia=" + dia;
+
+            String token = (String) session.getAttribute("JWT_TOKEN");
+            Response response = gatewayClient.get(url, Response.class, token);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("[FAILED] - Error al obtener resumen por trabajador: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body(Response.builder()
+                            .success(false)
+                            .message("Error al obtener resumen por trabajador: " + e.getMessage())
                             .build());
         }
     }

@@ -100,4 +100,21 @@ public class AttendanceController {
             throw new RuntimeException("Error: " + e.getMessage());
         }
     }
+
+    // ================= REPORTE SEMANAL DE SALARIOS ===================
+    @GetMapping("/weekly-salary")
+    @ResponseBody
+    public ResponseEntity<Response> getWeeklySalaryReport(HttpSession session) {
+        try {
+            String token = (String) session.getAttribute("JWT_TOKEN");
+            Response response = gatewayClient.get(
+                    "/api/workers/attendance/weekly-salary",
+                    Response.class,
+                    token);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("[FAILED] - Error al obtener reporte semanal: {}", e.getMessage());
+            throw new RuntimeException("Error: " + e.getMessage());
+        }
+    }
 }

@@ -9,7 +9,6 @@
 
         <main class="content-area p-4 w-100 bg-light" th:if="${admin}">
 
-
             <header class="d-flex justify-content-between">
                 <div>
                     <h1>Bienvenid@!</h1>
@@ -33,13 +32,15 @@
 
                 <button id="btnRegistrarNuevaTransaccion" class="dashboard-btn btn-transaccion"
                     th:if="${#lists.contains(modules, 'MODULE_FINANZAS')}">
-                    Registrar nueva transaccion
+                    Resumen semanal de salarios
                 </button>
 
+                <!-- 
                 <button id="btnVerSalarios" class="dashboard-btn btn-salarios"
                     th:if="${#lists.contains(modules, 'MODULE_FINANZAS')}">
                     Ver salarios
                 </button>
+                -->
             </section>
 
             <section class="dashboard-grid">
@@ -77,11 +78,13 @@
                 </div>
 
                 <div id="cardInformeTareas" class="dashboard-card tareas-card">
-                    <h3>INFORME DE TAREAS</h3>
+                    <h3>Tareas Generales</h3>
+                    <canvas id="taskChart"></canvas>
                 </div>
 
                 <div id="cardIngresosVsGastos" class="dashboard-card grafica-card">
-                    <h3>INGRESOS VS GASTOS</h3>
+                    <h3>Tareas por Trabajador</h3>
+                    <canvas id="workerTaskChart"></canvas>
                 </div>
             </section>
         </main>
@@ -126,11 +129,18 @@
 
     <div th:if="${#lists.contains(modules, 'MODULE_PARCELAS')}">
         <div th:if="${admin}" th:replace="~{home/plot/_modalsPlot :: fLotModalAdd}"></div>
-
-        <script th:src="@{/js/home/home.js}"></script>
+        <!-- RESUMEN SEMANAL DE SALARIOS -->
+        <div th:if="${admin}" th:replace="~{home/workers/_modalsWorker :: modalResumenSalariosFragment}"></div>
         <script th:src="@{/js/plot/plantatio.js}"></script>
         <script th:src="@{/js/plot/lot.js}"></script>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:src="@{/js/home/home.js}"></script>
+
+    <!-- jsPDF para generar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
 </body>
 

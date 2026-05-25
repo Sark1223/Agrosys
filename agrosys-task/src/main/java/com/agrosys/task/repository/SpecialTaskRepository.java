@@ -19,12 +19,19 @@ public interface SpecialTaskRepository extends JpaRepository<SpecialTask, Intege
 
     interface SpecialTaskWithWorkersProjection {
         Integer getSpecialTaskId();
+
         String getName();
+
         BigDecimal getPaymentAmount();
+
         LocalDate getCreateAt();
+
         Integer getTaskStageId();
+
         LocalDate getEndAt();
+
         String getDescription();
+
         String getWorkerIds();
     }
 
@@ -108,4 +115,46 @@ public interface SpecialTaskRepository extends JpaRepository<SpecialTask, Intege
     @Transactional
     @Query(value = "DELETE FROM agrosys_task.SPECIAL_TASK WHERE special_task_id = :specialTaskId", nativeQuery = true)
     void deleteSpecialTaskById(@Param("specialTaskId") Integer specialTaskId);
+
+    /*
+     * =============================================================================
+     * ================================
+     */
+    /* ==== QUERYS PARA LA INFO DEL GRAFICO ==== */
+    @Query(value = """
+                SELECT
+                w.workerId,
+                w.name,
+                SUM(CASE WHEN st.task_stage_id = 1 THEN 1 ELSE 0 END) as pendiente,
+                SUM(CASE WHEN st.task_stage_id = 2 THEN 1 ELSE 0 END) as en_proceso,
+                SUM(CASE WHEN st.task_stage_id = 3 THEN 1 ELSE 0 END) as finalizada
+            FROM agrosys_task.WORKER_TASK wt
+            JOIN agrosys_task.SPECIAL_TASK st ON wt.special_task_id = st.special_task_id
+            JOIN agrosys_worker.WORKER w ON wt.worker_id = w.workerId
+            GROUP BY w.workerId, w.name
+            ORDER BY w.name
+                """, nativeQuery = true)
+    List<Object[]> countSpecialTasksByWorker();
+
+    /* ==== QUERY PARA FILTROS ==== */
+    @Query(value = """
+            SELECT
+                w.workerId,
+                w.name,
+                SUM(CASE WHEN st.task_stage_id = 1 THEN 1 ELSE 0 END) as pendiente,
+                SUM(CASE WHEN st.task_stage_id = 2 THEN 1 ELSE 0 END) as en_proceso,
+                SUM(CASE WHEN st.task_stage_id = 3 THEN 1 ELSE 0 END) as finalizada
+            FROM agrosys_task.WORKER_TASK wt
+            JOIN agrosys_task.SPECIAL_TASK st ON wt.special_task_id = st.special_task_id
+            JOIN agrosys_worker.WORKER w ON wt.worker_id = w.workerId
+            WHERE YEAR(st.create_at) = :anio
+              AND (:mes IS NULL OR MONTH(st.create_at) = :mes)
+              AND (:dia IS NULL OR DAY(st.create_at) = :dia)
+            GROUP BY w.workerId, w.name
+            ORDER BY w.name
+            """, nativeQuery = true)
+    List<Object[]> countSpecialTasksByWorkerFiltered(
+            @Param("anio") Integer anio,
+            @Param("mes") Integer mes,
+            @Param("dia") Integer dia);
 }

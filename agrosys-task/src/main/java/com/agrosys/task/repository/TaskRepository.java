@@ -33,7 +33,7 @@ public interface TaskRepository extends JpaRepository<AgrosysTask, Integer> {
         Integer getPlantationId();
     }
 
-    // Buscar tarea por ID 
+    // Buscar tarea por ID
     @Query(value = """
             SELECT
                 t.task_id,
@@ -85,8 +85,7 @@ public interface TaskRepository extends JpaRepository<AgrosysTask, Integer> {
             @Param("createAt") LocalDate createAt,
             @Param("endAt") LocalDate endAt,
             @Param("taskStageId") Integer taskStageId,
-            @Param("plantationId") Integer plantationId
-    );
+            @Param("plantationId") Integer plantationId);
 
     // Eliminar tarea por ID (nativo)
     @Modifying
@@ -94,7 +93,7 @@ public interface TaskRepository extends JpaRepository<AgrosysTask, Integer> {
     @Query(value = "DELETE FROM agrosys_task.TASK WHERE task_id = :id", nativeQuery = true)
     void deleteTaskById(@Param("id") Integer id);
 
-    // Contar por ID 
+    // Contar por ID
     @Query(value = "SELECT COUNT(*) FROM agrosys_task.TASK WHERE task_id = :id", nativeQuery = true)
     int countById(@Param("id") Integer id);
 
@@ -104,15 +103,15 @@ public interface TaskRepository extends JpaRepository<AgrosysTask, Integer> {
     @Modifying
     @Transactional
     @Query(value = """
-        UPDATE agrosys_task.TASK
-        SET name = :name,
-            description = :description,
-            create_at = :createAt,
-            end_at = :endAt,
-            task_stage_id = :taskStageId,
-            plantation_id = :plantationId
-        WHERE task_id = :id
-        """, nativeQuery = true)
+            UPDATE agrosys_task.TASK
+            SET name = :name,
+                description = :description,
+                create_at = :createAt,
+                end_at = :endAt,
+                task_stage_id = :taskStageId,
+                plantation_id = :plantationId
+            WHERE task_id = :id
+            """, nativeQuery = true)
     int updateTask(
             @Param("id") Integer id,
             @Param("name") String name,
@@ -120,15 +119,40 @@ public interface TaskRepository extends JpaRepository<AgrosysTask, Integer> {
             @Param("createAt") LocalDate createAt,
             @Param("endAt") LocalDate endAt,
             @Param("taskStageId") Integer taskStageId,
-            @Param("plantationId") Integer plantationId
-    );
+            @Param("plantationId") Integer plantationId);
 
     @Modifying
     @Transactional
     @Query(value = """
-        UPDATE agrosys_task.TASK
-        SET task_stage_id = :taskStageId
-        WHERE task_id = :id
-        """, nativeQuery = true)
+            UPDATE agrosys_task.TASK
+            SET task_stage_id = :taskStageId
+            WHERE task_id = :id
+            """, nativeQuery = true)
     int updateTaskStage(@Param("id") Integer id, @Param("taskStageId") Integer taskStageId);
+
+    /*
+     * =============================================================================================================
+     */
+    /* ==== QUERYS PARA LA INFO DEL GRAFICO ==== */
+    @Query(value = """
+            SELECT task_stage_id, COUNT(*) as total
+                FROM agrosys_task.TASK
+                GROUP BY task_stage_id
+            """, nativeQuery = true)
+    List<Object[]> countTasksByStage();
+
+    /* ==== QUERY PARA FILTROS ==== */
+    @Query(value = """
+            SELECT task_stage_id, COUNT(*) as total
+            FROM agrosys_task.TASK
+            WHERE YEAR(create_at) = :anio
+              AND (:mes IS NULL OR MONTH(create_at) = :mes)
+              AND (:dia IS NULL OR DAY(create_at) = :dia)
+            GROUP BY task_stage_id
+            """, nativeQuery = true)
+    List<Object[]> countTasksByStageFiltered(
+            @Param("anio") Integer anio,
+            @Param("mes") Integer mes,
+            @Param("dia") Integer dia);
+
 }

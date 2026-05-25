@@ -101,4 +101,23 @@ public class AgrosysAttendanceController {
         }
     }
 
+    // ================= REPORTE SEMANAL DE SALARIOS ===================
+    @GetMapping("/weekly-salary")
+    @PreAuthorize("hasAuthority('MODULE_TRABAJADORES')")
+    public ResponseEntity<Response> getWeeklySalaryReport() {
+        log.info("[REQUEST] - Generando reporte semanal de salarios");
+        try {
+            Map<String, Object> report = attendanceService.getWeeklySalaryReport();
+            Response response = Response.builder()
+                    .success(true)
+                    .message("Reporte semanal generado exitosamente")
+                    .data(report)
+                    .build();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("[FAILED] - Error al generar reporte semanal: {}", e.getMessage());
+            throw new RuntimeException("Error: " + e.getMessage());
+        }
+    }
+
 }
