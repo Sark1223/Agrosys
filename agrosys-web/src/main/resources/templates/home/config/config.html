@@ -25,23 +25,23 @@
                     </li>
                 </ul>
                 <div id="myTabContent" class="tab-content">
-                    <div class="tab-pane fade" id="usuarios" role="tabpanel"
+                    <div class="fade pb-3 pt-1 px-2 tab-pane" id="usuarios" role="tabpanel"
                         th:classappend="${activeTab == 'usuarios'} ? 'show active' : ''">
-                        <div class="options p-2 d-flex justify-content-end flex-nowrap">
+                        <div class="d-flex flex-nowrap justify-content-end options w-100 py-2">
                             <button class="btn btn-primary" data-bs-toggle="modal"
                                 data-bs-target="#modalAddUser">Agregar Usuario</button>
                         </div>
-                        <div class="cards d-flex flex-wrap flex-row g-2" id="cardsContainerUsers">
-                            <!-- Se carga por JavaScript -->
+                        <div class="col-12 g-2 row w-100" id="cardsContainerUsers">
+                            <!-- Se carga por JavaScript cards d-flex flex-wrap flex-row g-2 col-12-->
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="roles" role="tabpanel"
+                    <div class=" fade pb-3 pt-1 px-2 tab-pane" id="roles" role="tabpanel"
                         th:classappend="${activeTab == 'roles'} ? 'show active' : ''">
-                        <div class="options p-2 d-flex justify-content-end flex-nowrap">
+                        <div class="options d-flex justify-content-end flex-nowrap py-2">
                             <button class="btn btn-primary" data-bs-toggle="modal"
                                 data-bs-target="#modalAddRole">Agregar Rol</button>
                         </div>
-                        <div class="cards d-flex flex-wrap flex-row g-2" id="cardsContainerRoles">
+                        <div class="col-12 g-2 row w-100" id="cardsContainerRoles">
                             <!-- Se carga por JavaScript -->
                         </div>
                     </div>

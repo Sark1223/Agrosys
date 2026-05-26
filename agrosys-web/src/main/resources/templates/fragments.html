@@ -23,27 +23,25 @@
 </head>
 
 <body>
-    <aside th:fragment="sidebar" class="sidebar d-flex flex-column px-2 bg-dark">
+    <aside th:fragment="sidebar" class="sidebar d-flex flex-column px-2 bg-dark" id="sidebarNavigation">
         <div class="logo"></div>
         <nav class="d-flex flex-column justify-content-center w-100 h-100 p-2 bg-dark gap-1">
             <a th:href="@{/home}" type="button"
-                class="text-decoration-none text-warning"><i class="ri-home-9-fill fs-5"></i></a>
+                class="text-decoration-none "><i class="ri-home-9-fill fs-5 text-warning" id="iconHome"></i></a>
             <a th:href="@{/plots}" th:if="${#lists.contains(modules, 'MODULE_PARCELAS')}"
-                class="text-decoration-none text-light"><i class="ri-plant-fill fs-5"></i></a>
+                class="text-decoration-none "><i class="ri-plant-fill fs-5 text-light" id="iconPlots"></i></a>
             <a th:href="@{/transactions}" th:if="${#lists.contains(modules, 'MODULE_FINANZAS')}"
                 class="text-decoration-none "><i class="ri-cash-line fs-5 text-light" id="iconTransactions"></i></a>
-            <a th:href="@{/transactions/payments}" th:if="${#lists.contains(modules, 'MODULE_FINANZAS')}"
-                class="text-decoration-none "><i class="ri-money-dollar-circle-line fs-5 text-light" id="iconPayments"></i></a>
             <a th:href="@{/workers}" th:if="${#lists.contains(modules, 'MODULE_TRABAJADORES')}"
-                class="text-decoration-none text-light"><i class="ri-team-fill fs-5"></i></a>
+                class="text-decoration-none "><i class="ri-team-fill fs-5 text-light" id="iconWorkers"></i></a>
             <a th:href="@{/tasks}" th:if="${#lists.contains(modules, 'MODULE_TAREAS')}"
-                class="text-decoration-none text-light"><i class="ri-task-fill fs-5"></i></a>
+                class="text-decoration-none "><i class="ri-task-fill fs-5 text-light" id="iconTasks"></i></a>
         </nav>
         <div class="footer-icons d-flex flex-column justify-content-center p-2 bg-dark">
             <a th:href="@{/config}" th:if="${#lists.contains(modules, 'MODULE_CONFIG')}"
-                class="text-decoration-none text-light"><i class="ri-settings-3-fill fs-5"></i></a>
+                class="text-decoration-none "><i class="ri-settings-3-fill fs-5 text-light" id="iconConfig"></i></a>
             <a th:href="@{/logout}"
-                class="text-decoration-none text-light"><i class="ri-logout-box-r-line fs-5"></i></a>
+                class="text-decoration-none "><i class="ri-logout-box-r-line fs-5 text-light" id="iconLogout"></i></a>
         </div>
     </aside>
 </body>

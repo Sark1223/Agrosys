@@ -52,40 +52,47 @@ function getActiveTab() {
     return 'usuarios';
 }
 
-$.fn.getAllPlots = function () {
+// const colores = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#E7E9ED', '#76A346', '#D9534F', '#5BC0DE'];
+const colores = ['#F07A3B', '#76A346', '#5E52C6', '#B9454E', '#A4F3C0', '#C881D9', '#096098', '#D9534F', '#5BC0DE'];
+
+$.fn.getAllUsers = function () {
 
     $.ajax({
         url: '/agrosys/config/get-users',
         type: 'GET',
         success: function (response) {
             const cardsContainer = $('#cardsContainerUsers');
-            cardsContainer.html(''); // Limpiar el contenedor antes de agregar nuevos usuarios
+            cardsContainer.html(''); // Limpiar el contenedor antes de agregar nuevos usuarios border-4 border-bottom-0 border-end-0 border-top-0  card mb-3 me-2 col-12 col-sm-12 col-md-6 col-lg-4 col-xl-3
 
-            if (response.success) { // Adaptar según tu objeto Response
+            if (response.success) { // Adaptar según tu objeto Response width: 300px;
                 console.log('Usuarios obtenidos:', response.data);
 
-                response.data.forEach(user => {
+                response.data.forEach((user, index) => {
                     const userCard = $(`
-                            <div class="card mb-3 me-2" style="width: 300px;">
-                                <div class="card-body d-flex flex-row justify-content-between align-items-start">
-                                    <div class="d-flex flex-column">
-                                        <h5 class="card-title text-capitalize ">${user.firstName?.toLowerCase()} ${user.lastName?.toLowerCase()}</h5>
-                                        <p class="card-text">${user.userName?.toLowerCase()}</p>
-                                        <p class="card-text text-capitalize">${user.rolName?.toLowerCase()}</p>
+                            <div class="col-12 col-lg-4 col-md-6 col-sm-12 col-xxl-3" >
+                                <div class="border-4 border-bottom-0 border-end-0 border-top-0 card" style=" border-color: ${colores[index % colores.length]} !important;">
+                                    <div class="card-body d-flex flex-row justify-content-between align-items-start">
+                                        <div class="align-items-baseline d-flex flex-column">
+                                            <h5 class="card-title text-capitalize ">${user.firstName?.toLowerCase()} ${user.lastName?.toLowerCase()}</h5>
+                                            <p class="card-text fw-light text-lowercase">${user.userName?.toLowerCase()}</p>
+                                            <p class="card-text fw-normal rounded-5 text-capitalize text-light" style="background-color: ${colores[index % colores.length]} !important; filter: brightness(1.3); font-size: 14px; padding: 0px 11px 2px 11px;">
+                                                ${user.rolName?.toLowerCase()}
+                                            </p>
+                                        </div>
+                                        <div class="dropdown">
+                                            <i class="ri-more-2-fill" type="button" id="dropdownMenuButton${user.userId}" data-bs-toggle="dropdown" aria-expanded="false">
+                                            </i>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton${user.userId}">
+                                                <li><a class="dropdown-item edit-password-user" data-bs-toggle="modal" data-bs-target="#modalEditPasswordUser" href="#">
+                                                    <i class="ri-key-fill pe-1"></i>Nueva contraseña</a></li>
+                                                <li><a class="dropdown-item edit-user" data-bs-toggle="modal" data-bs-target="#modalEditUser" href="#"><i
+                                                            class="ri-pencil-fill pe-1"></i>Editar</a></li>
+                                                <li><a class="dropdown-item delete-user" data-bs-toggle="modal" data-bs-target="#modalDeleteUser" href="#"><i
+                                                            class="ri-delete-bin-fill pe-1"></i>Eliminar</a></li>
+                                            </ul>
+                                        </div>
                                     </div>
-                                    <div class="dropdown">
-                                        <i class="ri-more-2-fill" type="button" id="dropdownMenuButton${user.userId}" data-bs-toggle="dropdown" aria-expanded="false">
-                                        </i>
-                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton${user.userId}">
-                                            <li><a class="dropdown-item edit-password-user" data-bs-toggle="modal" data-bs-target="#modalEditPasswordUser" href="#">
-                                                <i class="ri-key-fill pe-1"></i>Nueva contraseña</a></li>
-                                            <li><a class="dropdown-item edit-user" data-bs-toggle="modal" data-bs-target="#modalEditUser" href="#"><i
-                                                        class="ri-pencil-fill pe-1"></i>Editar</a></li>
-                                            <li><a class="dropdown-item delete-user" data-bs-toggle="modal" data-bs-target="#modalDeleteUser" href="#"><i
-                                                        class="ri-delete-bin-fill pe-1"></i>Eliminar</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
+                               </div>
                             </div>
                         `);
 
@@ -206,7 +213,7 @@ $.fn.getAllRoles = function () {
 
                             $modulos.find('input[type="checkbox"]').prop('checked', false);
 
-                            const modulosArray = role.modulos ? JSON.parse(role.modulos) : null ;
+                            const modulosArray = role.modulos ? JSON.parse(role.modulos) : null;
                             if (modulosArray) {
                                 console.log('Módulos del rol:', modulosArray);
 
@@ -260,6 +267,6 @@ $.fn.getAllRoles = function () {
     });
 };
 
-$.fn.getAllPlots(); // Llamada inicial para obtener los usuarios al cargar la página
+$.fn.getAllUsers(); // Llamada inicial para obtener los usuarios al cargar la página
 $.fn.getAllRoles(); // Llamada inicial para obtener los roles al cargar la página
 

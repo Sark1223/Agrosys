@@ -287,24 +287,20 @@ function escapeHtml(str) {
     });
 }
 
-$(document).ready(function() {
-    $.fn.getAllWorkers();
+// $(document).ready(function() {
 
-    $('a[data-bs-toggle="tab"][href="#asistencia"]').on('shown.bs.tab', function (e) {
-        var hoy = new Date().toISOString().split('T')[0];
-        $('#attendanceDate').val(hoy);
+//     $('a[data-bs-toggle="tab"][href="#asistencia"]').on('shown.bs.tab', function (e) {
         
-        $.fn.getWorkersForAttendance();
-    });
+//     });
 
-    $('a[data-bs-toggle="tab"][href="#historial"]').on('shown.bs.tab', function (e) {
-        const hoy = new Date().toISOString().split('T')[0];
+//     $('a[data-bs-toggle="tab"][href="#historial"]').on('shown.bs.tab', function (e) {
+//         const hoy = new Date().toISOString().split('T')[0];
     
-    if (!$('#filterStartDate').val()) $('#filterStartDate').val(hoy);
-    if (!$('#filterEndDate').val()) $('#filterEndDate').val(hoy);
-        $.fn.getAttendanceHistory();
-    });
-});
+//     if (!$('#filterStartDate').val()) $('#filterStartDate').val(hoy);
+//     if (!$('#filterEndDate').val()) $('#filterEndDate').val(hoy);
+        
+//     });
+// });
 
 
 // =========================================================================
@@ -522,3 +518,17 @@ $.fn.fillWorkerFilter = function(workers) {
         });
     }
 };
+
+
+    $.fn.getAllWorkers();
+
+var hoy = new Date().toISOString().split('T')[0];
+
+        $('#attendanceDate').val(hoy);
+        $('#filterStartDate').val(hoy);
+        $('#filterEndDate').val(hoy);
+        
+        $.fn.getWorkersForAttendance();
+        $.fn.getAttendanceHistory();
+
+// $.fn.getAllWorkers();

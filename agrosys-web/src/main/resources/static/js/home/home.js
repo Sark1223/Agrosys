@@ -22,7 +22,7 @@ $(document).ready(function () {
                         icon: 'warning', title: 'Asistencia', text: 'Ya se registró la asistencia del día de hoy.'
                     });
                 } else {
-                    window.location.href = '/agrosys/workers';
+                    window.location.href = '/agrosys/workers?tab=asistencia';
                 }
             },
             error: function () {
